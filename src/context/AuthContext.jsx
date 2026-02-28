@@ -65,10 +65,16 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     let mounted = true;
 
-    // Safety: if auth never resolves, stop loading and show login
+    // Safety: if auth never resolves, clear stale session and show login
     const safetyTimeout = setTimeout(() => {
       if (mounted) {
-        console.warn("[Auth] Session check timed out — showing login");
+        console.warn("[Auth] Session check timed out — clearing stale session, showing login");
+        // Clear stale localStorage token that may be blocking the supabase-js client
+        const baseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const ref = baseUrl?.match(/https:\/\/([^.]+)/)?.[1];
+        if (ref) {
+          try { localStorage.removeItem(`sb-${ref}-auth-token`); } catch {}
+        }
         setLoading(false);
       }
     }, 5000);
@@ -139,7 +145,10 @@ export function AuthProvider({ children }) {
     };
   }, [isAuthenticated, resetInactivityTimer]);
 
-  // ---- Login via Supabase Auth ----
+  // ---- Login via direct fetch (bypasses supabase-js init lock) ----
+  // supabase.auth.signInWithPassword() can hang indefinitely when a stale
+  // session causes the internal _initialize() lock to block.  Using fetch()
+  // against the Auth REST API directly — proven to work via curl.
   const login = useCallback(async (username, password) => {
     setAuthError(null);
 
@@ -150,58 +159,110 @@ export function AuthProvider({ children }) {
     }
 
     const email = `${cleanUsername}@${EMAIL_DOMAIN}`;
+    const baseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
     try {
-      // Timeout: if signInWithPassword hangs, fail after 10s
-      const authResult = await Promise.race([
-        supabase.auth.signInWithPassword({ email, password }),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("LOGIN_TIMEOUT")), 10000)
-        ),
-      ]);
+      // Step 1: Authenticate via Auth REST API (10s timeout)
+      const authController = new AbortController();
+      const authTimeout = setTimeout(() => authController.abort(), 10000);
 
-      const { data, error } = authResult;
+      const authRes = await fetch(
+        `${baseUrl}/auth/v1/token?grant_type=password`,
+        {
+          method: "POST",
+          headers: {
+            "apikey": anonKey,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+          signal: authController.signal,
+        }
+      );
+      clearTimeout(authTimeout);
 
-      if (error) {
-        const msg = error.message.includes("Invalid login")
+      if (!authRes.ok) {
+        const errBody = await authRes.json().catch(() => ({}));
+        const msg = (errBody.error_description || errBody.msg || errBody.error || "")
+          .toLowerCase().includes("invalid")
           ? "Usuario o contraseña incorrecta"
-          : error.message;
+          : errBody.error_description || errBody.msg || "Error de autenticación";
         setAuthError(msg);
         return { success: false, error: msg };
       }
 
-      // Load profile (with timeout)
-      const p = await Promise.race([
-        loadProfile(data.user.id),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("PROFILE_TIMEOUT")), 10000)
-        ),
-      ]);
+      const authData = await authRes.json();
+      const { access_token, refresh_token, user: authUser } = authData;
+
+      if (!access_token || !authUser?.id) {
+        setAuthError("Respuesta de autenticación inválida");
+        return { success: false, error: "Respuesta de autenticación inválida" };
+      }
+
+      // Step 2: Load profile via REST API (10s timeout)
+      const profileController = new AbortController();
+      const profileTimeout = setTimeout(() => profileController.abort(), 10000);
+
+      const profileRes = await fetch(
+        `${baseUrl}/rest/v1/profiles?id=eq.${authUser.id}&select=*`,
+        {
+          headers: {
+            "apikey": anonKey,
+            "Authorization": `Bearer ${access_token}`,
+          },
+          signal: profileController.signal,
+        }
+      );
+      clearTimeout(profileTimeout);
+
+      if (!profileRes.ok) {
+        setAuthError("Error cargando perfil");
+        return { success: false, error: "Error cargando perfil" };
+      }
+
+      const profiles = await profileRes.json();
+      const p = profiles?.[0] || null;
 
       if (!p) {
-        await supabase.auth.signOut();
         return { success: false, error: "Perfil de usuario no encontrado" };
       }
 
       if (p.active === false) {
-        await supabase.auth.signOut();
         return { success: false, error: "Tu cuenta está desactivada" };
       }
 
-      setSession(data.session);
+      // Step 3: Hydrate supabase-js client (fire-and-forget)
+      // Clear any stale session from localStorage first
+      const projectRef = baseUrl.match(/https:\/\/([^.]+)/)?.[1];
+      if (projectRef) {
+        try { localStorage.removeItem(`sb-${projectRef}-auth-token`); } catch {}
+      }
+      // setSession hydrates the client so future calls (Edge Functions, etc.) work
+      supabase.auth.setSession({
+        access_token,
+        refresh_token,
+      }).catch(err => console.warn("[Auth] setSession hydration failed (non-fatal):", err));
+
+      // Step 4: Update React state directly
+      const sessionObj = {
+        access_token,
+        refresh_token,
+        user: authUser,
+      };
+      setSession(sessionObj);
       setProfile(p);
       profileFetchRef.current = false;
 
       return { success: true, user: p };
     } catch (err) {
-      const isTimeout = err.message === "LOGIN_TIMEOUT" || err.message === "PROFILE_TIMEOUT";
-      const msg = isTimeout
+      const isAbort = err.name === "AbortError";
+      const msg = isAbort
         ? "El servidor no responde. Intenta de nuevo."
         : "Error de conexión. Intenta de nuevo.";
       setAuthError(msg);
       return { success: false, error: msg };
     }
-  }, [loadProfile]);
+  }, []);
 
   // ---- Logout ----
   const logout = useCallback(async () => {
