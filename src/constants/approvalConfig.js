@@ -36,7 +36,7 @@ export const ESTABLISHMENT_COMPANY = {
 // ---- Gerente de Área por Establecimiento (Step ①) ----
 // username → matches user.username in profiles table
 export const MANAGER_BY_ESTABLISHMENT = {
-  "Ypoti":        "fabiano",
+  "Ypoti":        "paulo",
   "Cerro Memby":  "fabiano",
   "Ybypora":      "fabiano",
   "Cielo Azul":   "mauricio",

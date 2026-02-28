@@ -383,7 +383,7 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
                   {budgetInfo.exceeds ? "⚠ Excede presupuesto" : "✓ Dentro del presupuesto"}
                 </div>
                 <div style={{ fontSize: 10, color: colors.textLight, marginTop: 2 }}>
-                  Presupuesto: {formatGuaranies(budgetInfo.budget.amount)} ({form.establishment} / {form.sector})
+                  Presupuesto: {formatGuaranies(budgetInfo.budget.planned)} ({form.establishment} / {form.sector})
                 </div>
               </div>
             )}

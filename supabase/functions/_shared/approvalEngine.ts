@@ -20,7 +20,7 @@ export const ESTABLISHMENT_COMPANY: Record<string, string> = {
 
 // ---- Gerente de Area por Establecimiento (Step 1) ----
 export const MANAGER_BY_ESTABLISHMENT: Record<string, string> = {
-  "Ypoti": "fabiano",
+  "Ypoti": "paulo",
   "Cerro Memby": "fabiano",
   "Ybypora": "fabiano",
   "Cielo Azul": "mauricio",
