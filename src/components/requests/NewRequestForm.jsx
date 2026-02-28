@@ -4,7 +4,8 @@ import {
   PRIORITY_LEVELS, INVENTORY_ITEMS,
 } from "../../constants";
 import { useAuth } from "../../context/AuthContext";
-import { getEstablishments, getSectors, getProductTypes } from "../../constants/parameters";
+import { useApp } from "../../context/AppContext";
+import { getEstablishments, getSectors, getProductTypes, getSuppliers } from "../../constants/parameters";
 import { calculateApprovalSteps } from "../../constants/approvalConfig";
 import { findBudgetForPR, wouldExceedBudget, formatGuaranies } from "../../constants/budgets";
 import { getUsers } from "../../constants/users";
@@ -15,7 +16,9 @@ const UNITS = ["Unidad", "Litro", "Kg", "Dosis", "Bolsa", "Balde", "Caja", "Roll
 
 export default function NewRequestForm({ onSubmit, onCancel }) {
   const { currentUser } = useAuth();
+  const { requests } = useApp();
   const [step, setStep] = useState(1);
+  const [isCustomSupplier, setIsCustomSupplier] = useState(false);
   const [form, setForm] = useState({
     name: "",
     requester: currentUser?.name || "",
@@ -54,6 +57,29 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
     setErrors({});
     setShowInventory(false);
   };
+
+  // Price history: find last purchase price for the selected product
+  const priceHistory = useMemo(() => {
+    if (!form.name || !requests?.length) return null;
+    const needle = form.name.toLowerCase().trim();
+    // Search through all past requests for items matching this product
+    for (const req of requests) {
+      if (!req.items?.length) continue;
+      for (const item of req.items) {
+        const itemName = (item.name || item.nombre || "").toLowerCase().trim();
+        if (itemName === needle && (item.unitPrice || item.precioUnitario)) {
+          return {
+            unitPrice: item.unitPrice || item.precioUnitario,
+            quantity: item.quantity || item.cantidad || 1,
+            totalPrice: item.totalPrice || (item.unitPrice || item.precioUnitario) * (item.quantity || item.cantidad || 1),
+            date: req.createdAt || req.date,
+            establishment: req.establishment,
+          };
+        }
+      }
+    }
+    return null;
+  }, [form.name, requests]);
 
   // Calculate preview approval info
   const approvalPreview = useMemo(() => {
@@ -367,6 +393,30 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
                   {formatGuaranies(form.totalAmount)}
                 </div>
               )}
+              {/* Price history suggestion */}
+              {priceHistory && !form.totalAmount && (
+                <button
+                  type="button"
+                  onClick={() => update("totalAmount", Math.round(priceHistory.unitPrice * (form.quantity || 1)))}
+                  style={{
+                    marginTop: 6, padding: "6px 10px", borderRadius: radius.md,
+                    background: colors.info + "10", border: `1px solid ${colors.info}25`,
+                    cursor: "pointer", width: "100%", textAlign: "left",
+                    fontFamily: font,
+                  }}
+                >
+                  <div style={{ fontSize: 11, fontWeight: 600, color: colors.info }}>
+                    💡 Precio historico disponible
+                  </div>
+                  <div style={{ fontSize: 10, color: colors.textLight, marginTop: 2 }}>
+                    Ultima compra: {formatGuaranies(priceHistory.unitPrice)}/unidad
+                    {priceHistory.date && ` — ${new Date(priceHistory.date).toLocaleDateString("es-PY")}`}
+                  </div>
+                  <div style={{ fontSize: 10, color: colors.info, marginTop: 2, fontWeight: 500 }}>
+                    Clic para usar: {formatGuaranies(priceHistory.unitPrice * (form.quantity || 1))}
+                  </div>
+                </button>
+              )}
             </div>
 
             {/* Budget indicator */}
@@ -462,12 +512,52 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
 
             <div>
               <label style={labelStyle}>Proveedor Sugerido</label>
-              <input
-                value={form.suggestedSupplier}
-                onChange={e => update("suggestedSupplier", e.target.value)}
-                placeholder="Opcional — nombre del proveedor"
-                style={inputStyle}
-              />
+              {!isCustomSupplier ? (
+                <select
+                  value={form.suggestedSupplier}
+                  onChange={e => {
+                    if (e.target.value === "__custom__") {
+                      setIsCustomSupplier(true);
+                      update("suggestedSupplier", "");
+                    } else {
+                      update("suggestedSupplier", e.target.value);
+                    }
+                  }}
+                  style={inputStyle}
+                >
+                  <option value="">Seleccionar proveedor (opcional)...</option>
+                  {getSuppliers().map(s => (
+                    <option key={s.id} value={s.name}>
+                      {s.name}{s.ruc ? ` (${s.ruc})` : ""}
+                    </option>
+                  ))}
+                  <option value="__custom__">✏ Otro (escribir manualmente)</option>
+                </select>
+              ) : (
+                <div style={{ display: "flex", gap: 6 }}>
+                  <input
+                    value={form.suggestedSupplier}
+                    onChange={e => update("suggestedSupplier", e.target.value)}
+                    placeholder="Nombre del proveedor..."
+                    style={{ ...inputStyle, flex: 1 }}
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsCustomSupplier(false);
+                      update("suggestedSupplier", "");
+                    }}
+                    style={{
+                      background: colors.border, border: "none", cursor: "pointer",
+                      borderRadius: radius.md, padding: "0 10px", fontSize: 11,
+                      color: colors.textLight, fontFamily: font,
+                    }}
+                  >
+                    ✕ Lista
+                  </button>
+                </div>
+              )}
             </div>
 
             <div>
@@ -509,7 +599,7 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
                       }}>
                         {i + 1}
                       </span>
-                      <span style={{ fontWeight: 500 }}>{s.role}:</span>
+                      <span style={{ fontWeight: 500 }}>{s.label}:</span>
                       <span style={{ color: colors.textLight }}>{s.approverName || "Automatico"}</span>
                     </div>
                   ))}
