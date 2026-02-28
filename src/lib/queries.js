@@ -6,6 +6,26 @@
 
 import { supabase } from "./supabase";
 
+// ---- Edge Function helper: ensures JWT is always sent ----
+async function invokeEdgeFunction(functionName, body) {
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session?.access_token) {
+    throw new Error("No hay sesión activa. Por favor, inicia sesión de nuevo.");
+  }
+
+  const { data, error } = await supabase.functions.invoke(functionName, {
+    body,
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+    },
+  });
+
+  if (error) throw new Error(error.message);
+  if (data?.error) throw new Error(data.error);
+  return data;
+}
+
 // ---- Transformers: Supabase (snake_case) -> Frontend (camelCase) ----
 
 function transformRequest(row, items = [], quotations = [], comments = [], steps = [], history = []) {
@@ -197,83 +217,64 @@ export async function fetchSingleRequest(requestUuid) {
 
 /** Insert a new request (status: borrador) + its items */
 export async function insertRequest(req) {
-  const { data, error } = await supabase.functions.invoke("request-mutations", {
-    body: { action: "create", request: req },
+  const data = await invokeEdgeFunction("request-mutations", {
+    action: "create", request: req,
   });
-  if (error) throw new Error(error.message);
-  if (data?.error) throw new Error(data.error);
   return data.requestUuid;
 }
 
 /** Confirm request: server calculates steps, submits for approval */
 export async function confirmRequestInDb(requestUuid) {
-  const { data, error } = await supabase.functions.invoke("request-workflow", {
-    body: { action: "confirm", requestUuid },
+  await invokeEdgeFunction("request-workflow", {
+    action: "confirm", requestUuid,
   });
-  if (error) throw new Error(error.message);
-  if (data?.error) throw new Error(data.error);
 }
 
 /** Approve current step */
 export async function approveStepInDb(requestUuid, comment) {
-  const { data, error } = await supabase.functions.invoke("request-workflow", {
-    body: { action: "approve", requestUuid, comment },
+  return await invokeEdgeFunction("request-workflow", {
+    action: "approve", requestUuid, comment,
   });
-  if (error) throw new Error(error.message);
-  if (data?.error) throw new Error(data.error);
-  return data;
 }
 
 /** Reject request at current step */
 export async function rejectRequestInDb(requestUuid, reason) {
-  const { data, error } = await supabase.functions.invoke("request-workflow", {
-    body: { action: "reject", requestUuid, reason },
+  await invokeEdgeFunction("request-workflow", {
+    action: "reject", requestUuid, reason,
   });
-  if (error) throw new Error(error.message);
-  if (data?.error) throw new Error(data.error);
 }
 
 /** Send request back for revision */
 export async function sendForRevisionInDb(requestUuid, reason) {
-  const { data, error } = await supabase.functions.invoke("request-workflow", {
-    body: { action: "revision", requestUuid, reason },
+  await invokeEdgeFunction("request-workflow", {
+    action: "revision", requestUuid, reason,
   });
-  if (error) throw new Error(error.message);
-  if (data?.error) throw new Error(data.error);
 }
 
 /** Advance request status to next step in STATUS_FLOW */
 export async function advanceStatusInDb(requestUuid, newStatus) {
-  const { data, error } = await supabase.functions.invoke("request-workflow", {
-    body: { action: "advance", requestUuid, newStatus },
+  await invokeEdgeFunction("request-workflow", {
+    action: "advance", requestUuid, newStatus,
   });
-  if (error) throw new Error(error.message);
-  if (data?.error) throw new Error(data.error);
 }
 
 /** Update request fields */
 export async function updateRequestInDb(requestUuid, updates) {
-  const { data, error } = await supabase.functions.invoke("request-mutations", {
-    body: { action: "update", requestUuid, updates },
+  await invokeEdgeFunction("request-mutations", {
+    action: "update", requestUuid, updates,
   });
-  if (error) throw new Error(error.message);
-  if (data?.error) throw new Error(data.error);
 }
 
 /** Add a comment to a request */
 export async function addCommentInDb(requestUuid, texto) {
-  const { data, error } = await supabase.functions.invoke("request-mutations", {
-    body: { action: "add-comment", requestUuid, texto },
+  await invokeEdgeFunction("request-mutations", {
+    action: "add-comment", requestUuid, texto,
   });
-  if (error) throw new Error(error.message);
-  if (data?.error) throw new Error(data.error);
 }
 
 /** Add a quotation to a request */
 export async function addQuotationInDb(requestUuid, quotation) {
-  const { data, error } = await supabase.functions.invoke("request-mutations", {
-    body: { action: "add-quotation", requestUuid, quotation },
+  await invokeEdgeFunction("request-mutations", {
+    action: "add-quotation", requestUuid, quotation,
   });
-  if (error) throw new Error(error.message);
-  if (data?.error) throw new Error(data.error);
 }

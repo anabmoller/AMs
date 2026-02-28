@@ -59,43 +59,44 @@ export function AuthProvider({ children }) {
     return data;
   }, []);
 
-  // ---- Initialize: check existing Supabase session ----
+  // ---- Initialize: listen for auth state changes ----
+  // Uses INITIAL_SESSION event (supabase-js v2.39+) instead of getSession()
+  // which can hang if token refresh stalls during client initialization.
   useEffect(() => {
     let mounted = true;
 
-    async function init() {
-      try {
-        const { data: { session: existingSession } } = await supabase.auth.getSession();
-
-        if (existingSession?.user && mounted) {
-          setSession(existingSession);
-          const p = await loadProfile(existingSession.user.id);
-          if (mounted && p) {
-            setProfile(p);
-          }
-        }
-      } catch (err) {
-        console.error("[Auth] Init error:", err);
-      } finally {
-        if (mounted) setLoading(false);
+    // Safety: if auth never resolves, stop loading and show login
+    const safetyTimeout = setTimeout(() => {
+      if (mounted) {
+        console.warn("[Auth] Session check timed out — showing login");
+        setLoading(false);
       }
-    }
+    }, 5000);
 
-    init();
-
-    // Listen for auth state changes (login, logout, token refresh)
+    // Single listener handles everything: initial session + subsequent changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, newSession) => {
         if (!mounted) return;
 
-        if (event === "SIGNED_IN" && newSession?.user) {
-          setSession(newSession);
-          // Only fetch profile if we don't already have it (avoid double-fetch on login)
-          if (!profileFetchRef.current) {
-            profileFetchRef.current = true;
-            const p = await loadProfile(newSession.user.id);
-            if (mounted && p) setProfile(p);
-            profileFetchRef.current = false;
+        if (event === "INITIAL_SESSION" || event === "SIGNED_IN") {
+          if (newSession?.user) {
+            setSession(newSession);
+            if (!profileFetchRef.current) {
+              profileFetchRef.current = true;
+              try {
+                const p = await loadProfile(newSession.user.id);
+                if (mounted && p) setProfile(p);
+              } catch (err) {
+                console.error("[Auth] Profile load failed:", err);
+              } finally {
+                profileFetchRef.current = false;
+              }
+            }
+          }
+          // Resolve loading after initial session (whether or not there's a user)
+          if (event === "INITIAL_SESSION" && mounted) {
+            setLoading(false);
+            clearTimeout(safetyTimeout);
           }
         } else if (event === "SIGNED_OUT") {
           setSession(null);
@@ -109,6 +110,7 @@ export function AuthProvider({ children }) {
     return () => {
       mounted = false;
       subscription?.unsubscribe();
+      clearTimeout(safetyTimeout);
     };
   }, [loadProfile]);
 
