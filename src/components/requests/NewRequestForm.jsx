@@ -526,11 +526,35 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
                   style={inputStyle}
                 >
                   <option value="">Seleccionar proveedor (opcional)...</option>
-                  {getSuppliers().map(s => (
-                    <option key={s.id} value={s.name}>
-                      {s.name}{s.ruc ? ` (${s.ruc})` : ""}
-                    </option>
-                  ))}
+                  {(() => {
+                    const suppliers = getSuppliers();
+                    const productType = (form.type || "").toLowerCase();
+                    // Sort: suppliers whose category matches product type first
+                    const sorted = [...suppliers].sort((a, b) => {
+                      const aCat = (a.category || "").toLowerCase();
+                      const bCat = (b.category || "").toLowerCase();
+                      const aMatch = productType && aCat.includes(productType) ? 0 : 1;
+                      const bMatch = productType && bCat.includes(productType) ? 0 : 1;
+                      if (aMatch !== bMatch) return aMatch - bMatch;
+                      return (a.name || "").localeCompare(b.name || "");
+                    });
+                    // Group with separator if there are matching suppliers
+                    const matching = sorted.filter(s => productType && (s.category || "").toLowerCase().includes(productType));
+                    const rest = sorted.filter(s => !productType || !(s.category || "").toLowerCase().includes(productType));
+                    return (
+                      <>
+                        {matching.map(s => (
+                          <option key={s.id} value={s.name}>{s.name} — {s.category}</option>
+                        ))}
+                        {matching.length > 0 && rest.length > 0 && (
+                          <option disabled>── Otros proveedores ──</option>
+                        )}
+                        {rest.map(s => (
+                          <option key={s.id} value={s.name}>{s.name}</option>
+                        ))}
+                      </>
+                    );
+                  })()}
                   <option value="__custom__">✏ Otro (escribir manualmente)</option>
                 </select>
               ) : (
@@ -611,19 +635,6 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
               )}
             </div>
 
-            {/* Assignee */}
-            <div>
-              <label style={labelStyle}>Asignar cotizacion a</label>
-              <select
-                value={form.assignee}
-                onChange={e => update("assignee", e.target.value)}
-                style={inputStyle}
-              >
-                <option value="">Seleccionar (opcional)...</option>
-                {getUsers().filter(u => u.active && ["comprador", "admin"].includes(u.role)).map(u => <option key={u.username} value={u.name}>{u.name}</option>)}
-              </select>
-            </div>
-
             {/* Summary */}
             <div style={{
               background: colors.surface, borderRadius: radius.xl, padding: 16,
@@ -651,7 +662,6 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
               {form.purpose && <SummaryRow label="Uso" value={form.purpose} />}
               {form.equipment && <SummaryRow label="Equipo" value={form.equipment} />}
               {form.suggestedSupplier && <SummaryRow label="Proveedor" value={form.suggestedSupplier} />}
-              {form.assignee && <SummaryRow label="Asignado" value={form.assignee} />}
             </div>
 
             {/* Budget warning */}

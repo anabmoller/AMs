@@ -1,9 +1,10 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { colors, font, fontDisplay, inputStyle, labelStyle, shadows, radius } from "../../styles/theme";
 import {
   getParameters, addParameterItem, updateParameterItem,
   toggleParameterItem, initParameters,
 } from "../../constants/parameters";
+import { getUsers } from "../../constants/users";
 
 const TABS = [
   { key: "establishments", label: "Establecimientos", icon: "\u{1F4CD}" },
@@ -254,36 +255,47 @@ export default function ParametersScreen({ onBack }) {
 
 // ---- Dynamic Form based on tab ----
 function ParameterForm({ tab, item, onSave, onCancel, saving }) {
+  // Build user options for role-based dropdowns
+  const usersByRole = useMemo(() => {
+    const users = getUsers().filter(u => u.active);
+    return {
+      gerente: users.filter(u => ["gerente", "admin"].includes(u.role))
+        .map(u => ({ value: u.username, label: `${u.name} (${u.username})` })),
+      diretoria: users.filter(u => ["diretoria", "admin"].includes(u.role))
+        .map(u => ({ value: u.username, label: `${u.name} (${u.username})` })),
+    };
+  }, []);
+
   const FIELDS = {
     establishments: [
       { key: "name", label: "Nombre", required: true },
-      { key: "code", label: "C\u00F3digo", required: true },
+      { key: "code", label: "Código", required: true },
       { key: "company", label: "Empresa" },
-      { key: "manager", label: "Gerente Responsable" },
-      { key: "location", label: "Ubicaci\u00F3n" },
+      { key: "manager", label: "Gerente Responsable", type: "user_select", roleFilter: "gerente" },
+      { key: "location", label: "Ubicación" },
     ],
     sectors: [
       { key: "name", label: "Nombre", required: true },
-      { key: "icon", label: "\u00CDcono (emoji)" },
-      { key: "description", label: "Descripci\u00F3n" },
+      { key: "icon", label: "Ícono (emoji)" },
+      { key: "description", label: "Descripción" },
     ],
     productTypes: [
       { key: "name", label: "Nombre", required: true },
-      { key: "icon", label: "\u00CDcono (emoji)" },
-      { key: "description", label: "Descripci\u00F3n" },
+      { key: "icon", label: "Ícono (emoji)" },
+      { key: "description", label: "Descripción" },
     ],
     suppliers: [
-      { key: "name", label: "Nombre / Raz\u00F3n Social", required: true },
+      { key: "name", label: "Nombre / Razón Social", required: true },
       { key: "ruc", label: "RUC" },
-      { key: "phone", label: "Tel\u00E9fono" },
+      { key: "phone", label: "Teléfono" },
       { key: "email", label: "Email" },
-      { key: "category", label: "Categor\u00EDa" },
+      { key: "category", label: "Categoría" },
     ],
     companies: [
       { key: "name", label: "Nombre", required: true },
       { key: "ruc", label: "RUC" },
       { key: "type", label: "Tipo", type: "select", options: ["empresa", "persona_fisica"] },
-      { key: "director", label: "Director" },
+      { key: "director", label: "Director", type: "user_select", roleFilter: "diretoria" },
     ],
   };
 
@@ -322,6 +334,18 @@ function ParameterForm({ tab, item, onSave, onCancel, saving }) {
               >
                 <option value="">Seleccionar...</option>
                 {f.options.map(o => <option key={o} value={o}>{o}</option>)}
+              </select>
+            ) : f.type === "user_select" ? (
+              <select
+                value={form[f.key] || ""}
+                onChange={e => setForm(prev => ({ ...prev, [f.key]: e.target.value }))}
+                disabled={saving}
+                style={{ ...inputStyle, padding: "10px 12px", fontSize: 13 }}
+              >
+                <option value="">Seleccionar usuario...</option>
+                {(usersByRole[f.roleFilter] || []).map(u => (
+                  <option key={u.value} value={u.value}>{u.label}</option>
+                ))}
               </select>
             ) : (
               <input
