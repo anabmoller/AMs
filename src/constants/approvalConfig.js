@@ -88,6 +88,7 @@ export const OVERBUDGET_APPROVER = "ana.moller";
 
 // ---- Veterinaria/Farmacia special approver (R5) ----
 export const VET_APPROVER = "rodrigo.ferreira";
+export const VET_APPROVER_2 = "paulo";
 export const VET_SECTORS = ["Veterinária", "Farmacia", "Veterinaria"];
 
 // ---- Super-Approvers: can approve any step up to their limit ----
@@ -156,7 +157,7 @@ export function calculateApprovalSteps(pr, users = []) {
   const company = ESTABLISHMENT_COMPANY[pr.establishment] || "Rural Bioenergia S.A.";
   const isVetSector = VET_SECTORS.includes(pr.sector);
 
-  // ---- R5: Veterinaria/Farmacia → Rodrigo first ----
+  // ---- R5: Veterinaria/Farmacia → Rodrigo first, then Paulo confirmation ----
   if (isVetSector) {
     const vetUser = resolveUser(VET_APPROVER);
     steps.push({
@@ -164,6 +165,18 @@ export function calculateApprovalSteps(pr, users = []) {
       label: "Especialista Veterinario",
       approverUsername: VET_APPROVER,
       approverName: vetUser?.name || "Rodrigo Ferreira",
+      sla: isEmergency ? SLA.MANAGER_EMERGENCY : SLA.MANAGER_NORMAL,
+      conditional: false,
+      status: STEP_STATUS.PENDING,
+      approvedAt: null,
+      approvedBy: null,
+    });
+    const vet2User = resolveUser(VET_APPROVER_2);
+    steps.push({
+      type: STEP_TYPES.VET,
+      label: "Confirmación Vet — Gerente",
+      approverUsername: VET_APPROVER_2,
+      approverName: vet2User?.name || displayName(VET_APPROVER_2),
       sla: isEmergency ? SLA.MANAGER_EMERGENCY : SLA.MANAGER_NORMAL,
       conditional: false,
       status: STEP_STATUS.PENDING,

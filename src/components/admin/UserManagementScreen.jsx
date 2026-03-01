@@ -87,7 +87,13 @@ export default function UserManagementScreen({ onBack }) {
       await addNewUser(data);
       setShowAddForm(false);
     } catch (err) {
-      setActionError(err.message || "Error al crear usuario");
+      const msg = err.message || "";
+      if (msg.toLowerCase().includes("already") || msg.toLowerCase().includes("registered") || msg.toLowerCase().includes("existe") || msg.toLowerCase().includes("duplicate")) {
+        setActionError("Este usuario ya fue registrado. Verifica el nombre de usuario e intenta de nuevo.");
+      } else {
+        setActionError(msg || "Error al crear usuario");
+      }
+      // Keep modal open so user can fix the issue
     } finally {
       setActionLoading(false);
     }

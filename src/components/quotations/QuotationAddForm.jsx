@@ -187,6 +187,19 @@ export default function QuotationAddForm({ items, currency: initCurrency, onAdd,
                     {((it.quantity || it.cantidad || 0) * parseFloat(itemPrices[idx])).toLocaleString()}
                   </div>
                 )}
+                {/* R7: Price deviation warning vs catalog average */}
+                {(() => {
+                  const entered = parseFloat(itemPrices[idx]);
+                  const avg = it._catalogRef?.ap || it.ap || 0;
+                  if (!entered || !avg) return null;
+                  const pct = ((entered - avg) / avg) * 100;
+                  if (pct > 5) return (
+                    <div className="w-full text-[10px] text-amber-400 font-medium px-3 pb-1">
+                      ⚠ Precio {pct.toFixed(0)}% sobre promedio catálogo ({avg.toLocaleString()})
+                    </div>
+                  );
+                  return null;
+                })()}
               </div>
             )) : (
               <div className="px-3 py-3 text-xs text-slate-400 text-center">Sin items en la solicitud</div>

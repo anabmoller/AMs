@@ -446,10 +446,17 @@ export async function shareViaWhatsApp(request, usdRate = 7800) {
     // Fallback below
   }
 
-  // Fallback: download PDF first, then open WhatsApp with message
+  // Fallback: download PDF first, then open WhatsApp with clean message
   downloadRequestPDF(request, usdRate);
   setTimeout(() => {
-    const msg = `${text}\n(PDF descargado, adjuntar en la conversación)`;
+    const statusLabel = request.status || "borrador";
+    const msg = [
+      `*${request.id}*`,
+      `Establecimiento: ${request.establishment || "—"}`,
+      `Items: ${productNames}${extra}`,
+      `Total: ${totalStr}`,
+      `Estado: ${statusLabel}`,
+    ].join("\n");
     const encoded = encodeURIComponent(msg);
     window.open(`https://wa.me/?text=${encoded}`, "_blank");
   }, 500);

@@ -3,7 +3,7 @@ import BackButton from "../common/BackButton";
 import PageHeader from "../common/PageHeader";
 import {
   MANAGER_MAP, COMPANY_MAP, PRESIDENT_MAP, ESTABLISHMENT_COMPANY,
-  COMPANIES, THRESHOLDS, SLA, OVERBUDGET_APPROVER, VET_APPROVER, VET_SECTORS,
+  COMPANIES, THRESHOLDS, SLA, OVERBUDGET_APPROVER, VET_APPROVER, VET_APPROVER_2, VET_SECTORS,
   USER_DISPLAY_NAMES,
 } from "../../constants/approvalConfig";
 import { formatGuaranies } from "../../constants/budgets";
@@ -170,7 +170,10 @@ export default function ApprovalConfigScreen({ onBack }) {
               Solicitudes de sectores veterinarios requieren autorización previa del especialista.
             </div>
             <div className="text-[11px] text-slate-400">
-              Aprobador: <strong>{VET_APPROVER}</strong>
+              Aprobador 1: <strong>{VET_APPROVER}</strong> (Especialista)
+            </div>
+            <div className="text-[11px] text-slate-400">
+              Aprobador 2: <strong>{VET_APPROVER_2}</strong> (Confirmación Gerente)
             </div>
             <div className="text-[11px] text-slate-400">
               Sectores: {VET_SECTORS.join(", ")}
@@ -199,6 +202,7 @@ export default function ApprovalConfigScreen({ onBack }) {
             { id: "R4", desc: "Emergencias: SLA reducido (Gerente 4h, Director 8h)", color: "#6366f1" },
             { id: "R5", desc: "Sectores Vet/Farmacia requieren autorización de especialista", color: "#7c6bb5" },
             { id: "R6", desc: "Exceso de presupuesto activa paso de aprobación overbudget", color: "#ef4444" },
+            { id: "R7", desc: "Alerta si precio unitario ingresado supera >5% el precio promedio del catálogo", color: "#f59e0b" },
           ].map(rule => (
             <div key={rule.id} className="flex gap-2.5 py-2.5 border-b border-white/[0.06]">
               <span
