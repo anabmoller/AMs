@@ -6,7 +6,7 @@
 // FIX v4: More robust token retrieval with clear error messages
 // ============================================================
 
-import { supabase, supabaseUrl, supabaseAnonKey, getStoredToken } from "./supabase";
+import { supabase, supabaseUrl, supabaseAnonKey, getStoredToken, setStoredToken } from "./supabase";
 
 // ---- Edge Function helper: direct fetch, no supabase-js dependency ----
 async function invokeEdgeFunction(functionName, body) {
@@ -23,7 +23,6 @@ async function invokeEdgeFunction(functionName, body) {
       token = result?.data?.session?.access_token;
       // If we got it from supabase-js, also update the store for next time
       if (token) {
-        const { setStoredToken } = await import("./supabase");
         setStoredToken(token);
       }
     } catch {
@@ -108,7 +107,6 @@ async function tryRefreshToken() {
     if (error || !data?.session?.access_token) return null;
 
     const newToken = data.session.access_token;
-    const { setStoredToken } = await import("./supabase");
     setStoredToken(newToken);
     return newToken;
   } catch {
@@ -118,6 +116,11 @@ async function tryRefreshToken() {
 
 // ---- Transformers: Supabase (snake_case) -> Frontend (camelCase) ----
 
+// Strip "building " prefix from establishment/sector names (DB cleanup)
+function cleanName(name) {
+  return (name || "").replace(/^(building|office)\s+/i, "");
+}
+
 function transformRequest(row, items = [], quotations = [], comments = [], steps = [], history = []) {
   return {
     id: row.request_number,
@@ -126,9 +129,9 @@ function transformRequest(row, items = [], quotations = [], comments = [], steps
     requester: row.requester,
     createdBy: row.created_by_name || "",
     createdById: row.created_by,
-    establishment: row.establishment,
+    establishment: cleanName(row.establishment),
     company: row.company,
-    sector: row.sector,
+    sector: cleanName(row.sector),
     type: row.type,
     priority: row.priority,
     status: row.status,
@@ -237,12 +240,12 @@ function groupBy(arr, key) {
 
 export async function fetchAllRequests() {
   const [reqRes, itemsRes, quotRes, commRes, stepsRes, histRes] = await Promise.all([
-    supabase.from("requests").select("*").order("created_at", { ascending: false }),
-    supabase.from("request_items").select("*"),
-    supabase.from("quotations").select("*"),
-    supabase.from("comments").select("*").order("created_at", { ascending: true }),
-    supabase.from("approval_steps").select("*").order("step_order", { ascending: true }),
-    supabase.from("approval_history").select("*").order("created_at", { ascending: true }),
+    supabase.from("requests").select("*").order("created_at", { ascending: false }).limit(500),
+    supabase.from("request_items").select("*").limit(500),
+    supabase.from("quotations").select("*").limit(500),
+    supabase.from("comments").select("*").order("created_at", { ascending: true }).limit(500),
+    supabase.from("approval_steps").select("*").order("step_order", { ascending: true }).limit(500),
+    supabase.from("approval_history").select("*").order("created_at", { ascending: true }).limit(500),
   ]);
 
   if (reqRes.error) {

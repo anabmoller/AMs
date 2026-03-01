@@ -1,8 +1,11 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo } from "react";
 import { getEstablishments } from "../../constants/parameters";
 import { useAuth } from "../../context/AuthContext";
 import { ROLES } from "../../constants/users";
 import BackButton from "../common/BackButton";
+import UserCard from "./UserCard";
+import UserFormModal from "./UserFormModal";
+import ConfirmModal from "./ConfirmModal";
 
 // ============================================================
 // YPOTI — User Management Screen (Supabase Backend)
@@ -228,6 +231,7 @@ export default function UserManagementScreen({ onBack }) {
           user={editingUser}
           title="Editar Usuario"
           establishments={establishments}
+          existingNames={users.map(u => u.name)}
           loading={actionLoading}
           onSave={handleEditSave}
           onResetPassword={() => handleResetPassword(editingUser.id)}
@@ -241,6 +245,7 @@ export default function UserManagementScreen({ onBack }) {
           user={null}
           title="Nuevo Usuario"
           establishments={establishments}
+          existingNames={users.map(u => u.name)}
           loading={actionLoading}
           onSave={handleAddSave}
           onClose={() => setShowAddForm(false)}
@@ -257,277 +262,6 @@ export default function UserManagementScreen({ onBack }) {
           onCancel={() => setShowResetConfirm(false)}
         />
       )}
-    </div>
-  );
-}
-
-// ---- User Card ----
-function UserCard({ user, onEdit, onToggleActive, disabled }) {
-  const role = ROLES[user.role];
-  const isActive = user.active !== false;
-
-  return (
-    <div
-      className={`bg-white/[0.03] rounded-xl px-3.5 py-3 border border-white/[0.06] flex items-center gap-3 transition-opacity duration-200 ${isActive ? 'opacity-100' : 'opacity-50'}`}
-    >
-      {/* Avatar */}
-      <div
-        className="w-[38px] h-[38px] rounded-lg flex-shrink-0 flex items-center justify-center text-white font-bold text-[13px]"
-        style={{ background: `linear-gradient(135deg, ${role?.color || '#10b981'} 0%, ${role?.color || '#10b981'}cc 100%)` }}
-      >
-        {user.avatar || user.name.charAt(0)}
-      </div>
-
-      {/* Info */}
-      <div className="flex-1 min-w-0 overflow-hidden">
-        <div className="text-sm font-semibold text-white whitespace-nowrap overflow-hidden text-ellipsis">
-          {user.name}
-        </div>
-        <div className="text-[11px] text-slate-400 whitespace-nowrap overflow-hidden text-ellipsis">
-          @{user.email || user.username} · {user.position || "—"} · {user.establishment}
-        </div>
-      </div>
-
-      {/* Role badge */}
-      <div
-        className="text-[10px] font-semibold px-2 py-0.5 rounded whitespace-nowrap flex-shrink-0"
-        style={{
-          background: (role?.color || '#10b981') + "15",
-          color: role?.color || '#10b981',
-        }}
-      >
-        {role?.label || user.role}
-      </div>
-
-      {/* Actions */}
-      <div className="flex gap-1 flex-shrink-0">
-        <button
-          onClick={onEdit}
-          disabled={disabled}
-          className="w-8 h-8 rounded-lg border-none bg-white/[0.02] cursor-pointer flex items-center justify-center text-sm"
-          title="Editar"
-        >
-          ✏
-        </button>
-        <button
-          onClick={onToggleActive}
-          disabled={disabled}
-          className={`w-8 h-8 rounded-lg border-none cursor-pointer flex items-center justify-center text-sm ${isActive ? 'bg-red-500/[0.06]' : 'bg-green-500/[0.06]'}`}
-          title={isActive ? "Desactivar" : "Activar"}
-        >
-          {isActive ? "🚫" : "✅"}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ---- User Form Modal ----
-function UserFormModal({ user, title, establishments, loading, onSave, onResetPassword, onClose }) {
-  const isEditing = !!user;
-  const [form, setForm] = useState({
-    name: user?.name || "",
-    email: user?.email || user?.username || "",
-    role: user?.role || "solicitante",
-    establishment: user?.establishment || "General",
-    position: user?.position || "",
-    avatar: user?.avatar || "",
-  });
-  const [error, setError] = useState("");
-
-  const handleSave = () => {
-    if (!form.name.trim()) { setError("Nombre es obligatorio"); return; }
-    if (!isEditing && !form.email.trim()) { setError("Usuario es obligatorio"); return; }
-
-    const parts = form.name.trim().split(/\s+/);
-    const avatar = form.avatar || (parts[0]?.charAt(0) + (parts[1]?.charAt(0) || "")).toUpperCase();
-
-    const saveData = {
-      name: form.name.trim(),
-      role: form.role,
-      establishment: form.establishment,
-      position: form.position,
-      avatar,
-    };
-
-    if (!isEditing) {
-      saveData.email = form.email.trim();
-    }
-
-    onSave(saveData);
-  };
-
-  const set = (key, val) => { setForm(f => ({ ...f, [key]: val })); setError(""); };
-
-  return (
-    <div
-      className="fixed inset-0 bg-black/40 flex items-center justify-center z-[1000] p-4"
-      onClick={onClose}
-    >
-      <div
-        className="bg-[#111218] rounded-2xl p-6 w-full max-w-[440px] max-h-[90vh] overflow-auto shadow-2xl"
-        onClick={e => e.stopPropagation()}
-      >
-        <h3 className="text-xl font-semibold text-white mb-5 mt-0">
-          {title}
-        </h3>
-
-        <div className="flex flex-col gap-4">
-          {/* Name */}
-          <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide">Nombre completo *</label>
-            <input
-              value={form.name}
-              onChange={e => set("name", e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-emerald-500/50 h-[42px]"
-              placeholder="Ej: Juan Rodriguez"
-            />
-          </div>
-
-          {/* Username (only for new users) */}
-          {!isEditing && (
-            <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide">Usuario (login) *</label>
-              <input
-                value={form.email}
-                onChange={e => set("email", e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-emerald-500/50 h-[42px]"
-                placeholder="Ej: juan.rodriguez"
-                autoCapitalize="none"
-                autoCorrect="off"
-              />
-              <div className="text-[11px] text-slate-400 mt-1">
-                La contraseña por defecto será "ypoti2026" — el usuario deberá cambiarla al primer inicio de sesión.
-              </div>
-            </div>
-          )}
-
-          {isEditing && (
-            <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide">Usuario (login)</label>
-              <div className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.02] text-sm text-slate-500 h-[42px] flex items-center">
-                @{user.email || user.username}
-              </div>
-            </div>
-          )}
-
-          {/* Role */}
-          <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide">Rol *</label>
-            <select
-              value={form.role}
-              onChange={e => set("role", e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-emerald-500/50 h-[42px] cursor-pointer"
-            >
-              {Object.entries(ROLES).map(([key, role]) => (
-                <option key={key} value={key}>{role.label} — {role.description}</option>
-              ))}
-            </select>
-            <div className="text-[11px] text-slate-400 mt-1">
-              {ROLES[form.role]?.description}
-            </div>
-          </div>
-
-          {/* Establishment */}
-          <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide">Establecimiento</label>
-            <select
-              value={form.establishment}
-              onChange={e => set("establishment", e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-emerald-500/50 h-[42px] cursor-pointer"
-            >
-              <option value="">Sin asignar</option>
-              {establishments.map(e => <option key={e} value={e}>{e}</option>)}
-            </select>
-          </div>
-
-          {/* Position */}
-          <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide">Cargo / Posicion</label>
-            <input
-              value={form.position}
-              onChange={e => set("position", e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-emerald-500/50 h-[42px]"
-              placeholder="Ej: Capataz, Tractorista..."
-            />
-          </div>
-
-          {/* Reset password button (only for editing) */}
-          {isEditing && onResetPassword && (
-            <button
-              onClick={onResetPassword}
-              disabled={loading}
-              className={`px-3.5 py-2.5 rounded-lg border border-amber-500/[0.19] bg-amber-500/[0.05] text-amber-400 text-xs font-semibold text-center ${loading ? 'cursor-default' : 'cursor-pointer'}`}
-            >
-              {loading ? "Reseteando..." : "Resetear contraseña a valor por defecto"}
-            </button>
-          )}
-
-          {/* Error */}
-          {error && (
-            <div className="bg-red-500/[0.06] border border-red-300/20 rounded-lg px-3 py-2 text-[13px] text-red-400 font-medium">
-              {error}
-            </div>
-          )}
-
-          {/* Actions */}
-          <div className="flex gap-2.5 mt-1">
-            <button
-              onClick={onClose}
-              className="flex-1 py-3 rounded-xl border border-white/[0.06] bg-transparent text-white text-sm font-medium cursor-pointer"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={loading}
-              className={`flex-1 py-3 rounded-xl border-none text-sm font-semibold ${
-                loading
-                  ? 'bg-slate-500 text-white cursor-default'
-                  : 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white cursor-pointer shadow-md shadow-emerald-500/20'
-              }`}
-            >
-              {loading ? "Guardando..." : "Guardar"}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ---- Confirm Modal ----
-function ConfirmModal({ title, message, confirmLabel = "Confirmar", onConfirm, onCancel }) {
-  return (
-    <div
-      className="fixed inset-0 bg-black/40 flex items-center justify-center z-[1000] p-4"
-      onClick={onCancel}
-    >
-      <div
-        className="bg-[#111218] rounded-2xl p-6 w-full max-w-[360px] shadow-2xl"
-        onClick={e => e.stopPropagation()}
-      >
-        <h3 className="text-[17px] font-semibold text-white mb-2 mt-0">
-          {title}
-        </h3>
-        <p className="text-[13px] text-slate-400 mb-5 mt-0 leading-relaxed">
-          {message}
-        </p>
-        <div className="flex gap-2.5">
-          <button
-            onClick={onCancel}
-            className="flex-1 py-3 rounded-xl border border-white/[0.06] bg-transparent text-white text-sm font-medium cursor-pointer"
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={onConfirm}
-            className="flex-1 py-3 rounded-xl border-none bg-emerald-500 text-white text-sm font-semibold cursor-pointer"
-          >
-            {confirmLabel}
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

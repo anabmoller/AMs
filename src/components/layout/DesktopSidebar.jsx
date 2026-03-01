@@ -1,12 +1,22 @@
 /**
- * Desktop sidebar navigation — dark mode
+ * Desktop sidebar navigation — dark mode, with theme toggle
  */
-export default function DesktopSidebar({ screen, onNavigate, onNewRequest, currentUser, canViewAnalytics, canManageUsers }) {
+import { useTheme } from "../../context/ThemeContext";
+import { useNotifications } from "../../context/NotificationContext";
+import { useAuth } from "../../context/AuthContext";
+import NotificationBell from "../shared/NotificationBell";
+
+export default function DesktopSidebar({ screen, onNavigate, onNewRequest, currentUser, canViewAnalytics, canManageUsers, usdRate, usdLive, onRefreshRate }) {
+  const { theme, toggleTheme } = useTheme();
+  const { getVisibleNotifications } = useNotifications();
+  const auth = useAuth();
+  const unreadCount = getVisibleNotifications(auth.currentUser?.name, auth.currentUser?.role).filter(n => !n.read).length;
+
   const mainItems = [
     { key: 'dashboard', icon: '📋', label: 'Solicitudes' },
+    { key: 'notifications', icon: '🔔', label: 'Notificaciones', badge: unreadCount || null },
     { key: 'inventory', icon: '📦', label: 'Inventario' },
     ...(canViewAnalytics ? [{ key: 'analytics', icon: '📊', label: 'Análisis' }] : []),
-    ...(canViewAnalytics ? [{ key: 'analysis', icon: '📈', label: 'Análisis Pro' }] : []),
     ...(canManageUsers ? [{ key: 'security', icon: '🛡️', label: 'Seguridad' }] : []),
   ];
 
@@ -21,8 +31,11 @@ export default function DesktopSidebar({ screen, onNavigate, onNewRequest, curre
 
   return (
     <aside className="desktop-sidebar bg-[#0d0e14]">
-      {/* Brand */}
-      <div className="px-5 pt-5 pb-4 border-b border-white/[0.06] flex items-center gap-2.5">
+      {/* Brand — clickable to go to Solicitudes */}
+      <div
+        onClick={() => onNavigate('dashboard')}
+        className="px-5 pt-5 pb-4 border-b border-white/[0.06] flex items-center gap-2.5 cursor-pointer hover:opacity-80 transition-opacity"
+      >
         <div className="w-9 h-9 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold text-base">
           Y
         </div>
@@ -32,14 +45,29 @@ export default function DesktopSidebar({ screen, onNavigate, onNewRequest, curre
         </div>
       </div>
 
-      {/* User card */}
-      <div className="mx-3 mt-3 mb-1 px-3 py-2.5 bg-[rgba(255,255,255,0.04)] rounded-lg border border-white/[0.06] flex items-center gap-2.5">
+      {/* User card — clickable to profile */}
+      <div
+        onClick={() => onNavigate('profile')}
+        className="mx-3 mt-3 mb-1 px-3 py-2.5 bg-[rgba(255,255,255,0.04)] rounded-lg border border-white/[0.06] flex items-center gap-2.5 cursor-pointer hover:bg-[rgba(255,255,255,0.07)] transition-colors"
+      >
         <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400 font-semibold text-xs">
           {initial}
         </div>
-        <div className="text-sm font-medium text-white truncate">
+        <div className="text-sm font-medium text-white truncate flex-1">
           {currentUser}
         </div>
+        {/* Notification bell */}
+        <div onClick={(e) => e.stopPropagation()}>
+          <NotificationBell onNavigate={onNavigate} />
+        </div>
+        {/* Theme toggle */}
+        <button
+          onClick={(e) => { e.stopPropagation(); toggleTheme(); }}
+          className="w-7 h-7 rounded-md bg-white/[0.06] border-none cursor-pointer flex items-center justify-center text-sm hover:bg-white/[0.12] transition-colors"
+          title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
+        >
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </button>
       </div>
 
       {/* Navigation */}
@@ -64,10 +92,15 @@ export default function DesktopSidebar({ screen, onNavigate, onNewRequest, curre
           active={screen === 'settings'}
           onClick={() => onNavigate('settings')}
         />
+        <NavItem
+          item={{ key: 'help', icon: '💬', label: 'Ayuda' }}
+          active={false}
+          onClick={() => window.open('https://wa.me/595986354781?text=Hola%2C%20necesito%20ayuda%20con%20YPOTI%20Compras', '_blank')}
+        />
       </nav>
 
       {/* New request button */}
-      <div className="px-4 pb-5 pt-3">
+      <div className="px-4 pb-3 pt-3">
         <button
           onClick={onNewRequest}
           className="w-full py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold flex items-center justify-center gap-1.5 transition-colors border-none cursor-pointer"
@@ -78,6 +111,42 @@ export default function DesktopSidebar({ screen, onNavigate, onNewRequest, curre
           </svg>
           Nueva Solicitud
         </button>
+      </div>
+
+      {/* USD Rate */}
+      {usdRate && (
+        <div className="px-5 pb-2 pt-1 flex items-center gap-1.5">
+          <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${usdLive ? 'bg-green-500' : 'bg-slate-500'}`} />
+          <span className="text-[10px] text-slate-500 flex-1">
+            TC: 1 USD = Gs {Number(usdRate).toLocaleString("es-PY")} {usdLive ? "(live)" : "(offline)"}
+          </span>
+          {onRefreshRate && (
+            <button
+              onClick={onRefreshRate}
+              className="bg-transparent border-none cursor-pointer text-slate-500 hover:text-slate-300 transition-colors p-0"
+              title="Actualizar tipo de cambio"
+            >
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+              </svg>
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Footer link (C19) */}
+      <div className="px-5 pb-4 pt-1">
+        <a
+          href="https://www.ypoti.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[11px] text-slate-600 hover:text-slate-400 transition-colors no-underline flex items-center gap-1"
+        >
+          ypoti.com
+          <svg width="10" height="10" viewBox="0 0 12 12" fill="currentColor" className="opacity-50">
+            <path d="M3.5 3a.5.5 0 000 1h3.793L2.146 9.146a.5.5 0 00.708.708L8 4.707V8.5a.5.5 0 001 0v-5a.5.5 0 00-.5-.5h-5z"/>
+          </svg>
+        </a>
       </div>
     </aside>
   );
@@ -102,7 +171,12 @@ function NavItem({ item, active, onClick }) {
       }`}
     >
       <span className="text-[15px] w-5 text-center">{item.icon}</span>
-      {item.label}
+      <span className="flex-1 text-left">{item.label}</span>
+      {item.badge > 0 && (
+        <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-px rounded-full min-w-[18px] text-center">
+          {item.badge}
+        </span>
+      )}
     </button>
   );
 }

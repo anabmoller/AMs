@@ -1,61 +1,26 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback } from "react";
 import {
   getParameters, addParameterItem, updateParameterItem,
-  toggleParameterItem, initParameters, getCompanies,
+  toggleParameterItem, initParameters,
 } from "../../constants/parameters";
-import { getUsers } from "../../constants/users";
+import ParameterForm from "./ParameterForm";
+import ParameterItemList from "./ParameterItemList";
 
 const TABS = [
-  { key: "establishments", label: "Establecimientos", icon: "\u{1F4CD}" },
-  { key: "sectors", label: "Sectores", icon: "\u{1F3F7}" },
-  { key: "productTypes", label: "Tipos Producto", icon: "\u{1F4E6}" },
-  { key: "suppliers", label: "Proveedores", icon: "\u{1F3EA}" },
-  { key: "companies", label: "Empresas", icon: "\u{1F3E2}" },
+  { key: "establishments", label: "Establecimientos", icon: "\uD83D\uDCCD" },
+  { key: "sectors", label: "Sectores", icon: "\uD83C\uDFF7" },
+  { key: "productTypes", label: "Tipos Producto", icon: "\uD83D\uDCE6" },
+  { key: "suppliers", label: "Proveedores", icon: "\uD83C\uDFEA" },
+  { key: "companies", label: "Empresas", icon: "\uD83C\uDFE2" },
 ];
 
-// ============================================================
-// SENACSA + SMGeo reference data (real, from screenshots)
-// ============================================================
-const SENACSA_DATA = {
-  "SANTA MARIA":      { code: "0101190045", unidadZonal: "CONCEPCION", departamento: "Concepción", municipio: "" },
-  "CIELO AZUL":       { code: "0101230338", unidadZonal: "CONCEPCION", departamento: "Concepción", municipio: "Paso Barreto", lat: "", lng: "" },
-  "YPOTI":            { code: "0103780002", unidadZonal: "HORQUETA",   departamento: "Concepción", municipio: "Horqueta", lat: "-23.315485", lng: "-56.712392" },
-  "YPOTI2":           { code: "0103780080", unidadZonal: "HORQUETA",   departamento: "Concepción", municipio: "Horqueta" },
-  "ESTANCIA YPOTI":   { code: "0103780002", unidadZonal: "HORQUETA",   departamento: "Concepción", municipio: "Horqueta", lat: "-23.3157237", lng: "-56.7113371" },
-  "CERRO MEMBY":      { code: "0107310001", unidadZonal: "YBY YAU",    departamento: "Concepción", municipio: "Yby Yaú", lat: "-22.951316", lng: "-56.457662" },
-  "ESTANCIA CERRO MEMBY": { code: "0107310001", unidadZonal: "YBY YAU", departamento: "Concepción", municipio: "Yby Yaú", lat: "-22.951316", lng: "-56.457662" },
-  "YBY PORA":         { code: "0107240013", unidadZonal: "YBY YAU",    departamento: "Concepción", municipio: "Yby Yaú" },
-  "YBYPORA":          { code: "0107240013", unidadZonal: "YBY YAU",    departamento: "Concepción", municipio: "Yby Yaú" },
-  "SANTA CLARA":      { code: "0210150007", unidadZonal: "SANTA ROSA DEL AGUARAY", departamento: "San Pedro", municipio: "Tacuatí", lat: "-23.474297", lng: "-56.236926" },
-  "EST. SANTA CLARA": { code: "0210150007", unidadZonal: "SANTA ROSA DEL AGUARAY", departamento: "San Pedro", municipio: "Tacuatí", lat: "-23.474297", lng: "-56.236926" },
-  "LUSIPAR":          { code: "0210150003", unidadZonal: "SANTA ROSA DEL AGUARAY", departamento: "San Pedro", municipio: "Tacuatí", lat: "-23.4333312", lng: "-56.3069802" },
-  "ESTANCIA LUSIPAR": { code: "0210150003", unidadZonal: "SANTA ROSA DEL AGUARAY", departamento: "San Pedro", municipio: "Tacuatí", lat: "-23.4333312", lng: "-56.3069802" },
-};
-
-function lookupSenacsa(name) {
-  if (!name) return null;
-  const upper = name.toUpperCase().trim();
-  if (SENACSA_DATA[upper]) return SENACSA_DATA[upper];
-  for (const [key, data] of Object.entries(SENACSA_DATA)) {
-    if (upper.includes(key) || key.includes(upper)) return data;
-  }
-  return null;
-}
-
 function formatName(raw) {
-  if (!raw) return "—";
+  if (!raw) return "\u2014";
   const username = raw.includes("@") ? raw.split("@")[0] : raw;
   const parts = username.split(/[.\s_-]+/);
   return parts
     .map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase())
     .join(" ");
-}
-
-function autoGenerateCode(name) {
-  if (!name) return "";
-  const words = name.trim().split(/\s+/);
-  if (words.length === 1) return words[0].substring(0, 3).toUpperCase();
-  return words.map(w => (w[0] || "")).join("").toUpperCase().slice(0, 4);
 }
 
 export default function ParametersScreen({ onBack }) {
@@ -66,6 +31,8 @@ export default function ParametersScreen({ onBack }) {
   const [search, setSearch] = useState("");
   const [saving, setSaving] = useState(false);
   const [actionError, setActionError] = useState(null);
+  const [sortKey, setSortKey] = useState("name");
+  const [sortDir, setSortDir] = useState("asc");
 
   const refresh = useCallback(() => setParams({ ...getParameters() }), []);
 
@@ -74,6 +41,18 @@ export default function ParametersScreen({ onBack }) {
     !search || (i.name || "").toLowerCase().includes(search.toLowerCase())
   );
   const activeCount = items.filter(i => i.active !== false).length;
+
+  const sorted = [...filtered].sort((a, b) => {
+    const av = (a[sortKey] || "").toString().toLowerCase();
+    const bv = (b[sortKey] || "").toString().toLowerCase();
+    const cmp = av < bv ? -1 : av > bv ? 1 : 0;
+    return sortDir === "asc" ? cmp : -cmp;
+  });
+
+  const toggleSort = (key) => {
+    if (sortKey === key) setSortDir(d => d === "asc" ? "desc" : "asc");
+    else { setSortKey(key); setSortDir("asc"); }
+  };
 
   const handleSave = async (formData) => {
     setSaving(true);
@@ -130,16 +109,16 @@ export default function ParametersScreen({ onBack }) {
         if (item.senacsa_code) parts.push(`SENACSA: ${item.senacsa_code}`);
         if (item.senacsa_unidad_zonal) parts.push(item.senacsa_unidad_zonal);
         else if (item.location) parts.push(item.location);
-        return parts.filter(Boolean).join(" · ");
+        return parts.filter(Boolean).join(" \u00B7 ");
       }
       case "sectors":
         return item.description || "";
       case "productTypes":
         return item.description || "";
       case "suppliers":
-        return [item.category, item.phone].filter(Boolean).join(" · ");
+        return [item.category, item.phone].filter(Boolean).join(" \u00B7 ");
       case "companies":
-        return `${item.type === "empresa" ? "Empresa" : "Persona Física"} · Dir: ${formatName(item.director)}`;
+        return `${item.type === "empresa" ? "Empresa" : "Persona F\u00EDsica"} \u00B7 Dir: ${formatName(item.director)}`;
       default:
         return "";
     }
@@ -150,7 +129,7 @@ export default function ParametersScreen({ onBack }) {
       {/* Header */}
       <div className="px-5 py-3 flex justify-between items-center">
         <button onClick={onBack} className="bg-transparent border-none cursor-pointer text-sm text-emerald-400 font-medium">
-          ← Volver
+          {"\u2190"} Volver
         </button>
         <button onClick={handleReset} disabled={saving} className={`bg-transparent border-none text-xs font-medium ${saving ? 'cursor-default text-slate-500 opacity-60' : 'cursor-pointer text-amber-400'}`}>
           {saving ? "Cargando..." : "Refrescar"}
@@ -159,7 +138,7 @@ export default function ParametersScreen({ onBack }) {
 
       <div className="px-5">
         <h2 className="text-[22px] font-semibold text-white mb-1 mt-0">
-          Parámetros del Sistema
+          Par{"\u00E1"}metros del Sistema
         </h2>
         <div className="text-[13px] text-slate-400 mb-4">
           Configurar establecimientos, sectores, productos y proveedores
@@ -170,7 +149,7 @@ export default function ParametersScreen({ onBack }) {
       {actionError && (
         <div className="mx-5 mb-3 px-3.5 py-2.5 rounded-lg bg-red-500/[0.06] border border-red-500/[0.19] flex justify-between items-center">
           <span className="text-xs text-red-400 font-medium">{actionError}</span>
-          <button onClick={() => setActionError(null)} className="bg-none border-none cursor-pointer text-sm text-red-400 px-1">✕</button>
+          <button onClick={() => setActionError(null)} className="bg-none border-none cursor-pointer text-sm text-red-400 px-1">{"\u2715"}</button>
         </div>
       )}
 
@@ -191,7 +170,7 @@ export default function ParametersScreen({ onBack }) {
         {/* Search + Add */}
         <div className="flex gap-2 mb-3">
           <div className="flex-1 flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-xl px-3 py-2">
-            <span className="text-sm opacity-40">{"\u{1F50D}"}</span>
+            <span className="text-sm opacity-40">{"\uD83D\uDD0D"}</span>
             <input
               placeholder="Buscar..."
               value={search}
@@ -206,7 +185,7 @@ export default function ParametersScreen({ onBack }) {
 
         {/* Count badge */}
         <div className="text-[11px] text-slate-400 mb-2.5 font-medium">
-          {activeCount} activos de {items.length} total · Mostrando {filtered.length}
+          {activeCount} activos de {items.length} total &middot; Mostrando {filtered.length}
         </div>
 
         {/* Form Modal */}
@@ -220,270 +199,18 @@ export default function ParametersScreen({ onBack }) {
           />
         )}
 
-        {/* Items List */}
-        {filtered.map(item => (
-          <div key={item.id} className={`bg-white/[0.03] rounded-xl px-4 py-3.5 mb-2 border border-white/[0.06] flex items-center gap-3 shadow-sm ${(item.active !== false) ? 'opacity-100' : 'opacity-50'}`}>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-semibold text-white">
-                {item.name}
-                {item.code && (
-                  <span className="text-[10px] text-slate-400 ml-2 bg-white/[0.02] px-1.5 py-0.5 rounded">
-                    {item.code}
-                  </span>
-                )}
-              </div>
-              <div className="text-[11px] text-slate-400 mt-0.5">
-                {renderSubtitle(item)}
-              </div>
-            </div>
-            <div className="flex gap-1.5 flex-shrink-0">
-              <button onClick={() => { setEditingItem(item); setShowForm(true); }} disabled={saving} className={`bg-emerald-500/[0.06] border-none rounded-lg px-2.5 py-1.5 cursor-pointer text-xs text-emerald-400 font-medium ${saving ? 'opacity-50' : ''}`}>
-                Editar
-              </button>
-              <button onClick={() => handleToggle(item.id)} disabled={saving} className={`border-none rounded-lg px-2.5 py-1.5 cursor-pointer text-xs font-medium ${saving ? 'opacity-50' : ''} ${(item.active !== false) ? 'bg-red-500/[0.06] text-red-400' : 'bg-green-500/[0.06] text-green-400'}`}>
-                {(item.active !== false) ? "Desact." : "Activar"}
-              </button>
-            </div>
-          </div>
-        ))}
-
-        {filtered.length === 0 && (
-          <div className="text-center p-10 text-slate-400 text-[13px]">
-            No se encontraron registros
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ==============================================================
-// Dynamic Form — with SENACSA auto-fill + all fixes
-// ==============================================================
-function ParameterForm({ tab, item, onSave, onCancel, saving }) {
-  const usersByRole = useMemo(() => {
-    const users = getUsers().filter(u => u.active);
-    return {
-      gerente: users.filter(u => ["gerente", "admin"].includes(u.role))
-        .map(u => ({ value: u.username, label: u.name })),
-      diretoria: users.filter(u => ["diretoria", "admin"].includes(u.role))
-        .map(u => ({ value: u.username, label: u.name })),
-    };
-  }, []);
-
-  const companyOptions = useMemo(() => {
-    try {
-      const companies = getCompanies();
-      if (companies && companies.length > 0) return companies.map(c => c.name).filter(Boolean);
-    } catch { /* fallback */ }
-    return [
-      "Rural Bioenergia S.A.",
-      "Chacobras S.A.",
-      "La Constancia S.A.",
-      "Control Pasto S.A.",
-      "Ana Moller",
-      "Gabriel Moller",
-      "Pedro Moller",
-    ];
-  }, []);
-
-  const FIELDS = {
-    establishments: [
-      { key: "name", label: "Nombre del Establecimiento", required: true },
-      { key: "code", label: "Código (auto)", required: true, hint: "Se genera automáticamente del nombre" },
-      { key: "senacsa_code", label: "Código SENACSA", hint: "Se auto-completa al escribir el nombre" },
-      { key: "senacsa_unidad_zonal", label: "Unidad Zonal SENACSA" },
-      { key: "company", label: "Empresa", type: "select", options: "companies", required: true },
-      { key: "manager", label: "Gerente Responsable", type: "user_select", roleFilter: "gerente" },
-      { key: "departamento", label: "Departamento" },
-      { key: "municipio", label: "Municipio" },
-      { key: "location", label: "Ubicación (texto libre)" },
-      { key: "latitude", label: "Latitud", hint: "Ej: -23.3154" },
-      { key: "longitude", label: "Longitud", hint: "Ej: -56.7123" },
-    ],
-    sectors: [
-      { key: "name", label: "Nombre", required: true },
-      { key: "description", label: "Descripción" },
-    ],
-    productTypes: [
-      { key: "name", label: "Nombre", required: true },
-      { key: "description", label: "Descripción" },
-    ],
-    suppliers: [
-      { key: "name", label: "Nombre / Razón Social", required: true },
-      { key: "ruc", label: "RUC" },
-      { key: "phone", label: "Teléfono" },
-      { key: "email", label: "Email" },
-      { key: "category", label: "Categoría" },
-    ],
-    companies: [
-      { key: "name", label: "Nombre", required: true },
-      { key: "ruc", label: "RUC" },
-      { key: "type", label: "Tipo", type: "select", options: ["empresa", "persona_fisica"] },
-      { key: "director", label: "Director", type: "user_select", roleFilter: "diretoria" },
-    ],
-  };
-
-  const fields = FIELDS[tab] || [];
-  const [form, setForm] = useState(() => {
-    if (item) return { ...item };
-    const empty = {};
-    fields.forEach(f => { empty[f.key] = ""; });
-    return empty;
-  });
-
-  const [codeManuallyEdited, setCodeManuallyEdited] = useState(!!item);
-  const [senacsaAutoFilled, setSenacsaAutoFilled] = useState(false);
-
-  const canSubmit = !saving && fields.filter(f => f.required).every(f => (form[f.key] || "").toString().trim());
-
-  const resolveOptions = (f) => {
-    if (f.options === "companies") return companyOptions;
-    if (Array.isArray(f.options)) return f.options;
-    return [];
-  };
-
-  const handleNameChange = useCallback((val) => {
-    const updates = { name: val };
-
-    if (!codeManuallyEdited) {
-      updates.code = autoGenerateCode(val);
-    }
-
-    if (tab === "establishments") {
-      const senacsa = lookupSenacsa(val);
-      if (senacsa) {
-        updates.senacsa_code = senacsa.code || "";
-        updates.senacsa_unidad_zonal = senacsa.unidadZonal || "";
-        if (senacsa.departamento) updates.departamento = senacsa.departamento;
-        if (senacsa.municipio) updates.municipio = senacsa.municipio;
-        if (senacsa.lat) updates.latitude = senacsa.lat;
-        if (senacsa.lng) updates.longitude = senacsa.lng;
-        if (senacsa.departamento && !updates.location) {
-          updates.location = senacsa.departamento;
-        }
-        setSenacsaAutoFilled(true);
-      }
-    }
-
-    setForm(prev => ({ ...prev, ...updates }));
-  }, [codeManuallyEdited, tab]);
-
-  return (
-    <div className="bg-white/[0.02] rounded-2xl p-5 border border-emerald-500/[0.19] mb-4">
-      <div className="text-sm font-semibold text-white mb-4">
-        {item ? `Editar: ${item.name}` : "Nuevo Registro"}
-      </div>
-
-      {/* SENACSA auto-fill indicator */}
-      {senacsaAutoFilled && tab === "establishments" && (
-        <div className="px-3 py-2 rounded-lg mb-3 bg-green-500/[0.06] border border-green-500/[0.19] text-[11px] text-green-400 font-medium">
-          ✓ Datos SENACSA auto-completados desde la base de referencia
-        </div>
-      )}
-
-      <div className="flex flex-col gap-3">
-        {fields.map(f => (
-          <div key={f.key}>
-            <label className="block text-[11px] font-medium text-slate-400 mb-1.5 tracking-wide">
-              {f.label} {f.required && <span className="text-red-400">*</span>}
-            </label>
-            {f.hint && (
-              <div className="text-[10px] text-slate-500 mb-0.5 italic">
-                {f.hint}
-              </div>
-            )}
-            {f.type === "select" ? (
-              <select
-                value={form[f.key] || ""}
-                onChange={e => setForm(prev => ({ ...prev, [f.key]: e.target.value }))}
-                disabled={saving}
-                className="w-full px-3 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] text-[13px] text-white outline-none transition-colors focus:border-emerald-500/50"
-              >
-                <option value="">Seleccionar...</option>
-                {resolveOptions(f).map(o => (
-                  <option key={o} value={o}>
-                    {o === "empresa" ? "Empresa" : o === "persona_fisica" ? "Persona Física" : o}
-                  </option>
-                ))}
-              </select>
-            ) : f.type === "user_select" ? (
-              <select
-                value={form[f.key] || ""}
-                onChange={e => setForm(prev => ({ ...prev, [f.key]: e.target.value }))}
-                disabled={saving}
-                className="w-full px-3 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] text-[13px] text-white outline-none transition-colors focus:border-emerald-500/50"
-              >
-                <option value="">Seleccionar usuario...</option>
-                {(usersByRole[f.roleFilter] || []).map(u => (
-                  <option key={u.value} value={u.value}>{u.label}</option>
-                ))}
-              </select>
-            ) : (
-              <input
-                value={form[f.key] || ""}
-                onChange={e => {
-                  const val = e.target.value;
-                  if (tab === "establishments" && f.key === "name") {
-                    handleNameChange(val);
-                  } else if (tab === "establishments" && f.key === "code") {
-                    setCodeManuallyEdited(true);
-                    setForm(prev => ({ ...prev, code: val }));
-                  } else {
-                    setForm(prev => ({ ...prev, [f.key]: val }));
-                  }
-                }}
-                placeholder={f.label}
-                disabled={saving}
-                className={`w-full px-3 py-2.5 rounded-lg border bg-white/[0.05] text-[13px] text-white outline-none transition-colors focus:border-emerald-500/50 ${
-                  senacsaAutoFilled && ["senacsa_code", "senacsa_unidad_zonal", "latitude", "longitude", "departamento", "municipio"].includes(f.key) && form[f.key]
-                    ? 'bg-green-500/[0.05] border-green-500/25'
-                    : 'border-white/[0.1]'
-                }`}
-              />
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Map preview if coordinates exist */}
-      {tab === "establishments" && form.latitude && form.longitude && (
-        <div className="mt-3">
-          <label className="block text-[11px] font-medium text-slate-400 mb-1 tracking-wide">
-            📍 Vista previa ubicación
-          </label>
-          <div className="rounded-xl overflow-hidden border border-white/[0.06] h-[180px]">
-            <iframe
-              title="Ubicación del establecimiento"
-              width="100%"
-              height="180"
-              frameBorder="0"
-              style={{ border: 0 }}
-              src={`https://www.openstreetmap.org/export/embed.html?bbox=${Number(form.longitude) - 0.03}%2C${Number(form.latitude) - 0.02}%2C${Number(form.longitude) + 0.03}%2C${Number(form.latitude) + 0.02}&layer=mapnik&marker=${form.latitude}%2C${form.longitude}`}
-              loading="lazy"
-            />
-          </div>
-          <div className="text-[10px] text-slate-400 mt-1 text-center">
-            Lat: {form.latitude} · Lng: {form.longitude}
-          </div>
-        </div>
-      )}
-
-      <div className="flex gap-2 mt-4">
-        <button onClick={onCancel} disabled={saving} className={`flex-1 py-3 rounded-xl border border-white/[0.06] bg-white/[0.03] text-white text-[13px] font-semibold ${saving ? 'cursor-default' : 'cursor-pointer'}`}>
-          Cancelar
-        </button>
-        <button
-          onClick={() => canSubmit && onSave(form)}
-          disabled={!canSubmit}
-          className={`flex-1 py-3 rounded-xl border-none text-[13px] font-semibold ${
-            canSubmit
-              ? 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white cursor-pointer'
-              : 'bg-white/[0.06] text-slate-500 cursor-default'
-          }`}
-        >
-          {saving ? "Guardando..." : (item ? "Guardar Cambios" : "Crear")}
-        </button>
+        {/* Items list with sort headers */}
+        <ParameterItemList
+          tab={tab}
+          sorted={sorted}
+          sortKey={sortKey}
+          sortDir={sortDir}
+          saving={saving}
+          onToggleSort={toggleSort}
+          onEdit={(item) => { setEditingItem(item); setShowForm(true); }}
+          onToggle={handleToggle}
+          renderSubtitle={renderSubtitle}
+        />
       </div>
     </div>
   );

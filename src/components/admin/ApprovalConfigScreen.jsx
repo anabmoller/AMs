@@ -2,8 +2,9 @@ import { useState } from "react";
 import BackButton from "../common/BackButton";
 import PageHeader from "../common/PageHeader";
 import {
-  MANAGER_BY_ESTABLISHMENT, DIRECTOR_BY_COMPANY, ESTABLISHMENT_COMPANY,
+  MANAGER_MAP, COMPANY_MAP, PRESIDENT_MAP, ESTABLISHMENT_COMPANY,
   COMPANIES, THRESHOLDS, SLA, OVERBUDGET_APPROVER, VET_APPROVER, VET_SECTORS,
+  USER_DISPLAY_NAMES,
 } from "../../constants/approvalConfig";
 import { formatGuaranies } from "../../constants/budgets";
 
@@ -14,13 +15,13 @@ const STEPS_DISPLAY = [
     color: "#f59e0b",
   },
   {
-    num: 2, label: "Director / CFO", type: "director", icon: "🏢",
-    description: "Aprueba compras mayores a ₲5M segun la empresa",
+    num: 2, label: "Director", type: "director", icon: "🏢",
+    description: "Aprueba compras mayores a ₲5M según la empresa",
     color: "#10b981",
   },
   {
-    num: 3, label: "Overbudget", type: "overbudget", icon: "⚠",
-    description: "Aprueba si el monto supera ₲50M o excede presupuesto",
+    num: 3, label: "Presidente", type: "president", icon: "👑",
+    description: "Aprueba compras mayores a ₲50M según la empresa",
     color: "#ef4444",
   },
 ];
@@ -90,14 +91,14 @@ export default function ApprovalConfigScreen({ onBack }) {
         <div className="flex justify-around mb-5 text-[10px] text-slate-400 font-medium text-center">
           <span className="w-[70px]">Gerente</span>
           <span className="w-[70px]">Director</span>
-          <span className="w-[70px]">Overbudget</span>
+          <span className="w-[70px]">Presidente</span>
           <span className="w-[70px]">Vet (cond.)</span>
         </div>
 
         {/* Thresholds Card */}
         <Card title="Umbrales de Aprobación" icon="📐">
           <ThresholdRow label="Director requerido" value={formatGuaranies(THRESHOLDS.DIRECTOR_REQUIRED)} desc="Compras >= este monto requieren aprobación del Director" />
-          <ThresholdRow label="Overbudget" value={formatGuaranies(THRESHOLDS.OVERBUDGET_DIRECTOR)} desc="Compras >= este monto requieren aprobación extra" />
+          <ThresholdRow label="Overbudget" value={formatGuaranies(THRESHOLDS.PRESIDENT_REQUIRED)} desc="Compras >= este monto requieren aprobación extra" />
         </Card>
 
         {/* SLA Card */}
@@ -111,11 +112,11 @@ export default function ApprovalConfigScreen({ onBack }) {
 
         {/* Manager Assignments */}
         <Card title="Gerentes por Establecimiento" icon="👤">
-          {Object.entries(MANAGER_BY_ESTABLISHMENT).map(([est, mgr]) => (
+          {Object.entries(MANAGER_MAP).map(([est, mgr]) => (
             <div key={est} className="flex justify-between items-center py-2 border-b border-white/[0.06]">
               <span className="text-[13px] text-white">📍 {est}</span>
               <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/[0.06] px-2.5 py-0.5 rounded-lg">
-                {mgr}
+                {USER_DISPLAY_NAMES[mgr] || mgr}
               </span>
             </div>
           ))}
@@ -123,35 +124,40 @@ export default function ApprovalConfigScreen({ onBack }) {
 
         {/* Director Assignments */}
         <Card title="Directores por Empresa" icon="🏢">
-          {COMPANIES.map(c => {
-            const dirUsername = DIRECTOR_BY_COMPANY[c.id] || "—";
-            return (
-              <div key={c.id} className="flex justify-between items-center py-2 border-b border-white/[0.06]">
-                <div>
-                  <div className="text-[13px] text-white">{c.name}</div>
-                  <div className="text-[10px] text-slate-400">
-                    {c.type === "empresa" ? "Empresa" : "Persona Física"}
-                  </div>
-                </div>
-                <span className="text-xs font-semibold text-blue-400 bg-blue-500/[0.06] px-2.5 py-0.5 rounded-lg">
-                  {dirUsername}
-                </span>
+          {Object.entries(COMPANY_MAP).map(([company, dirUsername]) => (
+            <div key={company} className="flex justify-between items-center py-2 border-b border-white/[0.06]">
+              <div>
+                <div className="text-[13px] text-white">{company}</div>
               </div>
-            );
-          })}
+              <span className="text-xs font-semibold text-blue-400 bg-blue-500/[0.06] px-2.5 py-0.5 rounded-lg">
+                {USER_DISPLAY_NAMES[dirUsername] || dirUsername}
+              </span>
+            </div>
+          ))}
+        </Card>
+
+        {/* President Assignments */}
+        <Card title="Presidentes por Empresa" icon="👑">
+          {Object.entries(PRESIDENT_MAP).map(([company, presUsername]) => (
+            <div key={company} className="flex justify-between items-center py-2 border-b border-white/[0.06]">
+              <div>
+                <div className="text-[13px] text-white">{company}</div>
+              </div>
+              <span className="text-xs font-semibold text-purple-400 bg-purple-500/[0.06] px-2.5 py-0.5 rounded-lg">
+                {USER_DISPLAY_NAMES[presUsername] || presUsername}
+              </span>
+            </div>
+          ))}
         </Card>
 
         {/* Establishment → Company Mapping */}
         <Card title="Establecimiento → Empresa" icon="🔗">
-          {Object.entries(ESTABLISHMENT_COMPANY).filter(([k]) => k !== "General").map(([est, compId]) => {
-            const comp = COMPANIES.find(c => c.id === compId);
-            return (
-              <div key={est} className="flex justify-between items-center py-1.5 border-b border-white/[0.06]">
-                <span className="text-xs text-white">{est}</span>
-                <span className="text-xs text-slate-400">{comp?.name || compId}</span>
-              </div>
-            );
-          })}
+          {Object.entries(ESTABLISHMENT_COMPANY).filter(([k]) => k !== "General").map(([est, company]) => (
+            <div key={est} className="flex justify-between items-center py-1.5 border-b border-white/[0.06]">
+              <span className="text-xs text-white">{est}</span>
+              <span className="text-xs text-slate-400">{company}</span>
+            </div>
+          ))}
         </Card>
 
         {/* Special Rules */}
@@ -189,7 +195,7 @@ export default function ApprovalConfigScreen({ onBack }) {
           {[
             { id: "R1", desc: "Toda SC requiere autorización del Gerente de Área asignado al establecimiento", color: "#f59e0b" },
             { id: "R2", desc: `SC >= ${formatGuaranies(THRESHOLDS.DIRECTOR_REQUIRED)} requiere aprobación del Director de la empresa`, color: "#10b981" },
-            { id: "R3", desc: `SC >= ${formatGuaranies(THRESHOLDS.OVERBUDGET_DIRECTOR)} requiere aprobación de ${OVERBUDGET_APPROVER}`, color: "#ef4444" },
+            { id: "R3", desc: `SC >= ${formatGuaranies(THRESHOLDS.PRESIDENT_REQUIRED)} requiere aprobación del Presidente de la empresa`, color: "#ef4444" },
             { id: "R4", desc: "Emergencias: SLA reducido (Gerente 4h, Director 8h)", color: "#6366f1" },
             { id: "R5", desc: "Sectores Vet/Farmacia requieren autorización de especialista", color: "#7c6bb5" },
             { id: "R6", desc: "Exceso de presupuesto activa paso de aprobación overbudget", color: "#ef4444" },

@@ -1,0 +1,75 @@
+export default function QuotationCard({
+  quotation, cheapest, bestItemPrices, onSelect, onRemove,
+}) {
+  const q = quotation;
+  return (
+    <div
+      onClick={() => onSelect(q.id)}
+      className={`rounded-xl px-4 py-3.5 mb-2 cursor-pointer relative ${
+        q.selected ? 'bg-green-500/[0.05] border-2 border-green-500' : 'bg-white/[0.03] border border-white/[0.06]'
+      }`}
+    >
+      {q.selected && (
+        <div className="absolute top-2.5 right-2.5 bg-green-500 text-white w-[22px] h-[22px] rounded-full flex items-center justify-center text-xs font-bold">
+          &#10003;
+        </div>
+      )}
+      {/* Remove button */}
+      <button
+        onClick={(e) => { e.stopPropagation(); onRemove(q.id); }}
+        className="absolute top-2.5 right-10 bg-transparent border-none text-red-400 text-xs cursor-pointer p-1 opacity-50 hover:opacity-100"
+        title="Eliminar cotizacion"
+      >
+        &#128465;
+      </button>
+
+      <div className="flex justify-between items-start">
+        <div>
+          <div className="text-sm font-semibold text-white">{q.supplier}</div>
+          <div className="text-[11px] text-slate-400 mt-0.5">
+            {q.date}
+            {q.deliveryDays > 0 && ` \u00B7 ${q.deliveryDays} dias entrega`}
+          </div>
+        </div>
+        <div className="text-right">
+          <div className={`text-base font-bold ${q.id === cheapest?.id ? 'text-green-400' : 'text-white'}`}>
+            {q.currency} {q.price?.toLocaleString()}
+          </div>
+        </div>
+      </div>
+
+      {/* Per-item breakdown */}
+      {q.items?.length > 0 && (
+        <div className="mt-2 pt-2 border-t border-white/[0.06]">
+          {q.items.map((qi, idx) => {
+            const isBest = qi.unitPrice > 0 && bestItemPrices[idx] === qi.unitPrice;
+            return qi.unitPrice > 0 ? (
+              <div key={idx} className="flex justify-between items-center py-0.5">
+                <span className="text-[11px] text-slate-400 truncate flex-1 mr-2">
+                  {qi.name}
+                </span>
+                <span className={`text-[11px] font-semibold flex-shrink-0 ${isBest ? 'text-green-400' : 'text-white'}`}>
+                  {qi.unitPrice.toLocaleString()} \u00D7 {qi.quantity} = {qi.subtotal.toLocaleString()}
+                </span>
+              </div>
+            ) : null;
+          })}
+        </div>
+      )}
+
+      {q.paymentTerms && (
+        <div className="text-[11px] text-slate-400 mt-1.5 bg-white/[0.02] px-2 py-1 rounded inline-block">
+          {q.paymentTerms}
+        </div>
+      )}
+      {q.notes && (
+        <div className="text-[11px] text-slate-400 mt-1 italic">{q.notes}</div>
+      )}
+      {q.attachment && (
+        <div className="mt-2 flex items-center gap-1.5 text-[11px] text-blue-400 bg-blue-500/[0.06] px-2 py-1 rounded">
+          {q.attachment.type?.startsWith("image/") ? "\uD83D\uDDBC" : "\uD83D\uDCC4"} {q.attachment.name}
+        </div>
+      )}
+    </div>
+  );
+}

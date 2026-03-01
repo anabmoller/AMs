@@ -78,18 +78,100 @@
 
 body {
   margin: 0;
-  background: #0a0b0f;
+  background: var(--color-bg, #0a0b0f);
   font-family: 'Inter', 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #fff;
+  color: var(--color-text, #fff);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Scrollbar dark */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+:root.dark ::-webkit-scrollbar { width: 6px; height: 6px; }
+:root.dark ::-webkit-scrollbar-track { background: transparent; }
+:root.dark ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+:root.dark ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* Scrollbar light */
+:root.light ::-webkit-scrollbar { width: 6px; height: 6px; }
+:root.light ::-webkit-scrollbar-track { background: transparent; }
+:root.light ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
+:root.light ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
+
+/* ---- Light mode overrides ---- */
+:root.light body {
+  background: #f8f9fa;
+  color: #111827;
+}
+
+:root.light .bg-\[\#0a0b0f\],
+:root.light .bg-\[\#0d0e14\] {
+  background: #ffffff !important;
+}
+
+:root.light .min-h-screen.bg-\[\#0a0b0f\] {
+  background: #f8f9fa !important;
+}
+
+:root.light .text-white {
+  color: #111827 !important;
+}
+
+:root.light .text-slate-400 {
+  color: #6b7280 !important;
+}
+
+:root.light .text-slate-500 {
+  color: #9ca3af !important;
+}
+
+:root.light .text-slate-600 {
+  color: #9ca3af !important;
+}
+
+:root.light .text-slate-300 {
+  color: #374151 !important;
+}
+
+:root.light .border-white\/\[0\.06\] {
+  border-color: #e5e7eb !important;
+}
+
+:root.light .bg-white\/\[0\.03\],
+:root.light .bg-white\/\[0\.02\],
+:root.light .bg-white\/\[0\.04\] {
+  background: #ffffff !important;
+}
+
+:root.light .bg-white\/\[0\.05\] {
+  background: #f9fafb !important;
+}
+
+:root.light .bg-white\/\[0\.06\] {
+  background: #f3f4f6 !important;
+}
+
+:root.light select,
+:root.light input,
+:root.light textarea {
+  color: #111827 !important;
+  background: #ffffff !important;
+  border-color: #d1d5db !important;
+}
+
+:root.light select option {
+  background: #ffffff;
+  color: #111827;
+}
+
+:root.light .desktop-sidebar {
+  background: #ffffff !important;
+  border-right-color: #e5e7eb !important;
+}
+
+:root.light .bg-\[\#1a1b22\] {
+  background: #ffffff !important;
+}
 
 /* Custom focus */
 *:focus-visible {
@@ -129,8 +211,8 @@ input:focus, select:focus, textarea:focus {
     position: fixed;
     left: 0;
     top: 0;
-    background: #0d0e14;
-    border-right: 1px solid rgba(255,255,255,0.06);
+    background: var(--color-sidebar-bg, #0d0e14);
+    border-right: 1px solid var(--color-border, rgba(255,255,255,0.06));
     z-index: 50;
   }
   .mobile-header { display: none !important; }

@@ -1,10 +1,20 @@
 import { getStatusDisplay, getStatusProgress, getPriorityDisplay, formatGuaranies } from "../../utils/statusHelpers";
 import { getSectors } from "../../constants/parameters";
 
-export default function RequestCard({ request: r, onClick }) {
+function getItemNames(r) {
+  const items = r.items || [];
+  if (items.length === 0) return r.name;
+  const names = items.map(i => i.product || i.name || i.nombre).filter(Boolean);
+  if (names.length <= 2) return names.join(", ");
+  return names.slice(0, 2).join(", ") + ` + ${names.length - 2} mas`;
+}
+
+export default function RequestCard({ request: r, onClick, usdRate }) {
   const status = getStatusDisplay(r.status);
   const priority = getPriorityDisplay(r.priority || r.urgency);
   const progress = getStatusProgress(r.status);
+  const displayName = getItemNames(r);
+  const rate = usdRate || 7800;
 
   return (
     <div
@@ -34,7 +44,7 @@ export default function RequestCard({ request: r, onClick }) {
 
       {/* Title */}
       <div className="text-sm font-semibold text-white leading-snug mb-2">
-        {r.name}
+        {displayName}
       </div>
 
       {/* Status + Meta */}
@@ -58,28 +68,28 @@ export default function RequestCard({ request: r, onClick }) {
         )}
         {r.totalAmount > 0 && (
           <span className="text-xs font-semibold text-white ml-auto font-sans">
-            {formatGuaranies(r.totalAmount)}
+            {formatGuaranies(r.totalAmount)} <span className="text-slate-500 font-normal">/ USD {Math.round(r.totalAmount / rate).toLocaleString("es-PY")}</span>
           </span>
         )}
       </div>
 
-      {/* Requester */}
-      {r.requester && (
-        <div className="mt-2 text-[11px] text-slate-500 flex items-center gap-1.5 pt-2 border-t border-white/[0.06]">
-          <span className="w-[18px] h-[18px] rounded-full bg-emerald-500/10 text-emerald-500 text-[9px] font-semibold inline-flex items-center justify-center">
-            {r.requester.charAt(0)}
-          </span>
-          <span className="font-medium text-slate-300">{r.requester}</span>
-          {r.assignee && (
-            <>
-              <svg width="12" height="12" viewBox="0 0 20 20" className="fill-slate-500">
-                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"/>
-              </svg>
-              <span>{r.assignee}</span>
-            </>
-          )}
+      {/* Requester + Assignee */}
+      <div className="mt-2 text-[11px] text-slate-500 flex flex-col gap-1 pt-2 border-t border-white/[0.06]">
+        {r.requester && (
+          <div className="flex items-center gap-1.5">
+            <span className="w-[18px] h-[18px] rounded-full bg-emerald-500/10 text-emerald-500 text-[9px] font-semibold inline-flex items-center justify-center">
+              {r.requester.charAt(0)}
+            </span>
+            <span className="font-medium text-slate-300">{r.requester}</span>
+          </div>
+        )}
+        <div className="flex items-center gap-1.5">
+          <svg width="12" height="12" viewBox="0 0 20 20" className="fill-slate-500 flex-shrink-0">
+            <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"/>
+          </svg>
+          <span className="text-slate-400">Asignado: {r.assignee || "Laura Rivas"}</span>
         </div>
-      )}
+      </div>
     </div>
   );
 }

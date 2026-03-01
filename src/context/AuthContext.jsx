@@ -137,7 +137,7 @@ export function AuthProvider({ children }) {
       subscription?.unsubscribe();
       clearTimeout(safetyTimeout);
     };
-  }, [loadProfile, loading]);
+  }, [loadProfile]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ---- Inactivity timeout ----
   const resetInactivityTimer = useCallback(() => {

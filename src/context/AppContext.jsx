@@ -3,8 +3,9 @@
 // All writes go through Edge Functions; reads use anon+RLS
 // ============================================================
 
-import { createContext, useContext, useState, useCallback, useEffect, useRef } from "react";
-import { STATUS_FLOW } from "../constants";
+import { createContext, useContext, useState, useCallback, useEffect, useRef, useMemo } from "react";
+import { STATUS_FLOW, SAMPLE_REQUESTS } from "../constants";
+import { normalizeStatus } from "../utils/statusHelpers";
 import { useAuth } from "./AuthContext";
 import { supabase } from "../lib/supabase";
 import { getCurrentStep, STEP_STATUS } from "../constants/approvalConfig";
@@ -12,6 +13,7 @@ import { initParameters } from "../constants/parameters";
 import { initBudgets } from "../constants/budgets";
 import { initUsers, hasPermission } from "../constants/users";
 import { sanitizeName, sanitizeMultiline, sanitizeNumber } from "../utils/sanitize";
+import { useNotifications } from "./NotificationContext";
 import {
   fetchAllRequests,
   fetchSingleRequest,
@@ -30,6 +32,7 @@ const AppContext = createContext(null);
 
 export function AppProvider({ children }) {
   const { currentUser } = useAuth();
+  const { notifyStatusChange } = useNotifications();
 
   const [requests, setRequests] = useState([]);
   const [notification, setNotification] = useState(null);
@@ -58,10 +61,10 @@ export function AppProvider({ children }) {
           initUsers(),
         ]);
 
-        // Load all requests with nested data
+        // Load all requests with nested data; fall back to sample data for demo
         const reqs = await fetchAllRequests();
         if (mounted) {
-          setRequests(reqs);
+          setRequests(reqs.length > 0 ? reqs : SAMPLE_REQUESTS);
         }
       } catch (err) {
         console.error("[App] Data load failed:", err);
@@ -179,12 +182,18 @@ export function AppProvider({ children }) {
       // - Inserts steps and history
       await confirmRequestInDb(req._uuid);
       await refreshRequest(req._uuid);
+      notifyStatusChange(req, "pend_autorizacion");
       showNotif("Solicitud enviada para aprobaci\u00F3n");
     } catch (err) {
       console.error("[App] confirmRequest failed:", err);
-      showNotif("Error al confirmar solicitud", "error");
+      const msg = err?.message || "";
+      if (msg.includes("borrador")) {
+        showNotif("La solicitud ya fue confirmada o no est\u00E1 en estado borrador", "error");
+      } else {
+        showNotif("Error al confirmar solicitud", "error");
+      }
     }
-  }, [currentUser, requests, showNotif, refreshRequest]);
+  }, [currentUser, requests, showNotif, refreshRequest, notifyStatusChange]);
 
   // ---- Approve current step ----
   const approveStep = useCallback(async (reqId, comment = "") => {
@@ -205,12 +214,13 @@ export function AppProvider({ children }) {
       }
 
       await refreshRequest(req._uuid);
+      if (result?.allApproved) notifyStatusChange(req, "aprobado");
       showNotif("Paso aprobado correctamente", "success");
     } catch (err) {
       console.error("[App] approveStep failed:", err);
       showNotif("Error al aprobar", "error");
     }
-  }, [currentUser, requests, showNotif, refreshRequest]);
+  }, [currentUser, requests, showNotif, refreshRequest, notifyStatusChange]);
 
   // ---- Reject request ----
   const rejectRequest = useCallback(async (reqId, reason = "") => {
@@ -230,12 +240,13 @@ export function AppProvider({ children }) {
       // Edge Function verifies approver and handles rejection
       await rejectRequestInDb(req._uuid, sanitizeMultiline(reason, 1000));
       await refreshRequest(req._uuid);
+      notifyStatusChange(req, "rechazado", { reason });
       showNotif("Solicitud rechazada", "error");
     } catch (err) {
       console.error("[App] rejectRequest failed:", err);
       showNotif("Error al rechazar", "error");
     }
-  }, [currentUser, requests, showNotif, refreshRequest]);
+  }, [currentUser, requests, showNotif, refreshRequest, notifyStatusChange]);
 
   // ---- Send for revision (back to borrador) ----
   const sendForRevision = useCallback(async (reqId, reason = "") => {
@@ -268,19 +279,21 @@ export function AppProvider({ children }) {
     const req = requests.find(r => r.id === reqId);
     if (!req) return;
 
-    const idx = STATUS_FLOW.findIndex(s => s.key === req.status);
-    if (idx >= STATUS_FLOW.length - 1) return;
+    const normalized = normalizeStatus(req.status);
+    const idx = STATUS_FLOW.findIndex(s => s.key === normalized);
+    if (idx < 0 || idx >= STATUS_FLOW.length - 1) return;
 
     try {
       const newStatus = STATUS_FLOW[idx + 1].key;
       await advanceStatusInDb(req._uuid, newStatus);
       await refreshRequest(req._uuid);
+      notifyStatusChange(req, newStatus);
       showNotif("Status actualizado");
     } catch (err) {
       console.error("[App] advanceStatus failed:", err);
       showNotif("Error al avanzar status", "error");
     }
-  }, [showNotif, currentUser, requests, refreshRequest]);
+  }, [showNotif, currentUser, requests, refreshRequest, notifyStatusChange]);
 
   // ---- Update request (general edits) ----
   const updateRequest = useCallback(async (reqId, updates) => {
@@ -347,25 +360,28 @@ export function AppProvider({ children }) {
     }
   }, [currentUser, requests, showNotif, refreshRequest]);
 
-  // ---- Computed values ----
-  const rejectedCount = requests.filter(r => r.status === "rechazado").length;
-  const statusCounts = [
-    ...STATUS_FLOW.map(s => ({
-      ...s,
-      count: requests.filter(r => r.status === s.key).length,
-    })),
-    ...(rejectedCount > 0 ? [{
-      key: "rechazado", label: "Rechazado", color: "#e74c3c", icon: "\u274C",
-      count: rejectedCount,
-    }] : []),
-  ];
+  // ---- Computed values (memoized) ----
+  const statusCounts = useMemo(() => {
+    const rejectedCount = requests.filter(r => r.status === "rechazado").length;
+    return [
+      ...STATUS_FLOW.map(s => ({
+        ...s,
+        count: requests.filter(r => normalizeStatus(r.status) === s.key).length,
+      })),
+      ...(rejectedCount > 0 ? [{
+        key: "rechazado", label: "Rechazado", color: "#e74c3c", icon: "\u274C",
+        count: rejectedCount,
+      }] : []),
+    ];
+  }, [requests]);
 
-  // Count pending approvals for current user
-  const pendingApprovals = requests.filter(r => {
-    if (!r.approvalSteps || r.status === "rechazado") return false;
-    const step = getCurrentStep(r.approvalSteps);
-    return step && currentUser && step.approverUsername === currentUser.email;
-  });
+  const pendingApprovals = useMemo(() => {
+    return requests.filter(r => {
+      if (!r.approvalSteps || r.status === "rechazado") return false;
+      const step = getCurrentStep(r.approvalSteps);
+      return step && currentUser && step.approverUsername === currentUser.email;
+    });
+  }, [requests, currentUser]);
 
   return (
     <AppContext.Provider value={{

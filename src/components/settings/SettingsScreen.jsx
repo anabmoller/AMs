@@ -2,7 +2,15 @@ import { useAuth } from "../../context/AuthContext";
 import { ROLES } from "../../constants/users";
 import BackButton from "../common/BackButton";
 
-export default function SettingsScreen({ onBack, onNavigate }) {
+const DEV_USERS = [
+  { name: "Ana Beatriz Moller", role: "admin", label: "Admin" },
+  { name: "Fabiano Ferreira", role: "gerente", label: "Gerente" },
+  { name: "Laura Rivas", role: "compras", label: "Compras" },
+  { name: "Alberto Silva", role: "solicitante", label: "Solicitante" },
+  { name: "Mauricio Moller", role: "diretoria", label: "Director" },
+];
+
+export default function SettingsScreen({ onBack, onNavigate, devMode, onSetDevMode }) {
   const { currentUser, logout, can } = useAuth();
   const role = ROLES[currentUser.role];
 
@@ -86,6 +94,42 @@ export default function SettingsScreen({ onBack, onNavigate }) {
             >
               Recargar datos del servidor
             </button>
+          </div>
+        )}
+
+        {/* Modo Desarrollador — only in development builds */}
+        {import.meta.env.DEV && can("manage_users") && (
+          <div className="bg-white/[0.03] rounded-2xl p-4 border border-amber-500/20 mb-4">
+            <div className="text-xs font-semibold text-amber-400 mb-2.5 uppercase tracking-wide">
+              🛠 Modo Desarrollador
+            </div>
+            <div className="text-[11px] text-slate-400 mb-3">
+              Simular la vista de otro usuario (solo visual)
+            </div>
+            <div className="flex flex-col gap-1.5">
+              {DEV_USERS.map(u => (
+                <button
+                  key={u.name}
+                  onClick={() => onSetDevMode && onSetDevMode({ name: u.name, role: u.role, label: u.label })}
+                  className={`w-full px-3.5 py-2.5 rounded-lg border text-left text-[13px] font-medium cursor-pointer transition-colors flex items-center justify-between ${
+                    devMode?.name === u.name
+                      ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+                      : 'bg-white/[0.02] border-white/[0.06] text-slate-300 hover:bg-white/[0.06]'
+                  }`}
+                >
+                  <span>{u.name} <span className="text-slate-500">({u.label})</span></span>
+                  <span className="text-[11px] font-semibold text-emerald-400">Entrar →</span>
+                </button>
+              ))}
+            </div>
+            {devMode && (
+              <button
+                onClick={() => onSetDevMode && onSetDevMode(null)}
+                className="w-full mt-2 py-2.5 rounded-lg border border-red-500/20 bg-red-500/[0.06] text-red-400 text-xs font-semibold cursor-pointer"
+              >
+                Salir del modo desarrollador
+              </button>
+            )}
           </div>
         )}
 

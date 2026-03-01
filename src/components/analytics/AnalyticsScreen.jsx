@@ -1,7 +1,9 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, lazy, Suspense } from "react";
 import { PRIORITY_LEVELS } from "../../constants";
 import { formatGuaranies, getBudgets } from "../../constants/budgets";
 import KPICard from "../common/KPICard";
+
+const StrategicAnalysis = lazy(() => import("../analysis/AnalysisScreen.jsx"));
 
 const TABS = [
   { key: "overview", label: "Vision General", icon: "📊" },
@@ -9,15 +11,22 @@ const TABS = [
   { key: "budgets", label: "Presupuestos", icon: "📋" },
 ];
 
-export default function AnalyticsScreen({ requests, statusCounts, onBack }) {
+const SECTIONS = [
+  { key: "operational", label: "Operativo", icon: "📊" },
+  { key: "strategic", label: "Estratégico Pro", icon: "📈" },
+];
+
+export default function AnalyticsScreen({ requests, statusCounts, onBack, defaultSection = "operational" }) {
+  const [section, setSection] = useState(defaultSection);
   const [tab, setTab] = useState("overview");
 
   const stats = useMemo(() => {
     const totalAmount = requests.reduce((sum, r) => sum + (r.totalAmount || 0), 0);
     const pendingCount = requests.filter(r =>
-      ["borrador", "cotizacion", "presupuestado", "pendiente_aprobacion"].includes(r.status)
+      ["borrador", "pend_autorizacion", "en_cotizacion", "pend_aprobacion",
+       "cotizacion", "presupuestado", "pendiente_aprobacion", "pendiente"].includes(r.status)
     ).length;
-    const completedCount = requests.filter(r => r.status === "registrado_sap").length;
+    const completedCount = requests.filter(r => r.status === "sap" || r.status === "registrado_sap").length;
     const emergencyCount = requests.filter(r => (r.priority || r.urgency) === "emergencial").length;
     const avgAmount = requests.length > 0 ? totalAmount / requests.length : 0;
 
@@ -89,28 +98,53 @@ export default function AnalyticsScreen({ requests, statusCounts, onBack }) {
         </div>
       </div>
 
-      {/* Tab Bar */}
-      <div className="flex gap-1 px-5 pb-4 overflow-x-auto scrollbar-none">
-        {TABS.map(t => (
+      {/* Section Toggle */}
+      <div className="flex gap-1 px-5 pb-3">
+        {SECTIONS.map(s => (
           <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
-            className={`flex-1 px-3 py-2.5 rounded-lg border-none text-xs font-semibold cursor-pointer transition-all ${
-              tab === t.key
-                ? 'bg-emerald-500/15 text-emerald-400 shadow-md'
-                : 'bg-white/[0.03] text-slate-400 hover:bg-white/[0.06]'
+            key={s.key}
+            onClick={() => setSection(s.key)}
+            className={`flex-1 px-3 py-2 rounded-lg border text-xs font-semibold cursor-pointer transition-all ${
+              section === s.key
+                ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                : 'bg-white/[0.02] text-slate-500 border-white/[0.06] hover:bg-white/[0.05]'
             }`}
           >
-            {t.icon} {t.label}
+            {s.icon} {s.label}
           </button>
         ))}
       </div>
 
-      <div className="px-5 pb-[120px]">
-        {tab === "overview" && <OverviewTab stats={stats} requests={requests} statusCounts={statusCounts} />}
-        {tab === "purchases" && <PurchasesTab stats={stats} />}
-        {tab === "budgets" && <BudgetsTab />}
-      </div>
+      {section === "strategic" ? (
+        <Suspense fallback={<div className="flex justify-center py-10"><div className="text-slate-400 text-sm">Cargando...</div></div>}>
+          <StrategicAnalysis embedded />
+        </Suspense>
+      ) : (
+        <>
+          {/* Tab Bar */}
+          <div className="flex gap-1 px-5 pb-4 overflow-x-auto scrollbar-none">
+            {TABS.map(t => (
+              <button
+                key={t.key}
+                onClick={() => setTab(t.key)}
+                className={`flex-1 px-3 py-2.5 rounded-lg border-none text-xs font-semibold cursor-pointer transition-all ${
+                  tab === t.key
+                    ? 'bg-emerald-500/15 text-emerald-400 shadow-md'
+                    : 'bg-white/[0.03] text-slate-400 hover:bg-white/[0.06]'
+                }`}
+              >
+                {t.icon} {t.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="px-5 pb-[120px]">
+            {tab === "overview" && <OverviewTab stats={stats} requests={requests} statusCounts={statusCounts} />}
+            {tab === "purchases" && <PurchasesTab stats={stats} />}
+            {tab === "budgets" && <BudgetsTab />}
+          </div>
+        </>
+      )}
     </div>
   );
 }

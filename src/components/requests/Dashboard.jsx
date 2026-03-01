@@ -19,12 +19,19 @@ export default function Dashboard({
   searchQuery,
   setSearchQuery,
   onSelectRequest,
+  usdRate,
 }) {
   const [viewMode, setViewMode] = useState("cards");
 
-  const pendingCount = requests.filter(r => r.status === "pendiente_aprobacion").length;
+  const pendingCount = requests.filter(r => {
+    const s = r.status;
+    return s === "pend_autorizacion" || s === "pend_aprobacion" || s === "pendiente_aprobacion" || s === "aprobacion_gerente" || s === "pendiente";
+  }).length;
   const draftCount = requests.filter(r => r.status === "borrador").length;
-  const inProcessCount = requests.filter(r => r.status === "en_proceso" || r.status === "cotizacion").length;
+  const inProcessCount = requests.filter(r => {
+    const s = r.status;
+    return s === "en_cotizacion" || s === "orden_compra" || s === "en_proceso" || s === "cotizacion";
+  }).length;
   const totalAmount = requests.reduce((sum, r) => sum + (r.totalAmount || 0), 0);
 
   return (
@@ -128,7 +135,7 @@ export default function Dashboard({
           />
         ) : (
           filtered.map(r => (
-            <RequestCard key={r.id} request={r} onClick={() => onSelectRequest(r)} />
+            <RequestCard key={r.id} request={r} onClick={() => onSelectRequest(r)} usdRate={usdRate} />
           ))
         )}
       </div>

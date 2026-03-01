@@ -1,0 +1,157 @@
+// ============================================================
+// RequestTimeline — Trazabilidad (approval history + pipeline)
+//                   + Attachments section
+// Extracted from RequestDetail.jsx
+// ============================================================
+import { STATUS_FLOW } from "../../constants";
+import { fmtDate, fmtDateTime } from "../../utils/dateFormatters";
+import AttachmentUpload from "./AttachmentUpload";
+
+function SectionTitle({ children, count, collapsed, onToggle }) {
+  return (
+    <div
+      onClick={onToggle}
+      className={`flex items-center justify-between select-none ${collapsed ? '' : 'mb-3'} ${onToggle ? 'cursor-pointer' : 'cursor-default'}`}
+    >
+      <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide flex items-center gap-1.5">
+        {children}
+        {count != null && (
+          <span className="bg-emerald-500/[0.08] text-emerald-400 text-[10px] font-bold px-1.5 py-px rounded-md min-w-[18px] text-center">
+            {count}
+          </span>
+        )}
+      </div>
+      {onToggle && (
+        <span
+          className="text-sm text-slate-400 transition-transform duration-200"
+          style={{ transform: collapsed ? "rotate(-90deg)" : "rotate(0)" }}
+        >
+          ▾
+        </span>
+      )}
+    </div>
+  );
+}
+
+export default function RequestTimeline({
+  request: r,
+  statusIdx,
+  showTrazabilidad,
+  onToggleTrazabilidad,
+  showAttachments,
+  onToggleAttachments,
+  attachments,
+  onAttachmentsChange,
+}) {
+  return (
+    <>
+      {/* ===== TRAZABILIDAD (collapsible) ===== */}
+      <div className="px-5 py-2">
+        <SectionTitle
+          count={(r.approvalHistory?.length || 0) + STATUS_FLOW.length}
+          collapsed={!showTrazabilidad}
+          onToggle={onToggleTrazabilidad}
+        >
+          Trazabilidad
+        </SectionTitle>
+
+        {/* Always show last 3 approval history entries */}
+        {r.approvalHistory?.length > 0 && (
+          <div className={showTrazabilidad ? 'mb-2' : ''}>
+            {(showTrazabilidad ? r.approvalHistory : r.approvalHistory.slice(-3)).map((entry, i) => {
+              const actionStyles = {
+                confirmed: { icon: "📤", color: "#3b82f6", label: "Confirmada" },
+                approved: { icon: "✅", color: "#22c55e", label: "Aprobada" },
+                rejected: { icon: "❌", color: "#ef4444", label: "Rechazada" },
+                revision: { icon: "↩", color: "#f59e0b", label: "Devuelta" },
+                advanced: { icon: "→", color: "#10b981", label: "Avanzada" },
+              };
+              const a = actionStyles[entry.action] || { icon: "•", color: "#94a3b8", label: entry.action };
+              return (
+                <div key={i} className="flex gap-2.5 mb-1.5 p-2 px-3 rounded-lg bg-white/[0.02] border border-white/[0.06]">
+                  <span className="text-sm">{a.icon}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs font-semibold" style={{ color: a.color }}>
+                      {entry.step ? `${entry.step}: ` : ""}{a.label}
+                      {entry.note ? ` — ${entry.note}` : ""}
+                    </div>
+                    <div className="text-[10px] text-slate-400 mt-px">
+                      {entry.by} · {fmtDateTime(entry.at)}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Pipeline timeline (shown when expanded) */}
+        {showTrazabilidad && (
+          <div className="bg-white/[0.03] rounded-xl px-4 py-3.5 border border-white/[0.06]">
+            {STATUS_FLOW.map((s, i) => {
+              const reached = i <= statusIdx;
+              return (
+                <div key={s.key} className="flex gap-3">
+                  <div className="flex flex-col items-center w-6">
+                    <div
+                      className="w-[18px] h-[18px] rounded-full flex items-center justify-center text-[9px] text-white transition-all duration-300"
+                      style={{
+                        background: reached ? s.color : 'rgba(255,255,255,0.06)',
+                        border: i === statusIdx ? `2px solid ${s.color}` : 'none',
+                        boxShadow: i === statusIdx ? `0 0 0 3px ${s.color}20` : 'none',
+                      }}
+                    >
+                      {reached ? "✓" : ""}
+                    </div>
+                    {i < STATUS_FLOW.length - 1 && (
+                      <div
+                        className="w-0.5 h-[22px]"
+                        style={{ background: i < statusIdx ? s.color : 'rgba(255,255,255,0.06)' }}
+                      />
+                    )}
+                  </div>
+                  <div className="pb-2 min-w-0">
+                    <div
+                      className={`text-xs ${reached ? 'font-semibold text-white' : 'font-normal text-slate-400'}`}
+                    >
+                      {s.icon} {s.label}
+                    </div>
+                    {reached && i === 0 && (
+                      <div className="text-[10px] text-slate-400">{fmtDate(r.date)}</div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {!showTrazabilidad && (r.approvalHistory?.length || 0) === 0 && (
+          <div className="text-xs text-slate-400 py-1.5">
+            Sin historial de acciones todavía
+          </div>
+        )}
+      </div>
+
+      {/* ===== ATTACHMENTS ===== */}
+      <div className="px-5 py-2">
+        <SectionTitle
+          count={attachments.length}
+          collapsed={!showAttachments}
+          onToggle={onToggleAttachments}
+        >
+          Adjuntos
+        </SectionTitle>
+        {showAttachments && (
+          <div className="bg-white/[0.03] rounded-xl p-4 border border-white/[0.06]">
+            <AttachmentUpload
+              requestUuid={r._uuid}
+              attachments={attachments}
+              onAttachmentsChange={onAttachmentsChange}
+            />
+          </div>
+        )}
+      </div>
+    </>
+  );
+}

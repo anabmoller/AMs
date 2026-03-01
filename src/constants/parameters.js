@@ -74,7 +74,7 @@ export async function initParameters() {
       establishments: (estab.data || []).map(e => ({
         id: e.legacy_id || e.id,
         _uuid: e.id,
-        name: e.name,
+        name: (e.name || "").replace(/^building\s+/i, ""),
         code: e.code,
         company: companyMap[e.company_id] || "",
         companyId: e.company_id,

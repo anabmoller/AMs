@@ -239,30 +239,33 @@ Deno.serve(async (req) => {
             .eq("id", requestUuid);
           if (reqUpdateErr) throw reqUpdateErr;
 
-          // Atomic budget consumption
+          // Atomic budget consumption (RPC primary, CAS fallback with retry)
           if (request.budget_id && Number(request.total_amount) > 0) {
             const amount = Number(request.total_amount);
             const { error: budgetErr } = await supabaseAdmin.rpc(
               "increment_budget_consumed",
               { budget_uuid: request.budget_id, amount },
             );
-            // Fallback if RPC doesn't exist: read-update
+            // Fallback if RPC doesn't exist: compare-and-swap with retry
             if (budgetErr) {
               console.warn(
                 "[request-workflow] RPC fallback for budget consumption",
               );
-              const { data: bData } = await supabaseAdmin
-                .from("budgets")
-                .select("consumed")
-                .eq("id", request.budget_id)
-                .single();
-              if (bData) {
-                await supabaseAdmin
+              let retries = 3;
+              while (retries-- > 0) {
+                const { data: bData } = await supabaseAdmin
                   .from("budgets")
-                  .update({
-                    consumed: (Number(bData.consumed) || 0) + amount,
-                  })
-                  .eq("id", request.budget_id);
+                  .select("consumed")
+                  .eq("id", request.budget_id)
+                  .single();
+                if (!bData) break;
+                const currentConsumed = Number(bData.consumed) || 0;
+                const { error: casErr } = await supabaseAdmin
+                  .from("budgets")
+                  .update({ consumed: currentConsumed + amount })
+                  .eq("id", request.budget_id)
+                  .eq("consumed", currentConsumed);
+                if (!casErr) break;
               }
             }
           }
@@ -412,19 +415,40 @@ Deno.serve(async (req) => {
           throw new Error("No permission to advance status");
         }
 
-        // Validate status is a known value
-        const VALID_STATUSES = [
+        // Sequential status flow (must match client STATUS_FLOW)
+        const STATUS_ORDER = [
           "borrador",
-          "pendiente_aprobacion",
+          "pend_autorizacion",
+          "autorizado",
+          "en_cotizacion",
+          "pend_aprobacion",
           "aprobado",
-          "en_proceso_compra",
-          "orden_emitida",
-          "en_transito",
+          "orden_compra",
           "recibido",
-          "entregado",
+          "sap",
         ];
-        if (!VALID_STATUSES.includes(newStatus)) {
+
+        if (!STATUS_ORDER.includes(newStatus)) {
           throw new Error(`Invalid status: ${newStatus}`);
+        }
+
+        // Fetch current status from DB
+        const { data: reqData, error: fetchErr } = await supabaseAdmin
+          .from("requests")
+          .select("status")
+          .eq("id", requestUuid)
+          .single();
+        if (fetchErr || !reqData) throw new Error("Request not found");
+
+        const currentIdx = STATUS_ORDER.indexOf(reqData.status);
+        const newIdx = STATUS_ORDER.indexOf(newStatus);
+
+        // Allow: next sequential step only (or reject from any state, handled by reject action)
+        if (currentIdx < 0 || newIdx !== currentIdx + 1) {
+          throw new Error(
+            `Invalid transition: ${reqData.status} → ${newStatus}. ` +
+            `Only sequential advances are allowed.`
+          );
         }
 
         const { error } = await supabaseAdmin
