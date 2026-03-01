@@ -170,7 +170,8 @@ body {
   border-right-color: #e5e7eb !important;
 }
 
-:root.light .bg-\[\#1a1b22\] {
+:root.light .bg-\[\#1a1b22\],
+:root.light .bg-\[\#1a1b23\] {
   background: #ffffff !important;
 }
 
