@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { colors, font, globalCSS } from "./styles/theme";
+import { useState, useEffect, useCallback } from "react";
 
 import ErrorBoundary from "./components/common/ErrorBoundary";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { AppProvider, useApp } from "./context/AppContext";
+import { ToastProvider } from "./components/shared/Toast";
 
 import LoginScreen from "./components/auth/LoginScreen";
 import ChangePasswordScreen from "./components/auth/ChangePasswordScreen";
@@ -21,6 +21,11 @@ import UserManagementScreen from "./components/admin/UserManagementScreen";
 import BudgetManagementScreen from "./components/admin/BudgetManagementScreen";
 import ParametersScreen from "./components/admin/ParametersScreen";
 import ApprovalConfigScreen from "./components/admin/ApprovalConfigScreen";
+import GlobalSearch from "./components/shared/GlobalSearch";
+
+// Lazy-loaded screens
+let AnalysisScreen = null;
+let SecurityDashboard = null;
 
 // ============================================================
 // YPOTI AGROPECUARIA — SISTEMA DE GESTION DE COMPRAS
@@ -41,57 +46,63 @@ function AppContent() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterEstablishment, setFilterEstablishment] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [showSearch, setShowSearch] = useState(false);
 
-  // Show loading spinner while checking Supabase session
+  // Cmd+K global search shortcut
+  useEffect(() => {
+    const handler = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setShowSearch(prev => !prev);
+      }
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, []);
+
+  // Lazy load analysis/security screens
+  useEffect(() => {
+    if (screen === 'analysis' && !AnalysisScreen) {
+      import('./components/analysis/AnalysisScreen.jsx').then(m => {
+        AnalysisScreen = m.default;
+        setScreen('analysis');
+      }).catch(() => {});
+    }
+    if (screen === 'security' && !SecurityDashboard) {
+      import('./components/admin/SecurityDashboard.jsx').then(m => {
+        SecurityDashboard = m.default;
+        setScreen('security');
+      }).catch(() => {});
+    }
+  }, [screen]);
+
+  // Loading spinner
   if (loading) {
     return (
-      <div style={{
-        fontFamily: font, background: colors.bg, minHeight: "100vh",
-        display: "flex", alignItems: "center", justifyContent: "center",
-      }}>
-        <div style={{ textAlign: "center" }}>
-          <div style={{
-            width: 48, height: 48, borderRadius: 12,
-            background: colors.primary,
-            display: "inline-flex", alignItems: "center", justifyContent: "center",
-            marginBottom: 16,
-          }}>
-            <span style={{ color: "#fff", fontSize: 20, fontWeight: 700 }}>Y</span>
+      <div className="min-h-screen bg-[#0a0b0f] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 rounded-xl bg-emerald-600 inline-flex items-center justify-center mb-4 shadow-lg shadow-emerald-600/20">
+            <span className="text-white text-xl font-bold">Y</span>
           </div>
-          <p style={{ color: colors.textLight, fontSize: 14 }}>Cargando...</p>
+          <p className="text-slate-500 text-sm">Cargando...</p>
         </div>
       </div>
     );
   }
 
-  if (!isAuthenticated) {
-    return <LoginScreen />;
-  }
+  if (!isAuthenticated) return <LoginScreen />;
+  if (forcePasswordChange) return <ChangePasswordScreen />;
 
-  // Force password change on first login
-  if (forcePasswordChange) {
-    return <ChangePasswordScreen />;
-  }
-
-  // Show loading while Supabase data initializes (parameters, budgets, users, requests)
+  // Data loading
   if (dataLoading) {
     return (
-      <div style={{
-        fontFamily: font, background: colors.bg, minHeight: "100vh",
-        display: "flex", alignItems: "center", justifyContent: "center",
-      }}>
-        <div style={{ textAlign: "center" }}>
-          <div style={{
-            width: 48, height: 48, borderRadius: 12,
-            background: colors.primary,
-            display: "inline-flex", alignItems: "center", justifyContent: "center",
-            marginBottom: 16,
-            boxShadow: `0 4px 16px ${colors.primary}30`,
-          }}>
-            <span style={{ color: "#fff", fontSize: 20, fontWeight: 700 }}>Y</span>
+      <div className="min-h-screen bg-[#0a0b0f] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 rounded-xl bg-emerald-600 inline-flex items-center justify-center mb-4 shadow-lg shadow-emerald-600/20">
+            <span className="text-white text-xl font-bold">Y</span>
           </div>
-          <p style={{ color: colors.textLight, fontSize: 14, margin: "0 0 4px" }}>Cargando datos...</p>
-          <p style={{ color: colors.textMuted, fontSize: 12, margin: 0 }}>Conectando con el servidor</p>
+          <p className="text-slate-400 text-sm mb-1">Cargando datos...</p>
+          <p className="text-slate-600 text-xs">Conectando con el servidor</p>
         </div>
       </div>
     );
@@ -105,15 +116,20 @@ function AppContent() {
   const filtered = visibleRequests.filter(r => {
     if (filterStatus !== "all" && r.status !== filterStatus) return false;
     if (filterEstablishment !== "all" && r.establishment !== filterEstablishment) return false;
-    if (searchQuery && !r.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        !r.id.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    if (searchQuery && !r.name?.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        !r.id?.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     return true;
   });
 
-  const handleNavigate = (target) => {
-    setScreen(target);
-    setSelectedRequestId(null);
-    setShowNewForm(false);
+  const handleNavigate = (target, requestId) => {
+    if (target === 'request' && requestId) {
+      setSelectedRequestId(requestId);
+      setScreen('dashboard');
+    } else {
+      setScreen(target);
+      setSelectedRequestId(null);
+      setShowNewForm(false);
+    }
   };
 
   const handleNewRequest = () => {
@@ -173,6 +189,14 @@ function AppContent() {
       );
     }
 
+    if (screen === "analysis" && can("view_analytics") && AnalysisScreen) {
+      return <AnalysisScreen onBack={() => setScreen("dashboard")} />;
+    }
+
+    if (screen === "security" && can("manage_users") && SecurityDashboard) {
+      return <SecurityDashboard onBack={() => setScreen("dashboard")} />;
+    }
+
     if (screen === "users" && can("manage_users")) {
       return <UserManagementScreen onBack={() => setScreen("settings")} />;
     }
@@ -217,7 +241,7 @@ function AppContent() {
   const newRequestHandler = can("create_request") ? handleNewRequest : () => showNotif("Sin permiso", "error");
 
   return (
-    <div style={{ fontFamily: font, background: colors.bg, minHeight: "100vh" }}>
+    <div className="min-h-screen bg-[#0a0b0f]">
       <DesktopSidebar
         screen={screen}
         onNavigate={handleNavigate}
@@ -227,12 +251,7 @@ function AppContent() {
         canManageUsers={can("manage_users")}
       />
 
-      <div className="app-main-content" style={{
-        maxWidth: 480,
-        margin: "0 auto",
-        position: "relative",
-        minHeight: "100vh",
-      }}>
+      <div className="app-main-content max-w-[480px] mx-auto relative min-h-screen">
         <Notification notification={notification} />
 
         <div className="mobile-header">
@@ -254,7 +273,14 @@ function AppContent() {
         )}
       </div>
 
-      <style>{globalCSS}</style>
+      {/* Global search modal */}
+      {showSearch && (
+        <GlobalSearch
+          onNavigate={handleNavigate}
+          requests={visibleRequests}
+          onClose={() => setShowSearch(false)}
+        />
+      )}
     </div>
   );
 }
@@ -264,7 +290,9 @@ export default function App() {
     <ErrorBoundary>
       <AuthProvider>
         <AppProvider>
-          <AppContent />
+          <ToastProvider>
+            <AppContent />
+          </ToastProvider>
         </AppProvider>
       </AuthProvider>
     </ErrorBoundary>

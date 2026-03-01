@@ -1,4 +1,3 @@
-import { colors, font, radius, shadows } from "../../styles/theme";
 import { getStatusDisplay, getStatusProgress, getPriorityDisplay, formatGuaranies } from "../../utils/statusHelpers";
 import { getSectors } from "../../constants/parameters";
 
@@ -10,89 +9,55 @@ export default function RequestCard({ request: r, onClick }) {
   return (
     <div
       onClick={onClick}
-      style={{
-        background: colors.card,
-        borderRadius: radius.lg,
-        padding: "14px 16px",
-        marginBottom: 8,
-        border: `1px solid ${colors.border}`,
-        cursor: "pointer",
-        transition: "all 0.15s",
-        position: "relative",
-        overflow: "hidden",
-      }}
-      onMouseEnter={e => {
-        e.currentTarget.style.borderColor = colors.primary + "50";
-        e.currentTarget.style.boxShadow = shadows.sm;
-      }}
-      onMouseLeave={e => {
-        e.currentTarget.style.borderColor = colors.border;
-        e.currentTarget.style.boxShadow = "none";
-      }}
+      className="bg-white/[0.03] rounded-xl px-4 py-3.5 mb-2 border border-white/[0.06] cursor-pointer transition-all duration-150 relative overflow-hidden hover:border-emerald-500/30 hover:shadow-[0_1px_3px_rgba(0,0,0,0.4),0_1px_2px_rgba(0,0,0,0.3)]"
     >
       {/* Progress bar */}
-      <div style={{
-        position: "absolute", top: 0, left: 0, right: 0, height: 2,
-        background: colors.borderLight,
-      }}>
-        <div style={{
-          width: `${progress}%`, height: "100%",
-          background: status.color,
-          transition: "width 0.3s",
-        }} />
+      <div className="absolute top-0 left-0 right-0 h-0.5 bg-white/[0.06]">
+        <div
+          className="h-full transition-[width] duration-300"
+          style={{ width: `${progress}%`, background: status.color }}
+        />
       </div>
 
       {/* Top row: ID + Priority */}
-      <div style={{
-        display: "flex", justifyContent: "space-between", alignItems: "center",
-        marginBottom: 6, paddingTop: 2,
-      }}>
-        <span style={{
-          fontSize: 11, color: colors.textMuted, fontWeight: 500,
-          fontFamily: font,
-        }}>
+      <div className="flex justify-between items-center mb-1.5 pt-0.5">
+        <span className="text-[11px] text-slate-500 font-medium font-sans">
           {r.id} · {r.date}
         </span>
-        <span style={{
-          fontSize: 10, fontWeight: 600,
-          color: priority.color,
-          background: priority.colorLight,
-          padding: "2px 8px", borderRadius: radius.full,
-        }}>
+        <span
+          className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+          style={{ color: priority.color, background: priority.colorLight }}
+        >
           {priority.icon} {priority.label}
         </span>
       </div>
 
       {/* Title */}
-      <div style={{
-        fontSize: 14, fontWeight: 600, color: colors.text,
-        lineHeight: 1.35, marginBottom: 8,
-      }}>
+      <div className="text-sm font-semibold text-white leading-snug mb-2">
         {r.name}
       </div>
 
       {/* Status + Meta */}
-      <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
-        <span style={{
-          fontSize: 11, padding: "3px 8px", borderRadius: radius.sm,
-          background: status.colorLight || (status.color + "12"),
-          color: status.color, fontWeight: 600,
-        }}>
+      <div className="flex gap-1.5 items-center flex-wrap">
+        <span
+          className="text-[11px] px-2 py-[3px] rounded-md font-semibold"
+          style={{
+            background: status.colorLight || (status.color + "12"),
+            color: status.color,
+          }}
+        >
           {status.label}
         </span>
-        <span style={{ fontSize: 11, color: colors.textLight }}>
+        <span className="text-[11px] text-slate-400">
           {r.establishment}
         </span>
         {r.sector && (
-          <span style={{ fontSize: 11, color: colors.textMuted }}>
+          <span className="text-[11px] text-slate-500">
             · {getSectors().find(s => s.name === r.sector)?.icon || ""} {r.sector}
           </span>
         )}
         {r.totalAmount > 0 && (
-          <span style={{
-            fontSize: 12, fontWeight: 600, color: colors.text,
-            marginLeft: "auto", fontFamily: font,
-          }}>
+          <span className="text-xs font-semibold text-white ml-auto font-sans">
             {formatGuaranies(r.totalAmount)}
           </span>
         )}
@@ -100,23 +65,14 @@ export default function RequestCard({ request: r, onClick }) {
 
       {/* Requester */}
       {r.requester && (
-        <div style={{
-          marginTop: 8, fontSize: 11, color: colors.textMuted,
-          display: "flex", alignItems: "center", gap: 6,
-          paddingTop: 8, borderTop: `1px solid ${colors.borderLight}`,
-        }}>
-          <span style={{
-            width: 18, height: 18, borderRadius: radius.full,
-            background: colors.primaryLight, color: colors.primary,
-            fontSize: 9, fontWeight: 600, display: "inline-flex",
-            alignItems: "center", justifyContent: "center",
-          }}>
+        <div className="mt-2 text-[11px] text-slate-500 flex items-center gap-1.5 pt-2 border-t border-white/[0.06]">
+          <span className="w-[18px] h-[18px] rounded-full bg-emerald-500/10 text-emerald-500 text-[9px] font-semibold inline-flex items-center justify-center">
             {r.requester.charAt(0)}
           </span>
-          <span style={{ fontWeight: 500, color: colors.textSecondary }}>{r.requester}</span>
+          <span className="font-medium text-slate-300">{r.requester}</span>
           {r.assignee && (
             <>
-              <svg width="12" height="12" viewBox="0 0 20 20" fill={colors.textMuted}>
+              <svg width="12" height="12" viewBox="0 0 20 20" className="fill-slate-500">
                 <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"/>
               </svg>
               <span>{r.assignee}</span>

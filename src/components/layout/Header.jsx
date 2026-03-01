@@ -1,42 +1,21 @@
-import { colors, font, radius } from "../../styles/theme";
-
+/**
+ * Mobile header — dark mode, sticky
+ */
 export default function Header({ currentUser }) {
+  const initial = currentUser?.charAt(0)?.toUpperCase() || 'U';
   return (
-    <header style={{
-      background: colors.card,
-      borderBottom: `1px solid ${colors.border}`,
-      padding: "12px 20px",
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      position: "sticky",
-      top: 0,
-      zIndex: 40,
-    }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <div style={{
-          width: 32, height: 32, borderRadius: radius.md,
-          background: colors.primary,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          color: "#fff", fontWeight: 700, fontSize: 14, fontFamily: font,
-        }}>Y</div>
+    <header className="bg-[#0d0e14] border-b border-white/[0.06] px-5 py-3 flex justify-between items-center sticky top-0 z-40">
+      <div className="flex items-center gap-2.5">
+        <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold text-sm">
+          Y
+        </div>
         <div>
-          <div style={{
-            fontSize: 16, fontWeight: 700, color: colors.text,
-            fontFamily: font, letterSpacing: "-0.02em", lineHeight: 1.1,
-          }}>YPOTI</div>
-          <div style={{ fontSize: 10, color: colors.textMuted, fontWeight: 500 }}>
-            Compras
-          </div>
+          <div className="text-base font-bold text-white tracking-tight leading-tight">YPOTI</div>
+          <div className="text-[10px] text-slate-500 font-medium">Compras</div>
         </div>
       </div>
-      <div style={{
-        width: 34, height: 34, borderRadius: radius.full,
-        background: colors.primaryLight,
-        display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: 13, fontWeight: 600, color: colors.primary,
-      }}>
-        {currentUser?.charAt(0) || "U"}
+      <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-xs font-semibold text-emerald-400">
+        {initial}
       </div>
     </header>
   );

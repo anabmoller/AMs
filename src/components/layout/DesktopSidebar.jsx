@@ -1,72 +1,49 @@
-import { colors, font, radius, shadows } from "../../styles/theme";
-
+/**
+ * Desktop sidebar navigation — dark mode
+ */
 export default function DesktopSidebar({ screen, onNavigate, onNewRequest, currentUser, canViewAnalytics, canManageUsers }) {
   const mainItems = [
-    { key: "dashboard", icon: "📋", label: "Solicitudes" },
-    { key: "inventory", icon: "📦", label: "Inventario" },
-    ...(canViewAnalytics ? [{ key: "analytics", icon: "📊", label: "Análisis" }] : []),
+    { key: 'dashboard', icon: '📋', label: 'Solicitudes' },
+    { key: 'inventory', icon: '📦', label: 'Inventario' },
+    ...(canViewAnalytics ? [{ key: 'analytics', icon: '📊', label: 'Análisis' }] : []),
+    ...(canViewAnalytics ? [{ key: 'analysis', icon: '📈', label: 'Análisis Pro' }] : []),
+    ...(canManageUsers ? [{ key: 'security', icon: '🛡️', label: 'Seguridad' }] : []),
   ];
 
   const adminItems = [
-    ...(canManageUsers ? [{ key: "users", icon: "👥", label: "Usuarios" }] : []),
-    ...(canViewAnalytics ? [{ key: "budgets", icon: "💰", label: "Presupuestos" }] : []),
-    ...(canManageUsers ? [{ key: "parameters", icon: "⚙️", label: "Parámetros" }] : []),
-    ...(canManageUsers ? [{ key: "approvalConfig", icon: "🔄", label: "Aprobaciones" }] : []),
+    ...(canManageUsers ? [{ key: 'users', icon: '👥', label: 'Usuarios' }] : []),
+    ...(canViewAnalytics ? [{ key: 'budgets', icon: '💰', label: 'Presupuestos' }] : []),
+    ...(canManageUsers ? [{ key: 'parameters', icon: '⚙️', label: 'Parámetros' }] : []),
+    ...(canManageUsers ? [{ key: 'approvalConfig', icon: '🔄', label: 'Aprobaciones' }] : []),
   ];
 
+  const initial = currentUser?.charAt(0)?.toUpperCase() || 'U';
+
   return (
-    <aside className="desktop-sidebar" style={{ background: colors.card }}>
+    <aside className="desktop-sidebar bg-[#0d0e14]">
       {/* Brand */}
-      <div style={{
-        padding: "20px 20px 16px",
-        borderBottom: `1px solid ${colors.border}`,
-        display: "flex", alignItems: "center", gap: 10,
-      }}>
-        <div style={{
-          width: 36, height: 36, borderRadius: radius.md,
-          background: colors.primary,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          color: "#fff", fontWeight: 700, fontSize: 16, fontFamily: font,
-        }}>Y</div>
+      <div className="px-5 pt-5 pb-4 border-b border-white/[0.06] flex items-center gap-2.5">
+        <div className="w-9 h-9 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold text-base">
+          Y
+        </div>
         <div>
-          <h1 style={{
-            fontFamily: font, fontSize: 18, margin: 0,
-            fontWeight: 700, color: colors.text,
-            letterSpacing: "-0.02em", lineHeight: 1.1,
-          }}>YPOTI</h1>
-          <div style={{
-            fontSize: 10, fontWeight: 500, color: colors.textMuted,
-            letterSpacing: "0.02em",
-          }}>
-            Gestión de Compras
-          </div>
+          <h1 className="text-lg font-bold text-white tracking-tight leading-tight m-0">YPOTI</h1>
+          <div className="text-[10px] font-medium text-slate-500 tracking-wide">{"Gestión de Compras"}</div>
         </div>
       </div>
 
       {/* User card */}
-      <div style={{
-        margin: "12px 12px 4px", padding: "10px 12px",
-        background: colors.surface, borderRadius: radius.md,
-        display: "flex", alignItems: "center", gap: 10,
-      }}>
-        <div style={{
-          width: 32, height: 32, borderRadius: radius.full,
-          background: colors.primaryLight,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          color: colors.primary, fontWeight: 600, fontSize: 13,
-        }}>
-          {currentUser.charAt(0)}
+      <div className="mx-3 mt-3 mb-1 px-3 py-2.5 bg-[rgba(255,255,255,0.04)] rounded-lg border border-white/[0.06] flex items-center gap-2.5">
+        <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400 font-semibold text-xs">
+          {initial}
         </div>
-        <div style={{
-          fontSize: 13, fontWeight: 500, color: colors.text,
-          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-        }}>
+        <div className="text-sm font-medium text-white truncate">
           {currentUser}
         </div>
       </div>
 
       {/* Navigation */}
-      <nav style={{ padding: "8px 12px", flex: 1, overflowY: "auto" }}>
+      <nav className="px-3 py-2 flex-1 overflow-y-auto">
         <SectionLabel>Principal</SectionLabel>
         {mainItems.map(item => (
           <NavItem key={item.key} item={item} active={screen === item.key} onClick={() => onNavigate(item.key)} />
@@ -74,7 +51,7 @@ export default function DesktopSidebar({ screen, onNavigate, onNewRequest, curre
 
         {adminItems.length > 0 && (
           <>
-            <SectionLabel>Administración</SectionLabel>
+            <SectionLabel>{"Administración"}</SectionLabel>
             {adminItems.map(item => (
               <NavItem key={item.key} item={item} active={screen === item.key} onClick={() => onNavigate(item.key)} />
             ))}
@@ -82,24 +59,19 @@ export default function DesktopSidebar({ screen, onNavigate, onNewRequest, curre
         )}
 
         <SectionLabel>Sistema</SectionLabel>
-        <NavItem item={{ key: "settings", icon: "🔧", label: "Configuración" }} active={screen === "settings"} onClick={() => onNavigate("settings")} />
+        <NavItem
+          item={{ key: 'settings', icon: '🔧', label: 'Configuración' }}
+          active={screen === 'settings'}
+          onClick={() => onNavigate('settings')}
+        />
       </nav>
 
       {/* New request button */}
-      <div style={{ padding: "12px 16px 20px" }}>
+      <div className="px-4 pb-5 pt-3">
         <button
           onClick={onNewRequest}
-          style={{
-            width: "100%", padding: "11px", borderRadius: radius.md,
-            border: "none",
-            background: colors.primary,
-            color: "#fff", fontSize: 13, fontWeight: 600, fontFamily: font,
-            cursor: "pointer",
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
-            transition: "background 0.15s",
-          }}
-          onMouseEnter={e => e.currentTarget.style.background = colors.primaryDark}
-          onMouseLeave={e => e.currentTarget.style.background = colors.primary}
+          className="w-full py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold flex items-center justify-center gap-1.5 transition-colors border-none cursor-pointer"
+          aria-label="Nueva Solicitud"
         >
           <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd"/>
@@ -113,11 +85,7 @@ export default function DesktopSidebar({ screen, onNavigate, onNewRequest, curre
 
 function SectionLabel({ children }) {
   return (
-    <div style={{
-      fontSize: 10, fontWeight: 600, color: colors.textMuted,
-      textTransform: "uppercase", letterSpacing: "0.08em",
-      padding: "14px 12px 6px",
-    }}>
+    <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest px-3 pt-3.5 pb-1.5">
       {children}
     </div>
   );
@@ -127,17 +95,13 @@ function NavItem({ item, active, onClick }) {
   return (
     <button
       onClick={onClick}
-      style={{
-        width: "100%", display: "flex", alignItems: "center", gap: 10,
-        padding: "9px 12px", borderRadius: radius.sm, border: "none",
-        background: active ? colors.primaryLight : "transparent",
-        color: active ? colors.primary : colors.textSecondary,
-        fontWeight: active ? 600 : 450,
-        fontSize: 13, fontFamily: font, cursor: "pointer",
-        marginBottom: 1, transition: "all 0.12s",
-      }}
+      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-md border-none text-sm cursor-pointer mb-0.5 transition-all ${
+        active
+          ? 'bg-emerald-500/10 text-emerald-400 font-semibold'
+          : 'bg-transparent text-slate-400 font-normal hover:bg-[rgba(255,255,255,0.06)] hover:text-slate-200'
+      }`}
     >
-      <span style={{ fontSize: 15, width: 20, textAlign: "center" }}>{item.icon}</span>
+      <span className="text-[15px] w-5 text-center">{item.icon}</span>
       {item.label}
     </button>
   );

@@ -1,5 +1,4 @@
 import { useState, useMemo } from "react";
-import { colors, font, fontDisplay, radius, shadows } from "../../styles/theme";
 import { INVENTORY_ITEMS, GROUP_COLORS } from "../../constants";
 import SearchInput from "../common/SearchInput";
 
@@ -44,40 +43,21 @@ export default function InventoryModal({ onSelect, onClose, onNewProduct }) {
   return (
     <div
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-      style={{
-        position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-        background: "rgba(0,0,0,0.5)", zIndex: 1000,
-        display: "flex", alignItems: "center", justifyContent: "center",
-        padding: 16,
-      }}
+      className="fixed inset-0 bg-black/50 z-[1000] flex items-center justify-center p-4"
     >
-      <div style={{
-        background: colors.bg, borderRadius: radius.xl,
-        maxWidth: 560, width: "100%", maxHeight: "70vh",
-        overflow: "hidden", display: "flex", flexDirection: "column",
-        animation: "fadeIn 0.2s ease",
-      }}>
+      <div className="bg-[#0a0b0f] rounded-2xl max-w-[560px] w-full max-h-[70vh] overflow-hidden flex flex-col animate-fadeIn">
         {/* Header */}
-        <div style={{ padding: "20px 20px 0" }}>
-          <div style={{
-            display: "flex", justifyContent: "space-between",
-            alignItems: "center", marginBottom: 14,
-          }}>
+        <div className="px-5 pt-5">
+          <div className="flex justify-between items-center mb-3.5">
             <div>
-              <h3 style={{
-                fontFamily: fontDisplay, fontSize: 20, fontWeight: 600,
-                color: colors.text, margin: 0,
-              }}>
+              <h3 className="text-xl font-semibold text-white m-0">
                 Catálogo de Productos
               </h3>
-              <div style={{ fontSize: 11, color: colors.textLight, marginTop: 2 }}>
+              <div className="text-[11px] text-slate-400 mt-0.5">
                 {INVENTORY_ITEMS.length} productos disponibles
               </div>
             </div>
-            <button onClick={onClose} style={{
-              background: colors.border, border: "none", width: 32, height: 32,
-              borderRadius: radius.md, cursor: "pointer", fontSize: 16,
-            }}>
+            <button onClick={onClose} className="bg-white/[0.06] border-none w-8 h-8 rounded-lg cursor-pointer text-base text-white flex items-center justify-center">
               ✕
             </button>
           </div>
@@ -92,57 +72,49 @@ export default function InventoryModal({ onSelect, onClose, onNewProduct }) {
           />
 
           {/* Group pills */}
-          <div style={{
-            display: "flex", gap: 6, overflowX: "auto", paddingBottom: 12,
-            scrollbarWidth: "none",
-          }}>
-            {groups.map(g => (
-              <button
-                key={g}
-                onClick={() => setActiveGroup(g)}
-                style={{
-                  padding: "5px 12px", borderRadius: radius.full,
-                  border: activeGroup === g
-                    ? `2px solid ${g === "all" ? colors.primary : (GROUP_COLORS[g] || colors.primary)}`
-                    : `1px solid ${colors.borderLight}`,
-                  background: activeGroup === g
-                    ? (g === "all" ? colors.primary : (GROUP_COLORS[g] || colors.primary)) + "12"
-                    : colors.card,
-                  color: activeGroup === g
-                    ? (g === "all" ? colors.primary : (GROUP_COLORS[g] || colors.primary))
-                    : colors.textLight,
-                  fontSize: 11, fontWeight: 600, fontFamily: font,
-                  cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
-                }}
-              >
-                {g === "all" ? `Todos (${INVENTORY_ITEMS.length})` : g}
-              </button>
-            ))}
+          <div className="flex gap-1.5 overflow-x-auto pb-3 scrollbar-none">
+            {groups.map(g => {
+              const groupColor = g === "all" ? "#10b981" : (GROUP_COLORS[g] || "#10b981");
+              return (
+                <button
+                  key={g}
+                  onClick={() => setActiveGroup(g)}
+                  className="px-3 py-1 rounded-full text-[11px] font-semibold cursor-pointer whitespace-nowrap flex-shrink-0"
+                  style={{
+                    border: activeGroup === g
+                      ? `2px solid ${groupColor}`
+                      : '1px solid rgba(255,255,255,0.06)',
+                    background: activeGroup === g
+                      ? groupColor + "12"
+                      : 'rgba(255,255,255,0.03)',
+                    color: activeGroup === g ? groupColor : '#94a3b8',
+                  }}
+                >
+                  {g === "all" ? `Todos (${INVENTORY_ITEMS.length})` : g}
+                </button>
+              );
+            })}
           </div>
         </div>
 
         {/* Items list */}
-        <div style={{ overflow: "auto", padding: "0 20px 20px", flex: 1 }}>
+        <div className="overflow-auto px-5 pb-5 flex-1">
           {filtered.length === 0 ? (
-            <div style={{
-              textAlign: "center", padding: 30,
-              color: colors.textLight, fontSize: 13,
-            }}>
+            <div className="text-center p-8 text-slate-400 text-[13px]">
               No se encontraron productos para "{search}"
             </div>
           ) : (
             Object.entries(groupedItems).map(([group, items]) => (
               <div key={group}>
                 {activeGroup === "all" && (
-                  <div style={{
-                    fontSize: 10, fontWeight: 600, color: GROUP_COLORS[group] || colors.textLight,
-                    textTransform: "uppercase", letterSpacing: 1,
-                    padding: "10px 0 6px", display: "flex", alignItems: "center", gap: 6,
-                  }}>
-                    <span style={{
-                      width: 6, height: 6, borderRadius: radius.xs,
-                      background: GROUP_COLORS[group] || colors.textLight,
-                    }} />
+                  <div
+                    className="text-[10px] font-semibold uppercase tracking-wide py-2.5 pb-1.5 flex items-center gap-1.5"
+                    style={{ color: GROUP_COLORS[group] || '#94a3b8' }}
+                  >
+                    <span
+                      className="w-1.5 h-1.5 rounded-sm"
+                      style={{ background: GROUP_COLORS[group] || '#94a3b8' }}
+                    />
                     {group} ({items.length})
                   </div>
                 )}
@@ -150,47 +122,27 @@ export default function InventoryModal({ onSelect, onClose, onNewProduct }) {
                   <div
                     key={item.code}
                     onClick={() => onSelect(item)}
-                    style={{
-                      background: colors.card, borderRadius: radius.lg, padding: "12px 14px",
-                      marginBottom: 4, cursor: "pointer",
-                      border: `1px solid ${colors.borderLight}`,
-                      display: "flex", justifyContent: "space-between", alignItems: "center",
-                      transition: "all 0.15s",
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.borderColor = colors.primary + "60";
-                      e.currentTarget.style.background = colors.primary + "04";
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.borderColor = colors.borderLight;
-                      e.currentTarget.style.background = colors.card;
-                    }}
+                    className="bg-white/[0.03] rounded-xl px-3.5 py-3 mb-1 cursor-pointer border border-white/[0.06] flex justify-between items-center transition-all duration-150 hover:border-emerald-500/40 hover:bg-emerald-500/[0.02]"
                   >
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: colors.text }}>
+                    <div className="flex-1">
+                      <div className="text-[13px] font-semibold text-white">
                         {item.name}
                       </div>
-                      <div style={{
-                        fontSize: 11, color: colors.textLight, marginTop: 2,
-                        display: "flex", alignItems: "center", gap: 6,
-                      }}>
-                        <span style={{
-                          fontFamily: "monospace", fontSize: 10,
-                          background: colors.surface, padding: "1px 5px",
-                          borderRadius: radius.xs,
-                        }}>
+                      <div className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1.5">
+                        <span className="font-mono text-[10px] bg-white/[0.02] px-1.5 py-px rounded">
                           {item.code}
                         </span>
                         <span>·</span>
                         <span>{item.group}</span>
                       </div>
                     </div>
-                    <span style={{
-                      fontSize: 10, background: (GROUP_COLORS[item.group] || colors.primary) + "12",
-                      color: GROUP_COLORS[item.group] || colors.primary,
-                      padding: "3px 8px", borderRadius: radius.sm, fontWeight: 600,
-                      whiteSpace: "nowrap", marginLeft: 8,
-                    }}>
+                    <span
+                      className="text-[10px] px-2 py-0.5 rounded font-semibold whitespace-nowrap ml-2"
+                      style={{
+                        background: (GROUP_COLORS[item.group] || "#10b981") + "12",
+                        color: GROUP_COLORS[item.group] || "#10b981",
+                      }}
+                    >
                       {item.type}
                     </span>
                   </div>
@@ -202,20 +154,12 @@ export default function InventoryModal({ onSelect, onClose, onNewProduct }) {
           {/* New product option */}
           <div
             onClick={onNewProduct}
-            style={{
-              background: colors.accent + "06", borderRadius: radius.lg, padding: "16px",
-              marginTop: 12, cursor: "pointer",
-              border: `1px dashed ${colors.accent}40`,
-              textAlign: "center",
-              transition: "all 0.15s",
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = colors.accent + "10"}
-            onMouseLeave={e => e.currentTarget.style.background = colors.accent + "06"}
+            className="bg-blue-400/[0.04] rounded-xl p-4 mt-3 cursor-pointer border border-dashed border-blue-400/25 text-center transition-all duration-150 hover:bg-blue-400/[0.06]"
           >
-            <div style={{ fontSize: 13, fontWeight: 600, color: colors.accent }}>
+            <div className="text-[13px] font-semibold text-blue-400">
               + Agregar producto nuevo
             </div>
-            <div style={{ fontSize: 11, color: colors.textLight, marginTop: 2 }}>
+            <div className="text-[11px] text-slate-400 mt-0.5">
               ¿No está en el catálogo? Créalo manualmente
             </div>
           </div>

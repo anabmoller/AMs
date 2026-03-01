@@ -99,8 +99,6 @@ export function AuthProvider({ children }) {
       async (event, newSession) => {
         if (!mounted) return;
 
-        console.log("[Auth] Event:", event, "hasSession:", !!newSession);
-
         if (event === "INITIAL_SESSION" || event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
           if (newSession?.access_token) {
             // CRITICAL: Always keep _accessToken in sync

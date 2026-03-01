@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from "react";
-import { colors, font, fontDisplay, labelStyle, inputStyle, shadows, radius } from "../../styles/theme";
 import {
   PRIORITY_LEVELS, INVENTORY_ITEMS,
 } from "../../constants";
@@ -48,7 +47,6 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
   const update = (key, val) => {
     setForm(prev => {
       const next = { ...prev, [key]: val };
-      // Auto-assign Laura Rivas for farm establishments (anything except Oficina)
       if (key === "establishment" && val) {
         next.assignee = OFICINA_ESTABLISHMENTS.includes(val)
           ? ""
@@ -75,7 +73,6 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
   const priceHistory = useMemo(() => {
     if (!form.name || !requests?.length) return null;
     const needle = form.name.toLowerCase().trim();
-    // Search through all past requests for items matching this product
     for (const req of requests) {
       if (!req.items?.length) continue;
       for (const item of req.items) {
@@ -140,7 +137,6 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
     if (validate()) {
       if (step < 3) setStep(s => s + 1);
       else {
-        // Auto-create item from the selected product so it appears in ITEMS section
         const formToSubmit = { ...form };
         if (form.name) {
           const unitPrice = form.totalAmount && form.quantity
@@ -168,83 +164,65 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
   ];
 
   const FieldError = ({ field }) => errors[field]
-    ? <div style={{ fontSize: 11, color: colors.danger, marginTop: 3, fontWeight: 500 }}>{errors[field]}</div>
+    ? <div className="text-[11px] text-red-400 mt-0.5 font-medium">{errors[field]}</div>
     : null;
 
   return (
-    <div style={{ padding: "0 0 40px", animation: "fadeIn 0.3s ease" }}>
+    <div className="pb-10 animate-fadeIn">
       {/* Header */}
-      <div style={{
-        padding: "12px 20px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-      }}>
-        <button onClick={onCancel} style={{
-          background: "transparent", border: "none", cursor: "pointer",
-          fontFamily: font, fontSize: 14, color: colors.accent, fontWeight: 500,
-        }}>
+      <div className="px-5 py-3 flex justify-between items-center">
+        <button
+          onClick={onCancel}
+          className="bg-transparent border-none cursor-pointer text-sm text-blue-400 font-medium"
+        >
           ← Cancelar
         </button>
-        <span style={{ fontSize: 12, color: colors.textLight, fontWeight: 500 }}>
+        <span className="text-xs text-slate-400 font-medium">
           Paso {step} de 3
         </span>
       </div>
 
-      <div style={{ padding: "0 20px" }}>
-        <h2 style={{
-          fontFamily: fontDisplay, fontSize: 22, fontWeight: 600,
-          color: colors.text, margin: "0 0 4px",
-        }}>
+      <div className="px-5">
+        <h2 className="text-[22px] font-semibold text-white mb-1 mt-0">
           {stepTitles[step - 1].title}
         </h2>
-        <div style={{ fontSize: 13, color: colors.textLight, marginBottom: 20 }}>
+        <div className="text-[13px] text-slate-400 mb-5">
           {stepTitles[step - 1].sub}
         </div>
 
         {/* Step indicators */}
-        <div style={{ display: "flex", gap: 6, marginBottom: 24 }}>
+        <div className="flex gap-1.5 mb-6">
           {[1, 2, 3].map(s => (
-            <div key={s} style={{
-              flex: 1, height: 4, borderRadius: 2,
-              background: s <= step
-                ? s < step ? colors.success : colors.primary
-                : colors.border,
-              transition: "background 0.3s",
-            }} />
+            <div
+              key={s}
+              className="flex-1 h-1 rounded-sm transition-colors duration-300"
+              style={{
+                background: s <= step
+                  ? s < step ? '#22c55e' : '#10b981'
+                  : 'rgba(255,255,255,0.06)',
+              }}
+            />
           ))}
         </div>
 
         {/* ============ Step 1: Product Selection ============ */}
         {step === 1 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div className="flex flex-col gap-3.5">
             {/* Product Selector */}
             <div>
-              <label style={labelStyle}>Producto *</label>
+              <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide">Producto *</label>
               <div
                 onClick={() => setShowInventory(true)}
-                style={{
-                  ...inputStyle,
-                  display: "flex", alignItems: "center", gap: 8,
-                  cursor: "pointer",
-                  background: form.fromInventory ? colors.success + "06" : colors.card,
-                  borderColor: errors.name ? colors.danger : form.fromInventory ? colors.success + "40" : colors.border,
-                }}
+                className={`w-full px-3.5 py-2.5 rounded-lg border text-sm outline-none transition-colors flex items-center gap-2 cursor-pointer ${
+                  form.fromInventory ? 'bg-green-500/[0.04] border-green-500/25' : 'bg-white/[0.03]'
+                } ${errors.name ? 'border-red-500' : form.fromInventory ? '' : 'border-white/[0.1]'}`}
               >
-                <span style={{ fontSize: 16 }}>📦</span>
-                <span style={{
-                  flex: 1,
-                  color: form.name ? colors.text : colors.textLight,
-                  fontSize: 14,
-                }}>
+                <span className="text-base">📦</span>
+                <span className={`flex-1 text-sm ${form.name ? 'text-white' : 'text-slate-400'}`}>
                   {form.name || "Buscar en catalogo o crear nuevo..."}
                 </span>
                 {form.inventoryItem && (
-                  <span style={{
-                    fontSize: 10, background: colors.success + "15",
-                    color: colors.success, padding: "2px 8px", borderRadius: radius.xs,
-                    fontWeight: 600, fontFamily: "monospace",
-                  }}>
+                  <span className="text-[10px] bg-green-500/[0.08] text-green-400 px-2 py-0.5 rounded font-semibold font-mono">
                     {form.inventoryItem.code}
                   </span>
                 )}
@@ -257,11 +235,7 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
                       update("fromInventory", false);
                       update("inventoryItem", null);
                     }}
-                    style={{
-                      background: colors.border, border: "none", cursor: "pointer",
-                      width: 22, height: 22, borderRadius: radius.sm, fontSize: 11,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                    }}
+                    className="bg-white/[0.06] border-none cursor-pointer w-[22px] h-[22px] rounded text-[11px] flex items-center justify-center"
                   >
                     ✕
                   </button>
@@ -284,12 +258,12 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
 
             {!form.fromInventory && !form.inventoryItem && form.name === "" && (
               <div>
-                <label style={labelStyle}>Nombre del producto (manual)</label>
+                <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide">Nombre del producto (manual)</label>
                 <input
                   value={form.name}
                   onChange={e => update("name", e.target.value)}
                   placeholder="Descripción del producto o servicio"
-                  style={{ ...inputStyle, borderColor: errors.name ? colors.danger : colors.border }}
+                  className={`w-full px-3.5 py-2.5 rounded-lg border bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-emerald-500/50 ${errors.name ? 'border-red-500' : 'border-white/[0.1]'}`}
                 />
                 <FieldError field="name" />
               </div>
@@ -297,53 +271,47 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
 
             {!form.fromInventory && form.name && (
               <div>
-                <label style={labelStyle}>Nombre del producto</label>
+                <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide">Nombre del producto</label>
                 <input
                   value={form.name}
                   onChange={e => update("name", e.target.value)}
                   placeholder="Descripción del producto o servicio"
-                  style={inputStyle}
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-emerald-500/50"
                 />
               </div>
             )}
 
-            <div style={{ display: "flex", gap: 10 }}>
-              <div style={{ flex: 1 }}>
-                <label style={labelStyle}>Solicitante *</label>
+            <div className="flex gap-2.5">
+              <div className="flex-1">
+                <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide">Solicitante *</label>
                 <input
                   value={form.requester}
                   readOnly
-                  style={{
-                    ...inputStyle,
-                    background: colors.surface,
-                    color: colors.textLight,
-                    cursor: "default",
-                    borderColor: errors.requester ? colors.danger : colors.border,
-                  }}
+                  className={`w-full px-3.5 py-2.5 rounded-lg border bg-white/[0.02] text-sm text-slate-400 outline-none cursor-default ${errors.requester ? 'border-red-500' : 'border-white/[0.1]'}`}
                 />
                 <FieldError field="requester" />
               </div>
             </div>
 
-            <div style={{ display: "flex", gap: 10 }}>
-              <div style={{ flex: 1 }}>
-                <label style={labelStyle}>Establecimiento *</label>
+            <div className="flex gap-2.5">
+              <div className="flex-1">
+                <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide">Establecimiento *</label>
                 <select
                   value={form.establishment}
                   onChange={e => update("establishment", e.target.value)}
-                  style={{ ...inputStyle, borderColor: errors.establishment ? colors.danger : colors.border }}
+                  className={`w-full px-3.5 py-2.5 rounded-lg border bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-emerald-500/50 ${errors.establishment ? 'border-red-500' : 'border-white/[0.1]'}`}
                 >
                   <option value="">Seleccionar...</option>
                   {getEstablishments().filter(e => e.active).map(e => <option key={e.name} value={e.name}>{e.name}</option>)}
                 </select>
                 <FieldError field="establishment" />
               </div>
-              <div style={{ flex: 1 }}>
-                <label style={labelStyle}>Sector *</label>
+              <div className="flex-1">
+                <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide">Sector *</label>
                 <select
                   value={form.sector}
                   onChange={e => update("sector", e.target.value)}
-                  style={{ ...inputStyle, borderColor: errors.sector ? colors.danger : colors.border }}
+                  className={`w-full px-3.5 py-2.5 rounded-lg border bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-emerald-500/50 ${errors.sector ? 'border-red-500' : 'border-white/[0.1]'}`}
                 >
                   <option value="">Seleccionar...</option>
                   {getSectors().filter(s => s.active).map(s => <option key={s.name} value={s.name}>{s.name}</option>)}
@@ -354,11 +322,11 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
 
             {!form.fromInventory && (
               <div>
-                <label style={labelStyle}>Tipo de Producto</label>
+                <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide">Tipo de Producto</label>
                 <select
                   value={form.type}
                   onChange={e => update("type", e.target.value)}
-                  style={inputStyle}
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-emerald-500/50"
                 >
                   <option value="">Seleccionar...</option>
                   {getProductTypes().filter(t => t.active).map(t => <option key={t.name} value={t.name}>{t.name}</option>)}
@@ -367,14 +335,11 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
             )}
 
             {form.fromInventory && form.inventoryItem && (
-              <div style={{
-                background: colors.success + "06", borderRadius: radius.lg, padding: "10px 14px",
-                border: `1px solid ${colors.success}20`,
-              }}>
-                <div style={{ fontSize: 11, fontWeight: 600, color: colors.success, marginBottom: 4 }}>
+              <div className="bg-green-500/[0.04] rounded-xl px-3.5 py-2.5 border border-green-500/[0.12]">
+                <div className="text-[11px] font-semibold text-green-400 mb-1">
                   ✓ Producto del catalogo
                 </div>
-                <div style={{ fontSize: 12, color: colors.textLight }}>
+                <div className="text-xs text-slate-400">
                   {form.inventoryItem.code} · {form.inventoryItem.group} · {form.inventoryItem.type}
                 </div>
               </div>
@@ -384,25 +349,25 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
 
         {/* ============ Step 2: Details ============ */}
         {step === 2 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            <div style={{ display: "flex", gap: 10 }}>
-              <div style={{ flex: 1 }}>
-                <label style={labelStyle}>Cantidad *</label>
+          <div className="flex flex-col gap-3.5">
+            <div className="flex gap-2.5">
+              <div className="flex-1">
+                <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide">Cantidad *</label>
                 <input
                   type="number"
                   value={form.quantity}
                   onChange={e => update("quantity", parseInt(e.target.value) || 0)}
-                  style={{ ...inputStyle, borderColor: errors.quantity ? colors.danger : colors.border }}
+                  className={`w-full px-3.5 py-2.5 rounded-lg border bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-emerald-500/50 ${errors.quantity ? 'border-red-500' : 'border-white/[0.1]'}`}
                   min={1}
                 />
                 <FieldError field="quantity" />
               </div>
-              <div style={{ flex: 1 }}>
-                <label style={labelStyle}>Unidad</label>
+              <div className="flex-1">
+                <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide">Unidad</label>
                 <select
                   value={form.unit}
                   onChange={e => update("unit", e.target.value)}
-                  style={inputStyle}
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-emerald-500/50"
                 >
                   {UNITS.map(u => <option key={u} value={u}>{u}</option>)}
                 </select>
@@ -410,17 +375,17 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
             </div>
 
             <div>
-              <label style={labelStyle}>Monto Estimado (₲)</label>
+              <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide">Monto Estimado (₲)</label>
               <input
                 type="number"
                 value={form.totalAmount || ""}
                 onChange={e => update("totalAmount", parseInt(e.target.value) || 0)}
                 placeholder="Ej: 5000000"
-                style={inputStyle}
+                className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-emerald-500/50"
                 min={0}
               />
               {form.totalAmount > 0 && (
-                <div style={{ fontSize: 11, color: colors.primary, marginTop: 4, fontWeight: 500 }}>
+                <div className="text-[11px] text-emerald-400 mt-1 font-medium">
                   {formatGuaranies(form.totalAmount)}
                 </div>
               )}
@@ -429,21 +394,16 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
                 <button
                   type="button"
                   onClick={() => update("totalAmount", Math.round(priceHistory.unitPrice * (form.quantity || 1)))}
-                  style={{
-                    marginTop: 6, padding: "6px 10px", borderRadius: radius.md,
-                    background: colors.info + "10", border: `1px solid ${colors.info}25`,
-                    cursor: "pointer", width: "100%", textAlign: "left",
-                    fontFamily: font,
-                  }}
+                  className="mt-1.5 p-2.5 rounded-lg bg-blue-500/[0.06] border border-blue-500/[0.15] cursor-pointer w-full text-left"
                 >
-                  <div style={{ fontSize: 11, fontWeight: 600, color: colors.info }}>
+                  <div className="text-[11px] font-semibold text-blue-400">
                     💡 Precio historico disponible
                   </div>
-                  <div style={{ fontSize: 10, color: colors.textLight, marginTop: 2 }}>
+                  <div className="text-[10px] text-slate-400 mt-0.5">
                     Ultima compra: {formatGuaranies(priceHistory.unitPrice)}/unidad
                     {priceHistory.date && ` — ${new Date(priceHistory.date).toLocaleDateString("es-PY")}`}
                   </div>
-                  <div style={{ fontSize: 10, color: colors.info, marginTop: 2, fontWeight: 500 }}>
+                  <div className="text-[10px] text-blue-400 mt-0.5 font-medium">
                     Clic para usar: {formatGuaranies(priceHistory.unitPrice * (form.quantity || 1))}
                   </div>
                 </button>
@@ -452,50 +412,43 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
 
             {/* Budget indicator */}
             {budgetInfo && form.totalAmount > 0 && (
-              <div style={{
-                background: budgetInfo.exceeds ? colors.danger + "08" : colors.success + "06",
-                borderRadius: radius.md, padding: "8px 12px",
-                border: `1px solid ${budgetInfo.exceeds ? colors.danger : colors.success}20`,
-              }}>
-                <div style={{
-                  fontSize: 11, fontWeight: 600,
-                  color: budgetInfo.exceeds ? colors.danger : colors.success,
-                }}>
+              <div className={`rounded-lg px-3 py-2 border ${
+                budgetInfo.exceeds
+                  ? 'bg-red-500/[0.05] border-red-500/[0.12]'
+                  : 'bg-green-500/[0.04] border-green-500/[0.12]'
+              }`}>
+                <div className={`text-[11px] font-semibold ${budgetInfo.exceeds ? 'text-red-400' : 'text-green-400'}`}>
                   {budgetInfo.exceeds ? "⚠ Excede presupuesto" : "✓ Dentro del presupuesto"}
                 </div>
-                <div style={{ fontSize: 10, color: colors.textLight, marginTop: 2 }}>
+                <div className="text-[10px] text-slate-400 mt-0.5">
                   Presupuesto: {formatGuaranies(budgetInfo.budget.planned)} ({form.establishment} / {form.sector})
                 </div>
               </div>
             )}
 
             <div>
-              <label style={labelStyle}>Prioridad</label>
-              <div style={{ display: "flex", gap: 8 }}>
+              <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide">Prioridad</label>
+              <div className="flex gap-2">
                 {PRIORITY_LEVELS.map(u => (
                   <button
                     key={u.value}
                     onClick={() => update("urgency", u.value)}
+                    className="flex-1 px-1.5 py-3 rounded-lg text-center transition-all duration-150 cursor-pointer"
                     style={{
-                      flex: 1, padding: "12px 6px", borderRadius: radius.md,
                       border: form.urgency === u.value
                         ? `2px solid ${u.color}`
-                        : `1px solid ${colors.border}`,
-                      background: form.urgency === u.value ? (u.colorLight || u.color + "10") : colors.card,
-                      cursor: "pointer", textAlign: "center",
-                      transition: "all 0.15s",
+                        : '1px solid rgba(255,255,255,0.06)',
+                      background: form.urgency === u.value ? (u.colorLight || u.color + "10") : 'rgba(255,255,255,0.03)',
                     }}
                   >
-                    <div style={{ fontSize: 16 }}>{u.icon}</div>
-                    <div style={{
-                      fontSize: 11, fontWeight: 600, marginTop: 4,
-                      color: form.urgency === u.value ? u.color : colors.textLight,
-                    }}>
+                    <div className="text-base">{u.icon}</div>
+                    <div
+                      className="text-[11px] font-semibold mt-1"
+                      style={{ color: form.urgency === u.value ? u.color : '#94a3b8' }}
+                    >
                       {u.label}
                     </div>
-                    <div style={{
-                      fontSize: 9, color: colors.textMuted, marginTop: 2,
-                    }}>
+                    <div className="text-[9px] text-slate-500 mt-0.5">
                       {u.days ? `${u.days}d` : `${u.hours}h`}
                     </div>
                   </button>
@@ -504,45 +457,42 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
             </div>
 
             <div>
-              <label style={labelStyle}>¿Por que necesitas este producto? *</label>
+              <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide">¿Por que necesitas este producto? *</label>
               <textarea
                 value={form.reason}
                 onChange={e => update("reason", e.target.value)}
                 placeholder="Justificacion de la compra..."
                 rows={3}
-                style={{
-                  ...inputStyle, resize: "vertical",
-                  borderColor: errors.reason ? colors.danger : colors.border,
-                }}
+                className={`w-full px-3.5 py-2.5 rounded-lg border bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-emerald-500/50 resize-y ${errors.reason ? 'border-red-500' : 'border-white/[0.1]'}`}
               />
               <FieldError field="reason" />
             </div>
 
             <div>
-              <label style={labelStyle}>¿Para que sera utilizado?</label>
+              <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide">¿Para que sera utilizado?</label>
               <textarea
                 value={form.purpose}
                 onChange={e => update("purpose", e.target.value)}
                 placeholder="Descripción del uso previsto..."
                 rows={2}
-                style={{ ...inputStyle, resize: "vertical" }}
+                className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-emerald-500/50 resize-y"
               />
             </div>
 
             {(form.type === "Repuesto" || form.type === "Equipamento" || form.type === "Maquinario") && (
               <div>
-                <label style={labelStyle}>Equipo/Maquinaria relacionada</label>
+                <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide">Equipo/Maquinaria relacionada</label>
                 <input
                   value={form.equipment}
                   onChange={e => update("equipment", e.target.value)}
                   placeholder="Ej: Valtra BH 194, John Deere cod 26"
-                  style={inputStyle}
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-emerald-500/50"
                 />
               </div>
             )}
 
             <div>
-              <label style={labelStyle}>Proveedor Sugerido</label>
+              <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide">Proveedor Sugerido</label>
               {!isCustomSupplier ? (
                 <select
                   value={form.suggestedSupplier}
@@ -554,13 +504,12 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
                       update("suggestedSupplier", e.target.value);
                     }
                   }}
-                  style={inputStyle}
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-emerald-500/50"
                 >
                   <option value="">Seleccionar proveedor (opcional)...</option>
                   {(() => {
                     const suppliers = getSuppliers();
                     const productType = (form.type || "").toLowerCase();
-                    // Sort: suppliers whose category matches product type first
                     const sorted = [...suppliers].sort((a, b) => {
                       const aCat = (a.category || "").toLowerCase();
                       const bCat = (b.category || "").toLowerCase();
@@ -569,7 +518,6 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
                       if (aMatch !== bMatch) return aMatch - bMatch;
                       return (a.name || "").localeCompare(b.name || "");
                     });
-                    // Group with separator if there are matching suppliers
                     const matching = sorted.filter(s => productType && (s.category || "").toLowerCase().includes(productType));
                     const rest = sorted.filter(s => !productType || !(s.category || "").toLowerCase().includes(productType));
                     return (
@@ -589,12 +537,12 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
                   <option value="__custom__">✏ Otro (escribir manualmente)</option>
                 </select>
               ) : (
-                <div style={{ display: "flex", gap: 6 }}>
+                <div className="flex gap-1.5">
                   <input
                     value={form.suggestedSupplier}
                     onChange={e => update("suggestedSupplier", e.target.value)}
                     placeholder="Nombre del proveedor..."
-                    style={{ ...inputStyle, flex: 1 }}
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-emerald-500/50 flex-1"
                     autoFocus
                   />
                   <button
@@ -603,11 +551,7 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
                       setIsCustomSupplier(false);
                       update("suggestedSupplier", "");
                     }}
-                    style={{
-                      background: colors.border, border: "none", cursor: "pointer",
-                      borderRadius: radius.md, padding: "0 10px", fontSize: 11,
-                      color: colors.textLight, fontFamily: font,
-                    }}
+                    className="bg-white/[0.06] border-none cursor-pointer rounded-lg px-2.5 text-[11px] text-slate-400"
                   >
                     ✕ Lista
                   </button>
@@ -616,13 +560,13 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
             </div>
 
             <div>
-              <label style={labelStyle}>Notas adicionales</label>
+              <label className="block text-xs font-medium text-slate-400 mb-1.5 tracking-wide">Notas adicionales</label>
               <textarea
                 value={form.notes}
                 onChange={e => update("notes", e.target.value)}
                 placeholder="Observaciones, especificaciones tecnicas..."
                 rows={2}
-                style={{ ...inputStyle, resize: "vertical" }}
+                className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-emerald-500/50 resize-y"
               />
             </div>
           </div>
@@ -630,51 +574,34 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
 
         {/* ============ Step 3: Review & Submit ============ */}
         {step === 3 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div className="flex flex-col gap-3.5">
             {/* Approval preview */}
-            <div style={{
-              background: colors.primary + "06", borderRadius: radius.lg, padding: "12px 14px",
-              border: `1px solid ${colors.primary}15`,
-            }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: colors.primary, marginBottom: 6 }}>
+            <div className="bg-emerald-500/[0.04] rounded-xl px-3.5 py-3 border border-emerald-500/[0.08]">
+              <div className="text-xs font-semibold text-emerald-400 mb-1.5">
                 🔄 Flujo de Autorización y Aprobación
               </div>
               {approvalPreview && approvalPreview.length > 0 ? (
-                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                <div className="flex flex-col gap-1">
                   {approvalPreview.map((s, i) => (
-                    <div key={i} style={{
-                      fontSize: 11, color: colors.text,
-                      display: "flex", alignItems: "center", gap: 6,
-                    }}>
-                      <span style={{
-                        width: 18, height: 18, borderRadius: radius.full,
-                        background: colors.primary + "15", color: colors.primary,
-                        fontSize: 9, fontWeight: 700, display: "flex",
-                        alignItems: "center", justifyContent: "center", flexShrink: 0,
-                      }}>
+                    <div key={i} className="text-[11px] text-white flex items-center gap-1.5">
+                      <span className="w-[18px] h-[18px] rounded-full bg-emerald-500/[0.08] text-emerald-400 text-[9px] font-bold flex items-center justify-center flex-shrink-0">
                         {i + 1}
                       </span>
-                      <span style={{ fontWeight: 500 }}>{s.label}:</span>
-                      <span style={{ color: colors.textLight }}>{s.approverName || "Automatico"}</span>
+                      <span className="font-medium">{s.label}:</span>
+                      <span className="text-slate-400">{s.approverName || "Automatico"}</span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div style={{ fontSize: 11, color: colors.textLight }}>
+                <div className="text-[11px] text-slate-400">
                   Los aprobadores se asignaran automaticamente segun establecimiento, monto y sector.
                 </div>
               )}
             </div>
 
             {/* Summary */}
-            <div style={{
-              background: colors.surface, borderRadius: radius.xl, padding: 16,
-              border: `1px solid ${colors.borderLight}`,
-            }}>
-              <div style={{
-                fontSize: 12, fontWeight: 600, color: colors.textLight,
-                marginBottom: 10, textTransform: "uppercase", letterSpacing: 1,
-              }}>
+            <div className="bg-white/[0.02] rounded-2xl p-4 border border-white/[0.06]">
+              <div className="text-xs font-semibold text-slate-400 mb-2.5 uppercase tracking-wide">
                 Resumen de la solicitud
               </div>
               <SummaryRow label="Producto" value={form.name} />
@@ -697,14 +624,11 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
 
             {/* Budget warning */}
             {budgetInfo?.exceeds && (
-              <div style={{
-                background: colors.warning + "10", borderRadius: radius.md, padding: "10px 12px",
-                border: `1px solid ${colors.warning}30`,
-              }}>
-                <div style={{ fontSize: 11, fontWeight: 600, color: colors.warning }}>
+              <div className="bg-amber-500/[0.06] rounded-lg px-3 py-2.5 border border-amber-500/[0.19]">
+                <div className="text-[11px] font-semibold text-amber-400">
                   ⚠ Esta solicitud excede el presupuesto asignado
                 </div>
-                <div style={{ fontSize: 10, color: colors.textLight, marginTop: 2 }}>
+                <div className="text-[10px] text-slate-400 mt-0.5">
                   Se requerira aprobacion adicional del Director
                 </div>
               </div>
@@ -713,31 +637,22 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
         )}
 
         {/* Navigation */}
-        <div style={{ display: "flex", gap: 10, marginTop: 24, paddingBottom: 20 }}>
+        <div className="flex gap-2.5 mt-6 pb-5">
           {step > 1 && (
             <button
               onClick={() => setStep(s => s - 1)}
-              style={{
-                flex: 1, padding: "14px", borderRadius: radius.lg,
-                border: `1px solid ${colors.border}`,
-                background: colors.card, color: colors.text,
-                fontSize: 14, fontWeight: 600, fontFamily: font,
-                cursor: "pointer",
-              }}
+              className="flex-1 py-3.5 rounded-xl border border-white/[0.06] bg-white/[0.03] text-white text-sm font-semibold cursor-pointer"
             >
               ← Anterior
             </button>
           )}
           <button
             onClick={handleNext}
+            className="py-3.5 rounded-xl border-none text-white text-sm font-semibold cursor-pointer shadow-md"
             style={{
-              flex: step > 1 ? 1 : undefined, width: step === 1 ? "100%" : undefined,
-              padding: "14px", borderRadius: radius.lg, border: "none",
-              background: step === 3 ? colors.secondary : colors.primary,
-              color: "#fff",
-              fontSize: 14, fontWeight: 600, fontFamily: font,
-              cursor: "pointer",
-              boxShadow: shadows.md,
+              flex: step > 1 ? 1 : undefined,
+              width: step === 1 ? "100%" : undefined,
+              background: step === 3 ? '#6366f1' : '#10b981',
             }}
           >
             {step === 3 ? "Crear Solicitud ✓" : "Siguiente →"}

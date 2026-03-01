@@ -1,24 +1,16 @@
-import { colors, font, radius } from "../../styles/theme";
-
 export default function PillButton({ active, onClick, label, color, title }) {
   return (
     <button
       onClick={onClick}
       title={title}
-      style={{
-        padding: "7px 14px",
-        borderRadius: radius.full,
-        border: "none",
-        background: active ? color : colors.card,
-        color: active ? "#fff" : colors.textLight,
-        fontSize: 12,
-        fontWeight: 500,
-        fontFamily: font,
-        cursor: "pointer",
-        whiteSpace: "nowrap",
-        boxShadow: active ? `0 2px 12px ${color}30` : `0 1px 3px rgba(0,0,0,0.06)`,
-        transition: "all 0.2s",
-      }}
+      className={`py-[7px] px-3.5 rounded-full border-none text-xs font-medium cursor-pointer whitespace-nowrap transition-all duration-200 ${
+        active ? "text-white" : "bg-white/[0.03] text-slate-400 shadow-sm"
+      }`}
+      style={
+        active
+          ? { background: color, boxShadow: `0 2px 12px ${color}30` }
+          : undefined
+      }
     >
       {label}
     </button>

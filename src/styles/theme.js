@@ -1,54 +1,53 @@
 // ============================================================
-// YPOTI COMPRAS — TEMA / ESTILOS (PDR v3)
-// Inspired by Precoro (precoro.com) — Clean SaaS Procurement
+// YPOTI COMPRAS — TEMA / ESTILOS (Dark Mode)
+// Dark theme with emerald accents
 // ============================================================
 
-// PDR v3 Brand Colors
 export const colors = {
   // Core brand
-  primary: "#006633",        // Emerald-700 — Verde YPOTI
-  primaryDark: "#004D26",    // Darker shade
-  primaryLight: "#E8F5EE",   // Very light green tint
-  primaryMid: "#00804A",     // Mid green
+  primary: "#10b981",        // Emerald-500
+  primaryDark: "#059669",    // Emerald-600
+  primaryLight: "rgba(16,185,129,0.1)",
+  primaryMid: "#34d399",     // Emerald-400
 
-  secondary: "#7B3014",      // Brown/Maroon — Marrón YPOTI
-  secondaryLight: "#F5EDE8", // Very light brown tint
+  secondary: "#7B3014",
+  secondaryLight: "rgba(123,48,20,0.1)",
 
   // Accent
-  accent: "#7B3014",         // Same as secondary for consistency
-  accentLight: "#9B4A2E",
+  accent: "#10b981",
+  accentLight: "#34d399",
 
-  // Neutrals (Precoro-inspired clean grays)
-  bg: "#F8F9FB",             // Clean light gray background
-  surface: "#F3F4F6",        // Slightly darker surface
-  card: "#FFFFFF",
-  text: "#1A1D23",           // Near-black for readability
-  textSecondary: "#4B5563",  // Medium gray text
-  textLight: "#6B7280",      // Light gray text
-  textMuted: "#9CA3AF",      // Very muted text
-  border: "#E5E7EB",         // Clean gray border
-  borderLight: "#F3F4F6",    // Very light border
+  // Dark mode neutrals
+  bg: "#0a0b0f",
+  surface: "rgba(255,255,255,0.05)",
+  card: "rgba(255,255,255,0.03)",
+  text: "#ffffff",
+  textSecondary: "#cbd5e1",  // Slate-300
+  textLight: "#94a3b8",      // Slate-400
+  textMuted: "#64748b",      // Slate-500
+  border: "rgba(255,255,255,0.08)",
+  borderLight: "rgba(255,255,255,0.06)",
 
   // Semantic
-  success: "#059669",        // Emerald-600
-  successLight: "#ECFDF5",
-  warning: "#D97706",        // Amber-600
-  warningLight: "#FFFBEB",
-  danger: "#DC2626",         // Red-600
-  dangerLight: "#FEF2F2",
-  info: "#2563EB",           // Blue-600
-  infoLight: "#EFF6FF",
+  success: "#10b981",
+  successLight: "rgba(16,185,129,0.1)",
+  warning: "#f59e0b",
+  warningLight: "rgba(245,158,11,0.1)",
+  danger: "#ef4444",
+  dangerLight: "rgba(239,68,68,0.1)",
+  info: "#3b82f6",
+  infoLight: "rgba(59,130,246,0.1)",
 
-  // Priority colors (from PDR 3.3)
-  priorityLow: "#6B7280",      // Gray
-  priorityMedium: "#F59E0B",   // Amber
-  priorityHigh: "#F97316",     // Orange
-  priorityEmergency: "#EF4444", // Red
+  // Priority colors
+  priorityLow: "#64748b",
+  priorityMedium: "#f59e0b",
+  priorityHigh: "#f97316",
+  priorityEmergency: "#ef4444",
 };
 
-// Typography — DM Sans (PDR v3 spec)
-export const font = "'DM Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif";
-export const fontDisplay = "'DM Sans', sans-serif";
+// Typography
+export const font = "'Inter', 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif";
+export const fontDisplay = "'Inter', sans-serif";
 export const fontMono = "'JetBrains Mono', 'SF Mono', 'Consolas', monospace";
 
 // Shared styles
@@ -67,7 +66,7 @@ export const inputStyle = {
   padding: "10px 14px",
   borderRadius: 8,
   border: `1px solid ${colors.border}`,
-  background: colors.card,
+  background: "rgba(255,255,255,0.05)",
   fontFamily: font,
   fontSize: 14,
   color: colors.text,
@@ -76,16 +75,16 @@ export const inputStyle = {
   transition: "border-color 0.15s, box-shadow 0.15s",
 };
 
-// Shadows (Precoro-inspired — minimal, clean)
+// Shadows (dark mode appropriate)
 export const shadows = {
-  xs: "0 1px 2px rgba(0,0,0,0.04)",
-  sm: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
-  md: "0 4px 6px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.03)",
-  lg: "0 10px 15px rgba(0,0,0,0.06), 0 4px 6px rgba(0,0,0,0.03)",
-  xl: "0 20px 25px rgba(0,0,0,0.08), 0 8px 10px rgba(0,0,0,0.04)",
-  card: "0 1px 3px rgba(0,0,0,0.04)",
-  dropdown: "0 4px 16px rgba(0,0,0,0.1)",
-  modal: "0 20px 60px rgba(0,0,0,0.15)",
+  xs: "0 1px 2px rgba(0,0,0,0.3)",
+  sm: "0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3)",
+  md: "0 4px 6px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2)",
+  lg: "0 10px 15px rgba(0,0,0,0.3), 0 4px 6px rgba(0,0,0,0.2)",
+  xl: "0 20px 25px rgba(0,0,0,0.4), 0 8px 10px rgba(0,0,0,0.3)",
+  card: "0 1px 3px rgba(0,0,0,0.2)",
+  dropdown: "0 4px 16px rgba(0,0,0,0.5)",
+  modal: "0 20px 60px rgba(0,0,0,0.6)",
 };
 
 // Border radius
@@ -97,91 +96,3 @@ export const radius = {
   xl: 16,
   full: 9999,
 };
-
-// Global CSS
-export const globalCSS = `
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
-
-  @keyframes slideDown {
-    from { transform: translate(-50%, -100%); opacity: 0; }
-    to { transform: translate(-50%, 0); opacity: 1; }
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes slideUp {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
-  }
-  @keyframes pulse {
-    0%, 100% { box-shadow: 0 0 0 4px rgba(0,102,51,0.10); }
-    50% { box-shadow: 0 0 0 8px rgba(0,102,51,0.05); }
-  }
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-  @keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-  }
-
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-  body {
-    margin: 0;
-    background: ${colors.bg};
-    font-family: ${font};
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: ${colors.border}; border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: ${colors.textMuted}; }
-
-  select { -webkit-appearance: none; appearance: none; }
-
-  input:focus, select:focus, textarea:focus {
-    border-color: ${colors.primary} !important;
-    box-shadow: 0 0 0 3px ${colors.primary}15 !important;
-    outline: none;
-  }
-
-  /* Responsive Layout */
-  .desktop-sidebar { display: none; }
-  .mobile-header { display: block; }
-  .mobile-bottom-nav { display: flex; }
-  .desktop-view-toggle { display: none; }
-
-  @media (min-width: 768px) {
-    .desktop-sidebar {
-      display: flex !important;
-      flex-direction: column;
-      width: 260px;
-      min-width: 260px;
-      height: 100vh;
-      position: fixed;
-      left: 0;
-      top: 0;
-      background: #fff;
-      border-right: 1px solid ${colors.border};
-      z-index: 50;
-    }
-    .mobile-header { display: none !important; }
-    .mobile-bottom-nav { display: none !important; }
-    .desktop-view-toggle { display: flex !important; }
-    .app-main-content {
-      margin-left: 260px !important;
-      max-width: none !important;
-      padding: 0 32px !important;
-      min-height: 100vh;
-    }
-  }
-  @media (min-width: 1200px) {
-    .app-main-content {
-      max-width: 1100px !important;
-    }
-  }
-`;
