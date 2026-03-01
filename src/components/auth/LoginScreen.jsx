@@ -4,22 +4,29 @@ import { useAuth } from "../../context/AuthContext";
 
 export default function LoginScreen() {
   const { login } = useAuth();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    if (!email.trim()) { setError("Ingresa tu usuario"); return; }
+    if (!username.trim()) { setError("Ingresa tu usuario"); return; }
     if (!password) { setError("Ingresa tu contraseña"); return; }
     setLoading(true);
-    setTimeout(() => {
-      const result = login(email.trim(), password);
-      if (!result.success) { setError(result.error); setLoading(false); }
-    }, 400);
+    try {
+      const result = await login(username.trim(), password);
+      if (!result.success) {
+        setError(result.error);
+        setLoading(false);
+      }
+      // On success, AuthContext updates state and App.jsx re-renders automatically
+    } catch (err) {
+      setError("Error de conexión. Intenta de nuevo.");
+      setLoading(false);
+    }
   };
 
   return (
@@ -51,7 +58,7 @@ export default function LoginScreen() {
             YPOTI Compras
           </h1>
           <p style={{ fontSize: 14, color: colors.textLight, margin: 0 }}>
-            Sistema de Gestión de Compras
+            Sistema de Gesti&oacute;n de Compras
           </p>
         </div>
 
@@ -62,7 +69,7 @@ export default function LoginScreen() {
           boxShadow: shadows.lg, padding: "36px 32px",
         }}>
           <h2 style={{ fontSize: 18, fontWeight: 600, color: colors.text, margin: "0 0 4px" }}>
-            Iniciar sesión
+            Iniciar sesi&oacute;n
           </h2>
           <p style={{ fontSize: 13, color: colors.textLight, margin: "0 0 28px" }}>
             Ingresa tus credenciales para acceder
@@ -74,17 +81,17 @@ export default function LoginScreen() {
                 Usuario
               </label>
               <input
-                type="text" value={email}
-                onChange={(e) => { setEmail(e.target.value); setError(""); }}
-                placeholder="ej: ana.karina"
+                type="text" value={username}
+                onChange={(e) => { setUsername(e.target.value); setError(""); }}
+                placeholder="ej: ana.moller"
                 autoComplete="username" autoCapitalize="none"
-                style={{ ...inputStyle, height: 44, border: `1px solid ${error && !email.trim() ? colors.danger : colors.border}` }}
+                style={{ ...inputStyle, height: 44, border: `1px solid ${error && !username.trim() ? colors.danger : colors.border}` }}
               />
             </div>
 
             <div>
               <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: colors.textSecondary, marginBottom: 6 }}>
-                Contraseña
+                Contrase&ntilde;a
               </label>
               <div style={{ position: "relative" }}>
                 <input
@@ -138,7 +145,7 @@ export default function LoginScreen() {
         </div>
 
         <div style={{ textAlign: "center", marginTop: 32, fontSize: 12, color: colors.textMuted, lineHeight: 1.5 }}>
-          Grupo Rural Bioenergia · YPOTI Compras v3.0
+          Grupo Rural Bioenergia &middot; YPOTI Compras v3.0
         </div>
       </div>
     </div>

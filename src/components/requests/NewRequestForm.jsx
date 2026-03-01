@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
 import { colors, font, fontDisplay, labelStyle, inputStyle, shadows, radius } from "../../styles/theme";
 import {
-  ESTABLISHMENTS, SECTORS, PRODUCT_TYPES, PRIORITY_LEVELS,
-  TEAM_MEMBERS, INVENTORY_ITEMS, COMPANIES,
+  PRIORITY_LEVELS, INVENTORY_ITEMS,
 } from "../../constants";
 import { useAuth } from "../../context/AuthContext";
+import { useApp } from "../../context/AppContext";
+import { getEstablishments, getSectors, getProductTypes, getSuppliers } from "../../constants/parameters";
 import { calculateApprovalSteps } from "../../constants/approvalConfig";
 import { findBudgetForPR, wouldExceedBudget, formatGuaranies } from "../../constants/budgets";
 import { getUsers } from "../../constants/users";
@@ -13,9 +14,15 @@ import InventoryModal from "./InventoryModal";
 
 const UNITS = ["Unidad", "Litro", "Kg", "Dosis", "Bolsa", "Balde", "Caja", "Rollo", "Metro", "Otro"];
 
+// Establishments that are NOT farms (no auto-assign)
+const OFICINA_ESTABLISHMENTS = ["Oficina"];
+const DEFAULT_FARM_ASSIGNEE = "Laura Rivas";
+
 export default function NewRequestForm({ onSubmit, onCancel }) {
   const { currentUser } = useAuth();
+  const { requests } = useApp();
   const [step, setStep] = useState(1);
+  const [isCustomSupplier, setIsCustomSupplier] = useState(false);
   const [form, setForm] = useState({
     name: "",
     requester: currentUser?.name || "",
@@ -39,7 +46,16 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
   const [errors, setErrors] = useState({});
 
   const update = (key, val) => {
-    setForm(prev => ({ ...prev, [key]: val }));
+    setForm(prev => {
+      const next = { ...prev, [key]: val };
+      // Auto-assign Laura Rivas for farm establishments (anything except Oficina)
+      if (key === "establishment" && val) {
+        next.assignee = OFICINA_ESTABLISHMENTS.includes(val)
+          ? ""
+          : DEFAULT_FARM_ASSIGNEE;
+      }
+      return next;
+    });
     setErrors(prev => ({ ...prev, [key]: undefined }));
   };
 
@@ -54,6 +70,29 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
     setErrors({});
     setShowInventory(false);
   };
+
+  // Price history: find last purchase price for the selected product
+  const priceHistory = useMemo(() => {
+    if (!form.name || !requests?.length) return null;
+    const needle = form.name.toLowerCase().trim();
+    // Search through all past requests for items matching this product
+    for (const req of requests) {
+      if (!req.items?.length) continue;
+      for (const item of req.items) {
+        const itemName = (item.name || item.nombre || "").toLowerCase().trim();
+        if (itemName === needle && (item.unitPrice || item.precioUnitario)) {
+          return {
+            unitPrice: item.unitPrice || item.precioUnitario,
+            quantity: item.quantity || item.cantidad || 1,
+            totalPrice: item.totalPrice || (item.unitPrice || item.precioUnitario) * (item.quantity || item.cantidad || 1),
+            date: req.createdAt || req.date,
+            establishment: req.establishment,
+          };
+        }
+      }
+    }
+    return null;
+  }, [form.name, requests]);
 
   // Calculate preview approval info
   const approvalPreview = useMemo(() => {
@@ -100,14 +139,32 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
   const handleNext = () => {
     if (validate()) {
       if (step < 3) setStep(s => s + 1);
-      else onSubmit(form);
+      else {
+        // Auto-create item from the selected product so it appears in ITEMS section
+        const formToSubmit = { ...form };
+        if (form.name) {
+          const unitPrice = form.totalAmount && form.quantity
+            ? Math.round(form.totalAmount / form.quantity)
+            : 0;
+          formToSubmit.items = [{
+            name: form.name,
+            code: form.inventoryItem?.code || "",
+            quantity: form.quantity || 1,
+            unit: form.unit || "Unidad",
+            unitPrice,
+            totalPrice: form.totalAmount || 0,
+            notes: "",
+          }];
+        }
+        onSubmit(formToSubmit);
+      }
     }
   };
 
   const stepTitles = [
-    { title: "¿Que necesitas?", sub: "Selecciona del catalogo o crea un producto nuevo" },
-    { title: "Detalles", sub: "Cantidad, urgencia y justificacion de la compra" },
-    { title: "Revision y Envio", sub: "Verifica los datos antes de crear la solicitud" },
+    { title: "¿Qué necesitas?", sub: "Selecciona del catálogo o crea un producto nuevo" },
+    { title: "Detalles", sub: "Cantidad, urgencia y justificación de la compra" },
+    { title: "Revisión y Envío", sub: "Verifica los datos antes de crear la solicitud" },
   ];
 
   const FieldError = ({ field }) => errors[field]
@@ -231,7 +288,7 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
                 <input
                   value={form.name}
                   onChange={e => update("name", e.target.value)}
-                  placeholder="Descripcion del producto o servicio"
+                  placeholder="Descripción del producto o servicio"
                   style={{ ...inputStyle, borderColor: errors.name ? colors.danger : colors.border }}
                 />
                 <FieldError field="name" />
@@ -244,7 +301,7 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
                 <input
                   value={form.name}
                   onChange={e => update("name", e.target.value)}
-                  placeholder="Descripcion del producto o servicio"
+                  placeholder="Descripción del producto o servicio"
                   style={inputStyle}
                 />
               </div>
@@ -277,7 +334,7 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
                   style={{ ...inputStyle, borderColor: errors.establishment ? colors.danger : colors.border }}
                 >
                   <option value="">Seleccionar...</option>
-                  {ESTABLISHMENTS.map(e => <option key={e} value={e}>{e}</option>)}
+                  {getEstablishments().filter(e => e.active).map(e => <option key={e.name} value={e.name}>{e.name}</option>)}
                 </select>
                 <FieldError field="establishment" />
               </div>
@@ -289,7 +346,7 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
                   style={{ ...inputStyle, borderColor: errors.sector ? colors.danger : colors.border }}
                 >
                   <option value="">Seleccionar...</option>
-                  {SECTORS.map(s => <option key={s} value={s}>{s}</option>)}
+                  {getSectors().filter(s => s.active).map(s => <option key={s.name} value={s.name}>{s.name}</option>)}
                 </select>
                 <FieldError field="sector" />
               </div>
@@ -304,7 +361,7 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
                   style={inputStyle}
                 >
                   <option value="">Seleccionar...</option>
-                  {PRODUCT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                  {getProductTypes().filter(t => t.active).map(t => <option key={t.name} value={t.name}>{t.name}</option>)}
                 </select>
               </div>
             )}
@@ -367,6 +424,30 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
                   {formatGuaranies(form.totalAmount)}
                 </div>
               )}
+              {/* Price history suggestion */}
+              {priceHistory && !form.totalAmount && (
+                <button
+                  type="button"
+                  onClick={() => update("totalAmount", Math.round(priceHistory.unitPrice * (form.quantity || 1)))}
+                  style={{
+                    marginTop: 6, padding: "6px 10px", borderRadius: radius.md,
+                    background: colors.info + "10", border: `1px solid ${colors.info}25`,
+                    cursor: "pointer", width: "100%", textAlign: "left",
+                    fontFamily: font,
+                  }}
+                >
+                  <div style={{ fontSize: 11, fontWeight: 600, color: colors.info }}>
+                    💡 Precio historico disponible
+                  </div>
+                  <div style={{ fontSize: 10, color: colors.textLight, marginTop: 2 }}>
+                    Ultima compra: {formatGuaranies(priceHistory.unitPrice)}/unidad
+                    {priceHistory.date && ` — ${new Date(priceHistory.date).toLocaleDateString("es-PY")}`}
+                  </div>
+                  <div style={{ fontSize: 10, color: colors.info, marginTop: 2, fontWeight: 500 }}>
+                    Clic para usar: {formatGuaranies(priceHistory.unitPrice * (form.quantity || 1))}
+                  </div>
+                </button>
+              )}
             </div>
 
             {/* Budget indicator */}
@@ -383,7 +464,7 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
                   {budgetInfo.exceeds ? "⚠ Excede presupuesto" : "✓ Dentro del presupuesto"}
                 </div>
                 <div style={{ fontSize: 10, color: colors.textLight, marginTop: 2 }}>
-                  Presupuesto: {formatGuaranies(budgetInfo.budget.amount)} ({form.establishment} / {form.sector})
+                  Presupuesto: {formatGuaranies(budgetInfo.budget.planned)} ({form.establishment} / {form.sector})
                 </div>
               </div>
             )}
@@ -442,7 +523,7 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
               <textarea
                 value={form.purpose}
                 onChange={e => update("purpose", e.target.value)}
-                placeholder="Descripcion del uso previsto..."
+                placeholder="Descripción del uso previsto..."
                 rows={2}
                 style={{ ...inputStyle, resize: "vertical" }}
               />
@@ -462,12 +543,76 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
 
             <div>
               <label style={labelStyle}>Proveedor Sugerido</label>
-              <input
-                value={form.suggestedSupplier}
-                onChange={e => update("suggestedSupplier", e.target.value)}
-                placeholder="Opcional — nombre del proveedor"
-                style={inputStyle}
-              />
+              {!isCustomSupplier ? (
+                <select
+                  value={form.suggestedSupplier}
+                  onChange={e => {
+                    if (e.target.value === "__custom__") {
+                      setIsCustomSupplier(true);
+                      update("suggestedSupplier", "");
+                    } else {
+                      update("suggestedSupplier", e.target.value);
+                    }
+                  }}
+                  style={inputStyle}
+                >
+                  <option value="">Seleccionar proveedor (opcional)...</option>
+                  {(() => {
+                    const suppliers = getSuppliers();
+                    const productType = (form.type || "").toLowerCase();
+                    // Sort: suppliers whose category matches product type first
+                    const sorted = [...suppliers].sort((a, b) => {
+                      const aCat = (a.category || "").toLowerCase();
+                      const bCat = (b.category || "").toLowerCase();
+                      const aMatch = productType && aCat.includes(productType) ? 0 : 1;
+                      const bMatch = productType && bCat.includes(productType) ? 0 : 1;
+                      if (aMatch !== bMatch) return aMatch - bMatch;
+                      return (a.name || "").localeCompare(b.name || "");
+                    });
+                    // Group with separator if there are matching suppliers
+                    const matching = sorted.filter(s => productType && (s.category || "").toLowerCase().includes(productType));
+                    const rest = sorted.filter(s => !productType || !(s.category || "").toLowerCase().includes(productType));
+                    return (
+                      <>
+                        {matching.map(s => (
+                          <option key={s.id} value={s.name}>{s.name} — {s.category}</option>
+                        ))}
+                        {matching.length > 0 && rest.length > 0 && (
+                          <option disabled>── Otros proveedores ──</option>
+                        )}
+                        {rest.map(s => (
+                          <option key={s.id} value={s.name}>{s.name}</option>
+                        ))}
+                      </>
+                    );
+                  })()}
+                  <option value="__custom__">✏ Otro (escribir manualmente)</option>
+                </select>
+              ) : (
+                <div style={{ display: "flex", gap: 6 }}>
+                  <input
+                    value={form.suggestedSupplier}
+                    onChange={e => update("suggestedSupplier", e.target.value)}
+                    placeholder="Nombre del proveedor..."
+                    style={{ ...inputStyle, flex: 1 }}
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsCustomSupplier(false);
+                      update("suggestedSupplier", "");
+                    }}
+                    style={{
+                      background: colors.border, border: "none", cursor: "pointer",
+                      borderRadius: radius.md, padding: "0 10px", fontSize: 11,
+                      color: colors.textLight, fontFamily: font,
+                    }}
+                  >
+                    ✕ Lista
+                  </button>
+                </div>
+              )}
             </div>
 
             <div>
@@ -492,7 +637,7 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
               border: `1px solid ${colors.primary}15`,
             }}>
               <div style={{ fontSize: 12, fontWeight: 600, color: colors.primary, marginBottom: 6 }}>
-                🔄 Flujo de Aprobacion Automatico
+                🔄 Flujo de Autorización y Aprobación
               </div>
               {approvalPreview && approvalPreview.length > 0 ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
@@ -509,7 +654,7 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
                       }}>
                         {i + 1}
                       </span>
-                      <span style={{ fontWeight: 500 }}>{s.role}:</span>
+                      <span style={{ fontWeight: 500 }}>{s.label}:</span>
                       <span style={{ color: colors.textLight }}>{s.approverName || "Automatico"}</span>
                     </div>
                   ))}
@@ -519,19 +664,6 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
                   Los aprobadores se asignaran automaticamente segun establecimiento, monto y sector.
                 </div>
               )}
-            </div>
-
-            {/* Assignee */}
-            <div>
-              <label style={labelStyle}>Asignar cotizacion a</label>
-              <select
-                value={form.assignee}
-                onChange={e => update("assignee", e.target.value)}
-                style={inputStyle}
-              >
-                <option value="">Seleccionar (opcional)...</option>
-                {TEAM_MEMBERS.map(t => <option key={t} value={t}>{t}</option>)}
-              </select>
             </div>
 
             {/* Summary */}
@@ -546,7 +678,7 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
                 Resumen de la solicitud
               </div>
               <SummaryRow label="Producto" value={form.name} />
-              {form.inventoryItem && <SummaryRow label="Codigo" value={form.inventoryItem.code} />}
+              {form.inventoryItem && <SummaryRow label="Código" value={form.inventoryItem.code} />}
               <SummaryRow label="Solicitante" value={form.requester} />
               <SummaryRow label="Establecimiento" value={form.establishment} />
               <SummaryRow label="Sector" value={form.sector} />
@@ -561,7 +693,6 @@ export default function NewRequestForm({ onSubmit, onCancel }) {
               {form.purpose && <SummaryRow label="Uso" value={form.purpose} />}
               {form.equipment && <SummaryRow label="Equipo" value={form.equipment} />}
               {form.suggestedSupplier && <SummaryRow label="Proveedor" value={form.suggestedSupplier} />}
-              {form.assignee && <SummaryRow label="Asignado" value={form.assignee} />}
             </div>
 
             {/* Budget warning */}

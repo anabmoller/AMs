@@ -1,7 +1,6 @@
 import { colors, font, fontDisplay, shadows, radius } from "../../styles/theme";
 import { useAuth } from "../../context/AuthContext";
 import { ROLES } from "../../constants/users";
-import { STORAGE_KEYS } from "../../constants/storageKeys";
 import BackButton from "../common/BackButton";
 
 export default function SettingsScreen({ onBack, onNavigate }) {
@@ -17,7 +16,7 @@ export default function SettingsScreen({ onBack, onNavigate }) {
           fontFamily: fontDisplay, fontSize: 22, fontWeight: 600,
           color: colors.text, margin: "0 0 20px",
         }}>
-          Configuracion
+          Configuración
         </h2>
 
         {/* User Profile Card */}
@@ -91,11 +90,11 @@ export default function SettingsScreen({ onBack, onNavigate }) {
             fontSize: 12, fontWeight: 600, color: colors.textLight,
             marginBottom: 10, textTransform: "uppercase", letterSpacing: 1,
           }}>
-            Informacion del Sistema
+            Información del Sistema
           </div>
-          <SettingsRow label="Version" value="3.0.0 (PDR v3)" />
+          <SettingsRow label="Versión" value="4.0.0 (Supabase)" />
           <SettingsRow label="Establecimiento" value={currentUser.establishment} />
-          <SettingsRow label="Datos" value="localStorage" />
+          <SettingsRow label="Datos" value="Supabase Cloud" />
         </div>
 
         {/* Data Management */}
@@ -108,26 +107,25 @@ export default function SettingsScreen({ onBack, onNavigate }) {
               fontSize: 12, fontWeight: 600, color: colors.textLight,
               marginBottom: 10, textTransform: "uppercase", letterSpacing: 1,
             }}>
-              Administracion
+              Administración
             </div>
             {can("manage_users") && (
-              <AdminButton icon="👥" label="Gestion de Usuarios" onClick={() => onNavigate("users")} color={colors.primary} />
+              <AdminButton icon="👥" label="Gestión de Usuarios" onClick={() => onNavigate("users")} color={colors.primary} />
             )}
             {can("view_analytics") && (
-              <AdminButton icon="💰" label="Gestion de Presupuestos" onClick={() => onNavigate("budgets")} color={colors.primary} />
+              <AdminButton icon="💰" label="Gestión de Presupuestos" onClick={() => onNavigate("budgets")} color={colors.primary} />
             )}
             {can("manage_settings") && (
-              <AdminButton icon="⚙" label="Parametros del Sistema" onClick={() => onNavigate("parameters")} color={colors.primary} />
+              <AdminButton icon="⚙" label="Parámetros del Sistema" onClick={() => onNavigate("parameters")} color={colors.primary} />
             )}
             {can("manage_settings") && (
-              <AdminButton icon="🔄" label="Flujo de Aprobacion" onClick={() => onNavigate("approvalConfig")} color={colors.primary} />
+              <AdminButton icon="🔄" label="Autorización y Aprobación" onClick={() => onNavigate("approvalConfig")} color={colors.primary} />
             )}
             <button
               onClick={() => {
-                localStorage.removeItem(STORAGE_KEYS.REQUESTS);
-                localStorage.removeItem(STORAGE_KEYS.BUDGETS);
-                localStorage.removeItem(STORAGE_KEYS.PARAMETERS);
-                window.location.reload();
+                if (window.confirm("\u00BFRecargar la aplicaci\u00F3n y refrescar datos desde el servidor?")) {
+                  window.location.reload();
+                }
               }}
               style={{
                 width: "100%", padding: "12px", borderRadius: radius.lg,
@@ -138,7 +136,7 @@ export default function SettingsScreen({ onBack, onNavigate }) {
                 cursor: "pointer", marginBottom: 8,
               }}
             >
-              Resetear datos a valores de ejemplo
+              Recargar datos del servidor
             </button>
           </div>
         )}
@@ -155,7 +153,7 @@ export default function SettingsScreen({ onBack, onNavigate }) {
             boxShadow: `0 4px 16px ${colors.accent}30`,
           }}
         >
-          Cerrar Sesion
+          Cerrar Sesión
         </button>
       </div>
     </div>

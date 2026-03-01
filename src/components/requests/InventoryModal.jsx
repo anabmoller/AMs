@@ -47,12 +47,13 @@ export default function InventoryModal({ onSelect, onClose, onNewProduct }) {
       style={{
         position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
         background: "rgba(0,0,0,0.5)", zIndex: 1000,
-        display: "flex", alignItems: "flex-end", justifyContent: "center",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        padding: 16,
       }}
     >
       <div style={{
-        background: colors.bg, borderRadius: `${radius.xl}px ${radius.xl}px 0 0`,
-        maxWidth: 560, width: "100%", maxHeight: "85vh",
+        background: colors.bg, borderRadius: radius.xl,
+        maxWidth: 560, width: "100%", maxHeight: "70vh",
         overflow: "hidden", display: "flex", flexDirection: "column",
         animation: "fadeIn 0.2s ease",
       }}>
@@ -67,7 +68,7 @@ export default function InventoryModal({ onSelect, onClose, onNewProduct }) {
                 fontFamily: fontDisplay, fontSize: 20, fontWeight: 600,
                 color: colors.text, margin: 0,
               }}>
-                Catalogo de Productos
+                Catálogo de Productos
               </h3>
               <div style={{ fontSize: 11, color: colors.textLight, marginTop: 2 }}>
                 {INVENTORY_ITEMS.length} productos disponibles
@@ -85,7 +86,7 @@ export default function InventoryModal({ onSelect, onClose, onNewProduct }) {
           <SearchInput
             value={search}
             onChange={setSearch}
-            placeholder="Buscar por nombre, codigo o tipo..."
+            placeholder="Buscar por nombre, código o tipo..."
             autoFocus
             style={{ marginBottom: 10 }}
           />
@@ -215,7 +216,7 @@ export default function InventoryModal({ onSelect, onClose, onNewProduct }) {
               + Agregar producto nuevo
             </div>
             <div style={{ fontSize: 11, color: colors.textLight, marginTop: 2 }}>
-              No esta en el catalogo? Crealo manualmente
+              ¿No está en el catálogo? Créalo manualmente
             </div>
           </div>
         </div>

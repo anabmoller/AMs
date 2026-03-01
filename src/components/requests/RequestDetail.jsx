@@ -6,7 +6,9 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { colors, font, fontDisplay, inputStyle, shadows, radius } from "../../styles/theme";
 import { STATUS_FLOW, URGENCY_LEVELS, PRIORITY_LEVELS } from "../../constants";
+import { generateCommentId } from "../../utils/ids";
 import AddItemModal from "./AddItemModal";
+import AttachmentUpload from "./AttachmentUpload";
 import QuotationPanel from "../quotations/QuotationPanel";
 import ApprovalFlow from "../approval/ApprovalFlow";
 import ApprovalActions from "../approval/ApprovalActions";
@@ -15,6 +17,7 @@ import { useAuth } from "../../context/AuthContext";
 import { formatGuaranies } from "../../constants/budgets";
 import { getStatusDisplay, getPriorityDisplay } from "../../utils/statusHelpers";
 import { fmtDate, fmtDateTime } from "../../utils/dateFormatters";
+import { getSectors, getProductTypes } from "../../constants/parameters";
 
 // ---- Sub-components ----
 
@@ -132,13 +135,13 @@ export default function RequestDetail({
   const [commentText, setCommentText] = useState("");
   const [commentInternal, setCommentInternal] = useState(false);
 
-  // Editable note
-  const [note, setNote] = useState(r.note || r.reason || "");
+  // Editable note (maps to `reason` column in DB)
+  const [note, setNote] = useState(r.reason || r.notes || "");
   const noteTimer = useRef(null);
   const saveNote = useCallback((val) => {
     if (noteTimer.current) clearTimeout(noteTimer.current);
     noteTimer.current = setTimeout(() => {
-      if (onUpdateRequest) onUpdateRequest(r.id, { note: val });
+      if (onUpdateRequest) onUpdateRequest(r.id, { reason: val });
     }, 500);
   }, [r.id, onUpdateRequest]);
 
@@ -149,12 +152,16 @@ export default function RequestDetail({
   // Items state (editable in borrador)
   const [items, setItems] = useState(r.items || []);
 
+  // Attachments state
+  const [attachments, setAttachments] = useState(r.adjuntos || []);
+
   // Sync state if request changes
   useEffect(() => {
     setComments(r.comments || []);
-    setNote(r.note || r.reason || "");
+    setNote(r.reason || r.notes || "");
     setItems(r.items || []);
-  }, [r.id, r.comments, r.note, r.reason, r.items]);
+    setAttachments(r.adjuntos || []);
+  }, [r.id, r.comments, r.notes, r.reason, r.items, r.adjuntos]);
 
   const status = getStatusDisplay(r.status);
   const statusIdx = STATUS_FLOW.findIndex(s => s.key === r.status);
@@ -168,18 +175,24 @@ export default function RequestDetail({
   const showQuotationBtn = canManageQuotations && statusIdx >= 2;
   const quotationCount = r.quotations?.length || 0;
 
-  // Items total
-  const itemsTotal = items.reduce((sum, it) => sum + ((it.precioUnitario || 0) * (it.cantidad || 0)), 0);
+  // Items total — handles both DB field names (English) and AddItemModal field names (Spanish)
+  const itemsTotal = items.reduce((sum, it) => {
+    const price = it.unitPrice || it.precioUnitario || 0;
+    const qty = it.quantity || it.cantidad || 0;
+    return sum + (price * qty);
+  }, 0);
   const displayTotal = itemsTotal > 0 ? itemsTotal : (r.totalAmount || 0);
 
   // ---- Handlers ----
   const handleAddComment = () => {
     if (!commentText.trim()) return;
     const newComment = {
-      id: `C-${Date.now()}`,
-      autor: currentUser.name,
+      id: generateCommentId(),
+      author: currentUser.name,
+      autor: currentUser.name,       // backward compat
       avatar: currentUser.avatar,
-      fecha: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+      fecha: new Date().toISOString(), // backward compat
       texto: commentText.trim(),
       interno: commentInternal,
     };
@@ -190,17 +203,28 @@ export default function RequestDetail({
     if (onUpdateRequest) onUpdateRequest(r.id, { comments: updated });
   };
 
+  const calcItemsTotal = (arr) => arr.reduce((s, it) => {
+    const price = it.unitPrice || it.precioUnitario || 0;
+    const qty = it.quantity || it.cantidad || 0;
+    return s + (price * qty);
+  }, 0);
+
   const handleRemoveItem = (idx) => {
     const updated = items.filter((_, i) => i !== idx);
     setItems(updated);
-    if (onUpdateRequest) onUpdateRequest(r.id, { items: updated, totalAmount: updated.reduce((s, it) => s + ((it.precioUnitario || 0) * (it.cantidad || 0)), 0) });
+    if (onUpdateRequest) onUpdateRequest(r.id, { items: updated, totalAmount: calcItemsTotal(updated) });
   };
 
   const handleAddItem = (item) => {
     const updated = [...items, item];
     setItems(updated);
     setShowAddItem(false);
-    if (onUpdateRequest) onUpdateRequest(r.id, { items: updated, totalAmount: updated.reduce((s, it) => s + ((it.precioUnitario || 0) * (it.cantidad || 0)), 0) });
+    if (onUpdateRequest) onUpdateRequest(r.id, { items: updated, totalAmount: calcItemsTotal(updated) });
+  };
+
+  const handleAttachmentsChange = (updated) => {
+    setAttachments(updated);
+    if (onUpdateRequest) onUpdateRequest(r.id, { adjuntos: updated });
   };
 
   // ---- RENDER ----
@@ -362,12 +386,20 @@ export default function RequestDetail({
           <InfoCell label="Establecimiento" value={r.establishment} />
           <InfoCell
             label="Urgencia"
-            value={r.urgency}
+            value={priority?.label || r.priority || r.urgency || "—"}
             color={urgency?.color}
             icon={urgency?.icon}
           />
-          <InfoCell label="Sector" value={r.sector || r.type} />
-          <InfoCell label="Tipo de Producto" value={r.type} />
+          <InfoCell
+            label="Sector"
+            value={r.sector || r.type}
+            icon={getSectors().find(s => s.name === (r.sector || r.type))?.icon}
+          />
+          <InfoCell
+            label="Tipo de Producto"
+            value={r.type}
+            icon={getProductTypes().find(t => t.name === r.type)?.icon}
+          />
           <InfoCell label="Cantidad" value={r.quantity} />
           <InfoCell label="Asignado a" value={r.assignee || "Sin asignar"} />
           {r.equipment && <InfoCell label="Equipo" value={r.equipment} span2 />}
@@ -422,25 +454,25 @@ export default function RequestDetail({
                       fontSize: 10, fontWeight: 700, color: colors.textLight,
                       background: colors.bg, padding: "2px 6px", borderRadius: radius.xs,
                     }}>{idx + 1}</span>
-                    {it.codigo && (
-                      <span style={{ fontSize: 10, color: colors.primary, fontWeight: 600 }}>{it.codigo}</span>
+                    {(it.codigo || it.code) && (
+                      <span style={{ fontSize: 10, color: colors.primary, fontWeight: 600 }}>{it.codigo || it.code}</span>
                     )}
                   </div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: colors.text, marginTop: 3 }}>
-                    {it.nombre || it.name || "Item"}
+                    {it.name || it.nombre || "Item"}
                   </div>
                   <div style={{ fontSize: 11, color: colors.textLight, marginTop: 2 }}>
-                    {it.cantidad || 0} {it.unidad || "un"} × {formatGuaranies(it.precioUnitario || 0)}
+                    {it.quantity || it.cantidad || 0} {it.unit || it.unidad || "un"} × {formatGuaranies(it.unitPrice || it.precioUnitario || 0)}
                   </div>
-                  {it.proveedor && (
+                  {(it.proveedor || it.supplier) && (
                     <div style={{ fontSize: 10, color: colors.textLight, marginTop: 1 }}>
-                      Prov: {it.proveedor}
+                      Prov: {it.proveedor || it.supplier}
                     </div>
                   )}
                 </div>
                 <div style={{ textAlign: "right", flexShrink: 0 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: colors.text }}>
-                    {formatGuaranies((it.precioUnitario || 0) * (it.cantidad || 0))}
+                    {formatGuaranies((it.unitPrice || it.precioUnitario || 0) * (it.quantity || it.cantidad || 0))}
                   </div>
                   {isBorrador && (
                     <button onClick={() => handleRemoveItem(idx)} style={{
@@ -575,9 +607,9 @@ export default function RequestDetail({
                       color: "#fff", fontSize: 11, fontWeight: 700,
                       display: "flex", alignItems: "center", justifyContent: "center",
                     }}>
-                      {(c.avatar || c.autor?.[0] || "?").toUpperCase()}
+                      {(c.avatar || (c.author || c.autor || "?")?.[0] || "?").toUpperCase()}
                     </div>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: colors.text }}>{c.autor}</span>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: colors.text }}>{c.author || c.autor}</span>
                     {c.interno && (
                       <span style={{
                         fontSize: 9, fontWeight: 700, color: colors.warning,
@@ -586,7 +618,7 @@ export default function RequestDetail({
                       }}>Interno</span>
                     )}
                     <span style={{ fontSize: 10, color: colors.textLight, marginLeft: "auto" }}>
-                      {fmtDateTime(c.fecha)}
+                      {fmtDateTime(c.createdAt || c.fecha)}
                     </span>
                   </div>
                   <div style={{ fontSize: 13, color: colors.text, lineHeight: 1.5, paddingLeft: 34 }}>
@@ -751,10 +783,10 @@ export default function RequestDetail({
         )}
       </div>
 
-      {/* ===== ATTACHMENTS (collapsible placeholder) ===== */}
+      {/* ===== ATTACHMENTS ===== */}
       <div style={{ padding: "8px 20px" }}>
         <SectionTitle
-          count={r.adjuntos?.length || 0}
+          count={attachments.length}
           collapsed={!showAttachments}
           onToggle={() => setShowAttachments(!showAttachments)}
         >
@@ -763,33 +795,13 @@ export default function RequestDetail({
         {showAttachments && (
           <div style={{
             background: colors.card, borderRadius: radius.lg, padding: 16,
-            border: `1px solid ${colors.borderLight}`, textAlign: "center",
+            border: `1px solid ${colors.borderLight}`,
           }}>
-            <div style={{
-              border: `2px dashed ${colors.border}`, borderRadius: radius.lg,
-              padding: "20px 16px", color: colors.textLight,
-            }}>
-              <div style={{ fontSize: 24, marginBottom: 6 }}>📎</div>
-              <div style={{ fontSize: 12, fontWeight: 500 }}>
-                Arrastrar archivos o hacer clic para subir
-              </div>
-              <div style={{ fontSize: 10, marginTop: 4, color: colors.border }}>
-                PDF, JPG, PNG — Máximo 25 MB
-              </div>
-            </div>
-            {r.adjuntos?.length > 0 && (
-              <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 4 }}>
-                {r.adjuntos.map((a, i) => (
-                  <div key={i} style={{
-                    fontSize: 12, color: colors.primary, padding: "6px 10px",
-                    background: colors.primary + "08", borderRadius: radius.md,
-                    textAlign: "left",
-                  }}>
-                    📎 {a.name || a}
-                  </div>
-                ))}
-              </div>
-            )}
+            <AttachmentUpload
+              requestUuid={r._uuid}
+              attachments={attachments}
+              onAttachmentsChange={handleAttachmentsChange}
+            />
           </div>
         )}
       </div>
