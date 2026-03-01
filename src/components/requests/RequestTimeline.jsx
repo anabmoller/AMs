@@ -5,7 +5,7 @@
 // ============================================================
 import { STATUS_FLOW } from "../../constants";
 import { fmtDate, fmtDateTime } from "../../utils/dateFormatters";
-import AttachmentUpload from "./AttachmentUpload";
+
 
 function SectionTitle({ children, count, collapsed, onToggle }) {
   return (
@@ -38,10 +38,6 @@ export default function RequestTimeline({
   statusIdx,
   showTrazabilidad,
   onToggleTrazabilidad,
-  showAttachments,
-  onToggleAttachments,
-  attachments,
-  onAttachmentsChange,
 }) {
   return (
     <>
@@ -171,25 +167,6 @@ export default function RequestTimeline({
         )}
       </div>
 
-      {/* ===== ATTACHMENTS ===== */}
-      <div className="px-5 py-2">
-        <SectionTitle
-          count={attachments.length}
-          collapsed={!showAttachments}
-          onToggle={onToggleAttachments}
-        >
-          Adjuntos
-        </SectionTitle>
-        {showAttachments && (
-          <div className="bg-white/[0.03] rounded-xl p-4 border border-white/[0.06]">
-            <AttachmentUpload
-              requestUuid={r._uuid}
-              attachments={attachments}
-              onAttachmentsChange={onAttachmentsChange}
-            />
-          </div>
-        )}
-      </div>
     </>
   );
 }

@@ -25,6 +25,7 @@ import RequestItemsTable from "./RequestItemsTable";
 import QuotationComparison from "./QuotationComparison";
 import RequestComments from "./RequestComments";
 import RequestTimeline from "./RequestTimeline";
+import AttachmentUpload from "./AttachmentUpload";
 
 // ---- Shared sub-components (kept inline — small & used only here) ----
 
@@ -126,7 +127,7 @@ export default function RequestDetail({
 
   // Collapsible sections
   const [showTrazabilidad, setShowTrazabilidad] = useState(false);
-  const [showAttachments, setShowAttachments] = useState(false);
+  const [showAttachments, setShowAttachments] = useState(true);
 
   // Items state (editable in borrador)
   const [items, setItems] = useState(r.items || []);
@@ -373,6 +374,38 @@ export default function RequestDetail({
             onCommentInternalChange={setCommentInternal}
             onAddComment={handleAddComment}
           />
+
+          {/* Global Attachments — any involved role, any active phase */}
+          <div className="px-5 xl:px-0 py-2">
+            <div className="flex items-center justify-between mb-2 cursor-pointer" onClick={() => setShowAttachments(!showAttachments)}>
+              <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide flex items-center gap-1.5">
+                📎 Adjuntos
+                {attachments.length > 0 && (
+                  <span className="bg-emerald-500/[0.08] text-emerald-400 text-[10px] font-bold px-1.5 py-px rounded-md">
+                    {attachments.length}
+                  </span>
+                )}
+              </div>
+              <span className="text-sm text-slate-400 transition-transform duration-200" style={{ transform: showAttachments ? "rotate(0)" : "rotate(-90deg)" }}>
+                ▾
+              </span>
+            </div>
+            {showAttachments && (
+              <div className="bg-white/[0.03] rounded-xl p-4 border border-white/[0.06]">
+                {isRejected || isCancelado ? (
+                  <div className="text-xs text-slate-500 text-center py-2">
+                    No se pueden adjuntar archivos en solicitudes {isRejected ? "rechazadas" : "canceladas"}.
+                  </div>
+                ) : (
+                  <AttachmentUpload
+                    requestUuid={r._uuid}
+                    attachments={attachments}
+                    onAttachmentsChange={handleAttachmentsChange}
+                  />
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* ---- SIDEBAR COLUMN ---- */}
@@ -451,16 +484,12 @@ export default function RequestDetail({
             </div>
           </div>
 
-          {/* Trazabilidad + Attachments */}
+          {/* Trazabilidad */}
           <RequestTimeline
             request={r}
             statusIdx={statusIdx}
             showTrazabilidad={showTrazabilidad}
             onToggleTrazabilidad={() => setShowTrazabilidad(!showTrazabilidad)}
-            showAttachments={showAttachments}
-            onToggleAttachments={() => setShowAttachments(!showAttachments)}
-            attachments={attachments}
-            onAttachmentsChange={handleAttachmentsChange}
           />
         </div>
       </div>
