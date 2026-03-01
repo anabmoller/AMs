@@ -15,7 +15,7 @@ export default function ApprovalActions({ request, currentUser, onApprove, onRej
   const currentStep = getCurrentStep(request.approvalSteps);
   if (!currentStep) return null;
 
-  const canApprove = canUserApproveStep(currentUser, currentStep);
+  const canApprove = canUserApproveStep(currentUser, currentStep, request.totalAmount || 0);
   if (!canApprove) {
     return (
       <div className="bg-amber-500/[0.06] rounded-xl px-4 py-3.5 border border-amber-500/[0.19] flex items-center gap-2.5">

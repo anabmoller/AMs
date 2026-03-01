@@ -52,7 +52,7 @@ export const PRESIDENT_BY_COMPANY: Record<string, string> = {
 };
 
 // ---- Overbudget Approver (R6 condicional — budget excedido below 50M) ----
-export const OVERBUDGET_APPROVER = "ana.moller";
+export const OVERBUDGET_APPROVER = "mauricio";
 
 // ---- Veterinaria/Farmacia special approver (R5) ----
 export const VET_APPROVER = "rodrigo.ferreira";

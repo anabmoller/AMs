@@ -67,13 +67,14 @@ function AppContent() {
   const [devMode, setDevMode] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  // Effective user: when dev mode is active, override currentUser and can()
+  // Effective user: when dev mode is active, override currentUser (name, role, email)
   const effectiveUser = useMemo(() => {
     if (!devMode) return currentUser;
     return {
       ...currentUser,
       name: devMode.name,
       role: devMode.role,
+      email: devMode.username || currentUser.email,
       avatar: devMode.name.split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase(),
     };
   }, [currentUser, devMode]);

@@ -84,7 +84,7 @@ export const MANAGER_BY_ESTABLISHMENT = MANAGER_MAP;
 export const DIRECTOR_BY_COMPANY = COMPANY_MAP;
 
 // ---- Overbudget Approver (condicional — R6) ----
-export const OVERBUDGET_APPROVER = "ana.moller";
+export const OVERBUDGET_APPROVER = "mauricio";
 
 // ---- Veterinaria/Farmacia special approver (R5) ----
 export const VET_APPROVER = "rodrigo.ferreira";

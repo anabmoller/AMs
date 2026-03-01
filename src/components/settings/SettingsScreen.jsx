@@ -3,11 +3,11 @@ import { ROLES } from "../../constants/users";
 import BackButton from "../common/BackButton";
 
 const DEV_USERS = [
-  { name: "Ramón Sosa", role: "solicitante", label: "Solicitante" },
-  { name: "Paulo Becker", role: "gerente", label: "Autoriza / Aprueba hasta ₲5M" },
-  { name: "Laura Rivas", role: "comprador", label: "Presupuesta (Compras)" },
-  { name: "Ronei Ferreira", role: "diretoria", label: "Autoriza todo / Aprueba hasta ₲50M" },
-  { name: "Mauricio Moller", role: "diretoria", label: "Autoriza y aprueba cualquier momento" },
+  { name: "Ramón Sosa", username: "ramon.sosa", role: "solicitante", label: "Solicitante" },
+  { name: "Paulo Becker", username: "paulo", role: "gerente", label: "Autoriza / Aprueba hasta ₲5M" },
+  { name: "Laura Rivas", username: "laura.rivas", role: "comprador", label: "Presupuesta (Compras)" },
+  { name: "Ronei Ferreira", username: "ronei", role: "diretoria", label: "Autoriza todo / Aprueba hasta ₲50M" },
+  { name: "Mauricio Moller", username: "mauricio", role: "diretoria", label: "Autoriza y aprueba cualquier momento" },
 ];
 
 export default function SettingsScreen({ onBack, onNavigate, devMode, onSetDevMode }) {
