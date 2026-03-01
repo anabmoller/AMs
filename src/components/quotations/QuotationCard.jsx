@@ -71,14 +71,34 @@ export default function QuotationCard({
         <button
           onClick={(e) => {
             e.stopPropagation();
-            if (q.attachment.data) {
-              window.open(q.attachment.data, "_blank");
+            const data = q.attachment.data || q.attachment.url;
+            if (!data) return;
+            // For base64 data URIs, convert to blob for reliable viewing
+            if (data.startsWith("data:")) {
+              try {
+                const [header, b64] = data.split(",");
+                const mime = header.match(/:(.*?);/)?.[1] || "application/octet-stream";
+                const bytes = atob(b64);
+                const arr = new Uint8Array(bytes.length);
+                for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+                const blob = new Blob([arr], { type: mime });
+                window.open(URL.createObjectURL(blob), "_blank");
+              } catch { window.open(data, "_blank"); }
+            } else {
+              window.open(data, "_blank");
             }
           }}
-          className="mt-2 flex items-center gap-1.5 text-[11px] text-blue-400 bg-blue-500/[0.06] px-2 py-1 rounded cursor-pointer border-none bg-transparent hover:bg-blue-500/[0.12] transition-colors w-full text-left"
+          disabled={!q.attachment.data && !q.attachment.url}
+          className={`mt-2 flex items-center gap-1.5 text-[11px] px-2 py-1 rounded border-none transition-colors w-full text-left ${
+            q.attachment.data || q.attachment.url
+              ? 'text-blue-400 bg-blue-500/[0.06] cursor-pointer hover:bg-blue-500/[0.12]'
+              : 'text-slate-500 bg-white/[0.02] cursor-default'
+          }`}
         >
           {q.attachment.type?.startsWith("image/") ? "🖼" : "📄"} {q.attachment.name}
-          <span className="text-[10px] text-slate-500 ml-auto">Abrir ↗</span>
+          <span className="text-[10px] text-slate-500 ml-auto">
+            {q.attachment.data || q.attachment.url ? "Abrir ↗" : "Sin archivo"}
+          </span>
         </button>
       )}
     </div>

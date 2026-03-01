@@ -157,6 +157,7 @@ body {
   color: #111827 !important;
   background: #ffffff !important;
   border-color: #d1d5db !important;
+  color-scheme: light !important;
 }
 
 :root.light select option {
@@ -180,7 +181,8 @@ body {
   border-radius: 4px;
 }
 
-/* Form elements */
+/* Form elements — force dark color-scheme for native controls */
+select, input, textarea { color-scheme: dark; }
 select { -webkit-appearance: none; appearance: none; }
 
 input:focus, select:focus, textarea:focus {
