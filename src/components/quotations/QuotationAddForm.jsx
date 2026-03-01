@@ -120,18 +120,18 @@ export default function QuotationAddForm({ items, currency: initCurrency, onAdd,
             className={inputCls}
           />
           {showSuggestions && suggestions.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-[#161722] border border-white/[0.1] rounded-lg shadow-xl z-50 max-h-[180px] overflow-auto">
+            <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl z-50 max-h-[180px] overflow-auto">
               {suggestions.map((s, i) => (
                 <div
                   key={i}
-                  className="px-3 py-2 cursor-pointer hover:bg-white/[0.06] border-b border-white/[0.04] last:border-0"
+                  className="px-3 py-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 border-b border-slate-100 dark:border-white/[0.04] last:border-0"
                   onMouseDown={() => {
                     setSupplier(s.n);
                     setShowSuggestions(false);
                   }}
                 >
-                  <div className="text-xs text-white font-medium">{s.n}</div>
-                  <div className="text-[10px] text-slate-400">RUC: {s.r} &middot; {s.c} compra{s.c !== 1 ? "s" : ""}</div>
+                  <div className="text-xs text-slate-900 dark:text-white font-medium">{s.n}</div>
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400">RUC: {s.r} &middot; {s.c} compra{s.c !== 1 ? "s" : ""}</div>
                 </div>
               ))}
             </div>

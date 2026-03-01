@@ -66,9 +66,18 @@ export default function QuotationCard({
         <div className="text-[11px] text-slate-400 mt-1 italic">{q.notes}</div>
       )}
       {q.attachment && (
-        <div className="mt-2 flex items-center gap-1.5 text-[11px] text-blue-400 bg-blue-500/[0.06] px-2 py-1 rounded">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            if (q.attachment.data) {
+              window.open(q.attachment.data, "_blank");
+            }
+          }}
+          className="mt-2 flex items-center gap-1.5 text-[11px] text-blue-400 bg-blue-500/[0.06] px-2 py-1 rounded cursor-pointer border-none bg-transparent hover:bg-blue-500/[0.12] transition-colors w-full text-left"
+        >
           {q.attachment.type?.startsWith("image/") ? "🖼" : "📄"} {q.attachment.name}
-        </div>
+          <span className="text-[10px] text-slate-500 ml-auto">Abrir ↗</span>
+        </button>
       )}
     </div>
   );

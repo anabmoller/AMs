@@ -74,16 +74,26 @@ export default function RequestStepItems({
     setItemAmount(unitPrice);
   };
 
+  const selectFreeProduct = () => {
+    const freeItem = { n: productSearch.trim(), c: "LIBRE", g: "", u: "unidad", up: 0, lp: 0, ap: 0, ld: "", ls: "", _isFree: true };
+    setSelectedProduct(freeItem);
+    setShowDropdown(false);
+    setItemQty(1);
+    setItemUnitPrice(0);
+    setItemAmount(0);
+  };
+
   const addItem = () => {
     if (!selectedProduct) return;
     if (itemQty <= 0) { onSetErrors({ itemQty: "Debe ser > 0" }); return; }
     onSetItems(prev => [...prev, {
       product: selectedProduct.n,
-      code: selectedProduct.c,
+      code: selectedProduct._isFree ? "" : selectedProduct.c,
       qty: itemQty,
-      unit: autoUnit(selectedProduct.c),
+      unit: selectedProduct._isFree ? "unidad" : autoUnit(selectedProduct.c),
       estimatedAmount: itemAmount || 0,
-      _catalogRef: selectedProduct,
+      _catalogRef: selectedProduct._isFree ? null : selectedProduct,
+      isFreeItem: selectedProduct._isFree || false,
     }]);
     setSelectedProduct(null);
     setProductSearch("");
@@ -137,13 +147,13 @@ export default function RequestStepItems({
           className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-emerald-500/50"
         />
         {/* Dropdown */}
-        {showDropdown && filteredProducts.length > 0 && (
-          <div className="absolute z-20 top-full left-0 right-0 mt-1 max-h-52 overflow-y-auto bg-[#1a1b22] rounded-lg border border-white/[0.1] shadow-xl">
+        {showDropdown && (filteredProducts.length > 0 || productSearch.trim().length >= 2) && (
+          <div className="absolute z-20 top-full left-0 right-0 mt-1 max-h-52 overflow-y-auto bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 shadow-xl">
             {filteredProducts.map(p => (
               <button
                 key={p.c}
                 onClick={() => selectProduct(p)}
-                className="w-full text-left px-3 py-2 border-none bg-transparent hover:bg-white/[0.06] cursor-pointer flex items-center gap-2 transition-colors"
+                className="w-full text-left px-3 py-2 border-none bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer flex items-center gap-2 transition-colors"
               >
                 <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/[0.08] px-1.5 py-0.5 rounded">{p.c}</span>
                 <span className="text-sm text-white flex-1 truncate">{p.n}</span>
@@ -153,6 +163,16 @@ export default function RequestStepItems({
                 <span className="text-[10px] text-slate-500">{p.g}</span>
               </button>
             ))}
+            {/* Free product option when no exact match or always at bottom */}
+            {productSearch.trim().length >= 2 && (
+              <button
+                onClick={selectFreeProduct}
+                className="w-full text-left px-3 py-2.5 border-t border-slate-100 dark:border-white/[0.06] bg-transparent hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer flex items-center gap-2 transition-colors"
+              >
+                <span className="text-[10px] font-mono text-amber-400 bg-amber-500/[0.08] px-1.5 py-0.5 rounded">➕</span>
+                <span className="text-sm text-amber-400 flex-1 truncate">Agregar "{productSearch.trim()}" como producto libre</span>
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -228,8 +248,11 @@ export default function RequestStepItems({
           {items.map((it, i) => (
             <div key={i} className="px-3 py-2 flex items-center gap-2 border-b border-white/[0.04] last:border-b-0">
               <div className="flex-1 min-w-0">
-                <div className="text-sm text-white font-medium truncate">{it.product}</div>
-                <div className="text-[10px] text-slate-500">{it.code} · {it.qty} {it.unit} · {fmtGs(it.estimatedAmount)}</div>
+                <div className="text-sm text-white font-medium truncate flex items-center gap-1.5">
+                  {it.product}
+                  {it.isFreeItem && <span className="text-[9px] text-amber-400 bg-amber-500/[0.1] px-1.5 py-0.5 rounded-full font-medium">Producto libre</span>}
+                </div>
+                <div className="text-[10px] text-slate-500">{it.code || "Sin código"} · {it.qty} {it.unit} · {fmtGs(it.estimatedAmount)}</div>
               </div>
               <button
                 onClick={() => removeItem(i)}
