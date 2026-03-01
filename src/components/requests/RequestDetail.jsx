@@ -395,9 +395,32 @@ export default function RequestDetail({
             {showAttachments && (
               <div className="bg-white/[0.03] rounded-xl p-4 border border-white/[0.06]">
                 {isRejected || isCancelado ? (
-                  <div className="text-xs text-slate-500 text-center py-2">
-                    No se pueden adjuntar archivos en solicitudes {isRejected ? "rechazadas" : "canceladas"}.
-                  </div>
+                  <>
+                    {/* Read-only view of existing attachments */}
+                    {attachments.length > 0 ? (
+                      <div className="flex flex-col gap-1.5">
+                        {attachments.map(att => (
+                          <div key={att.id} className="flex items-center gap-2.5 bg-white/[0.02] rounded-lg px-3 py-2 border border-white/[0.06]">
+                            <div className="w-11 h-11 rounded bg-emerald-500/[0.06] flex items-center justify-center text-lg flex-shrink-0">
+                              {att.type?.startsWith("image/") ? "🖼" : "📄"}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-xs font-medium text-white truncate">{att.name}</div>
+                            </div>
+                            {att.url && (
+                              <a href={att.url} target="_blank" rel="noopener noreferrer"
+                                className="bg-emerald-500/[0.06] border-none rounded px-2 py-1 text-[10px] text-emerald-400 font-semibold no-underline">
+                                Ver
+                              </a>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : null}
+                    <div className="text-xs text-slate-500 text-center py-2 mt-1">
+                      No se pueden adjuntar archivos en solicitudes {isRejected ? "rechazadas" : "canceladas"}.
+                    </div>
+                  </>
                 ) : (
                   <AttachmentUpload
                     requestUuid={r._uuid}
