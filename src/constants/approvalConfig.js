@@ -25,7 +25,7 @@ export const ESTABLISHMENT_COMPANY = {
   "Santa Clara": "Rural Bioenergia S.A.",
   "Yby Pyta": "Rural Bioenergia S.A.",
   "Lusipar": "Rural Bioenergia S.A.",
-  "Santa Maria da Serra": "Rural Bioenergia S.A.",
+  "Santa Maria": "Rural Bioenergia S.A.",
   "Oro Verde": "Rural Bioenergia S.A.",
   "General": "Rural Bioenergia S.A.",
 };
@@ -39,7 +39,7 @@ export const MANAGER_MAP = {
   "Santa Clara": "fabiano",
   "Yby Pyta": "fabiano",
   "Lusipar": "fabiano",
-  "Santa Maria da Serra": "pedro",
+  "Santa Maria": "pedro",
   "Oro Verde": "paulo",
   "General": "ronei",
 };
@@ -66,7 +66,7 @@ export const PRESIDENT_MAP = {
 // ---- Username → Display Name mapping ----
 export const USER_DISPLAY_NAMES = {
   "paulo": "Paulo Becker",
-  "fabiano": "Fabiano Ferreira",
+  "fabiano": "Fabiano Squeruque",
   "pedro": "Pedro Moller",
   "ronei": "Ronei Barrios",
   "mauricio": "Mauricio Moller",

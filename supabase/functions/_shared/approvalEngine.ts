@@ -13,7 +13,7 @@ export const ESTABLISHMENT_COMPANY: Record<string, string> = {
   "Santa Clara": "Rural Bioenergia S.A.",
   "Yby Pyta": "Rural Bioenergia S.A.",
   "Lusipar": "Rural Bioenergia S.A.",
-  "Santa Maria da Serra": "Rural Bioenergia S.A.",
+  "Santa Maria": "Rural Bioenergia S.A.",
   "Oro Verde": "Rural Bioenergia S.A.",
   "General": "Rural Bioenergia S.A.",
 };
@@ -27,7 +27,7 @@ export const MANAGER_BY_ESTABLISHMENT: Record<string, string> = {
   "Santa Clara": "fabiano",
   "Yby Pyta": "fabiano",
   "Lusipar": "fabiano",
-  "Santa Maria da Serra": "pedro",
+  "Santa Maria": "pedro",
   "Oro Verde": "paulo",
   "General": "ronei",
 };

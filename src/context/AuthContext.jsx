@@ -39,6 +39,9 @@ export function AuthProvider({ children }) {
     avatar: profile.avatar,
     active: profile.active,
     force_password_change: profile.force_password_change,
+    isSuperApprover: profile.is_super_approver || false,
+    canApprove: profile.can_approve || false,
+    phone: profile.phone || null,
   } : null;
 
   const isAuthenticated = !!currentUser && currentUser.active !== false;

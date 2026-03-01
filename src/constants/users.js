@@ -148,6 +148,15 @@ export const ROLES = {
       "create_request", "view_own_requests",
     ],
   },
+  observador: {
+    key: "observador",
+    label: "Observador",
+    description: "Acceso de solo lectura al sistema",
+    color: "#94a3b8",
+    permissions: [
+      "view_all_requests", "view_inventory",
+    ],
+  },
 };
 
 // ---- Module-level cache ----
@@ -214,6 +223,9 @@ export async function initUsers() {
       position: p.position,
       avatar: p.avatar,
       active: p.active !== false,
+      isSuperApprover: p.is_super_approver || false,
+      canApprove: p.can_approve || false,
+      phone: p.phone || null,
     }));
   } catch (err) {
     console.error("[Users] Init failed:", err);

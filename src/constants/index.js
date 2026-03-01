@@ -144,7 +144,7 @@ export const SAMPLE_REQUESTS = [
     urgency: "Media",
     establishment: "Cielo Azul",
     sector: "Agricultura",
-    requester: "Fabiano Ferreira",
+    requester: "Fabiano Squeruque",
     status: "autorizado",
     date: "2026-02-25",
     assignee: "Ana Karina",
