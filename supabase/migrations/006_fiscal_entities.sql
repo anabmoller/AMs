@@ -19,9 +19,11 @@ CREATE TABLE IF NOT EXISTS fiscal_entities (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- 2. RLS policies
+-- 2. RLS policies (idempotent)
 ALTER TABLE fiscal_entities ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS fiscal_entities_select ON fiscal_entities;
 CREATE POLICY fiscal_entities_select ON fiscal_entities FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS fiscal_entities_admin ON fiscal_entities;
 CREATE POLICY fiscal_entities_admin ON fiscal_entities FOR ALL USING (is_admin());
 
 -- 3. Insert 6 fiscal entities
@@ -45,9 +47,11 @@ CREATE TABLE IF NOT EXISTS user_fiscal_entities (
   UNIQUE(user_id, fiscal_entity_id)
 );
 
--- 5. RLS policies for junction table
+-- 5. RLS policies for junction table (idempotent)
 ALTER TABLE user_fiscal_entities ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS user_fiscal_entities_select ON user_fiscal_entities;
 CREATE POLICY user_fiscal_entities_select ON user_fiscal_entities FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS user_fiscal_entities_admin ON user_fiscal_entities;
 CREATE POLICY user_fiscal_entities_admin ON user_fiscal_entities FOR ALL USING (is_admin());
 
 -- 6. Indexes

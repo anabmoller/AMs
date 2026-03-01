@@ -16,9 +16,11 @@ CREATE TABLE IF NOT EXISTS functional_accounts (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- 2. RLS policies
+-- 2. RLS policies (idempotent: drop-if-exists before create)
 ALTER TABLE functional_accounts ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS functional_accounts_select ON functional_accounts;
 CREATE POLICY functional_accounts_select ON functional_accounts FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS functional_accounts_admin ON functional_accounts;
 CREATE POLICY functional_accounts_admin ON functional_accounts FOR ALL USING (is_admin());
 
 -- 3. Insert 11 functional accounts

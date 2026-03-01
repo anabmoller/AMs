@@ -40,9 +40,11 @@ CREATE TABLE IF NOT EXISTS user_establishments (
   UNIQUE(user_id, establishment_id)
 );
 
--- 5. RLS policies for junction table
+-- 5. RLS policies for junction table (idempotent)
 ALTER TABLE user_establishments ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS user_establishments_select ON user_establishments;
 CREATE POLICY user_establishments_select ON user_establishments FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS user_establishments_admin ON user_establishments;
 CREATE POLICY user_establishments_admin ON user_establishments FOR ALL USING (is_admin());
 
 -- 6. Index for faster lookups

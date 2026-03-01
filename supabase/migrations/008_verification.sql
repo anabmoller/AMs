@@ -5,10 +5,10 @@
 --          restructured database is correct and consistent.
 -- ============================================================
 
--- 1. Count real users (should be 21)
+-- 1. Count real users (migration 003 inserts 20; may be more if pre-existing)
 SELECT 'Real users' AS check,
        COUNT(*) AS total,
-       CASE WHEN COUNT(*) = 21 THEN 'PASS' ELSE 'FAIL — expected 21' END AS result
+       CASE WHEN COUNT(*) >= 20 THEN 'PASS' ELSE 'FAIL — expected ≥20' END AS result
 FROM users WHERE active = true;
 
 -- 2. Count functional accounts (should be 11)
@@ -72,10 +72,21 @@ FROM information_schema.tables
 WHERE table_schema = 'public'
   AND table_name IN ('user_establishments', 'user_fiscal_entities');
 
--- 10. List all users with roles for manual review
+-- 10. Verify key approval roles exist (MANAGER_MAP + SUPER_APPROVERS)
+SELECT 'Key approval users' AS check,
+       COUNT(*) AS found,
+       CASE WHEN COUNT(*) >= 4 THEN 'PASS' ELSE 'WARN — check paulo, fabiano, ronei, mauricio' END AS result
+FROM users WHERE email IN (
+  'paulo@ypoti.com', 'fabiano@ypoti.com', 'ronei@ypoti.com', 'mauriciomoller@ypoti.com'
+) AND active = true;
+
+-- 11. List all users with roles for manual review
+-- NOTE: Verify that profiles.username values match approval engine usernames
+-- (e.g., profiles.username='ronei' maps to MANAGER_MAP/SUPER_APPROVERS['ronei'])
+-- NOTE: VET_APPROVER='rodrigo.ferreira' must exist in profiles table
 SELECT id, name, email, role, phone, is_super_approver, can_approve, active
 FROM users
 ORDER BY name;
 
--- 11. Summary
+-- 12. Summary
 SELECT '✅ Verification complete — run in Supabase SQL Editor' AS status;
