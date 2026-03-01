@@ -13,6 +13,7 @@ import ChangePasswordScreen from "./components/auth/ChangePasswordScreen";
 import Header from "./components/layout/Header";
 import BottomNav from "./components/layout/BottomNav";
 import DesktopSidebar from "./components/layout/DesktopSidebar";
+import MobileDrawer from "./components/layout/MobileDrawer";
 import Notification from "./components/common/Notification";
 import Dashboard from "./components/requests/Dashboard";
 import RequestDetail from "./components/requests/RequestDetail";
@@ -64,6 +65,7 @@ function AppContent() {
   const [usdRate, setUsdRate] = useState(7800);
   const [usdLive, setUsdLive] = useState(false);
   const [devMode, setDevMode] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   // Effective user: when dev mode is active, override currentUser and can()
   const effectiveUser = useMemo(() => {
@@ -319,8 +321,23 @@ function AppContent() {
         <Notification notification={notification} />
 
         <div className="mobile-header">
-          <Header currentUser={effectiveUser.name} />
+          <Header
+            currentUser={effectiveUser.name}
+            onToggleDrawer={() => setDrawerOpen(prev => !prev)}
+            onNavigate={handleNavigate}
+          />
         </div>
+
+        <MobileDrawer
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          screen={screen}
+          onNavigate={handleNavigate}
+          onNewRequest={newRequestHandler}
+          currentUser={effectiveUser.name}
+          canViewAnalytics={effectiveCan("view_analytics")}
+          canManageUsers={effectiveCan("manage_users")}
+        />
 
         {renderContent()}
 
