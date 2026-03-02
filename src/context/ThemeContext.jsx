@@ -18,7 +18,7 @@ const THEMES = {
     border: "#e5e7eb",
     text: "#111827",
     textMuted: "#6b7280",
-    accent: "#059669",
+    accent: "#6B1E2F",
     sidebarBg: "#ffffff",
   },
 };

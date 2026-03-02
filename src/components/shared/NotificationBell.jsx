@@ -55,7 +55,7 @@ export default function NotificationBell({ onNavigate }) {
             {unreadCount > 0 && (
               <button
                 onClick={() => markAllAsRead()}
-                className="text-[11px] text-emerald-400 font-medium bg-transparent border-none cursor-pointer hover:text-emerald-300"
+                className="text-[11px] text-[#C8A03A] font-medium bg-transparent border-none cursor-pointer hover:text-[#C8A03A]/80 transition-colors"
               >
                 Marcar todas como leídas
               </button>
