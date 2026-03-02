@@ -183,7 +183,7 @@ export default function QuotationAddForm({ items, currency: initCurrency, onAdd,
                   />
                 </div>
                 {parseFloat(itemPrices[idx]) > 0 && (
-                  <div className="text-[10px] text-emerald-400 font-semibold w-[70px] text-right flex-shrink-0">
+                  <div className="text-[10px] text-[#C8A03A] font-semibold w-[70px] text-right flex-shrink-0">
                     {((it.quantity || it.cantidad || 0) * parseFloat(itemPrices[idx])).toLocaleString()}
                   </div>
                 )}
@@ -208,7 +208,7 @@ export default function QuotationAddForm({ items, currency: initCurrency, onAdd,
             {formTotal > 0 && (
               <div className="px-3 py-2 bg-white/[0.02] border-t border-white/[0.06] flex justify-between items-center">
                 <span className="text-[11px] font-semibold text-slate-400">TOTAL</span>
-                <span className="text-sm font-bold text-emerald-400">
+                <span className="text-sm font-bold text-[#C8A03A]">
                   {currency} {formTotal.toLocaleString()}
                 </span>
               </div>

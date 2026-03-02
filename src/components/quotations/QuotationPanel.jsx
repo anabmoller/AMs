@@ -109,9 +109,9 @@ export default function QuotationPanel({ request, currentUser, onClose, onSave }
                 <div className="text-[10px] text-slate-400 mt-px">{cheapest?.supplier}</div>
               </div>
               {fastest && fastest.deliveryDays > 0 && (
-                <div className="flex-1 bg-emerald-500/[0.06] rounded-xl px-3 py-2.5 border border-emerald-500/[0.12]">
-                  <div className="text-[10px] text-emerald-400 font-semibold uppercase">Mas rapido</div>
-                  <div className="text-sm font-bold text-emerald-400 mt-0.5">{fastest.deliveryDays} dias</div>
+                <div className="flex-1 bg-[#C8A03A]/[0.06] rounded-xl px-3 py-2.5 border border-[#C8A03A]/[0.12]">
+                  <div className="text-[10px] text-[#C8A03A] font-semibold uppercase">Mas rapido</div>
+                  <div className="text-sm font-bold text-[#C8A03A] mt-0.5">{fastest.deliveryDays} dias</div>
                   <div className="text-[10px] text-slate-400 mt-px">{fastest.supplier}</div>
                 </div>
               )}
@@ -133,7 +133,7 @@ export default function QuotationPanel({ request, currentUser, onClose, onSave }
               <button
                 onClick={() => setShowComparison(false)}
                 className={`flex-1 py-2 text-xs font-semibold border-none cursor-pointer ${
-                  !showComparison ? 'bg-emerald-500/[0.12] text-emerald-400' : 'bg-transparent text-slate-400'
+                  !showComparison ? 'bg-[#C8A03A]/[0.12] text-[#C8A03A]' : 'bg-transparent text-slate-400'
                 }`}
               >
                 Tarjetas
@@ -141,7 +141,7 @@ export default function QuotationPanel({ request, currentUser, onClose, onSave }
               <button
                 onClick={() => setShowComparison(true)}
                 className={`flex-1 py-2 text-xs font-semibold border-none cursor-pointer ${
-                  showComparison ? 'bg-emerald-500/[0.12] text-emerald-400' : 'bg-transparent text-slate-400'
+                  showComparison ? 'bg-[#C8A03A]/[0.12] text-[#C8A03A]' : 'bg-transparent text-slate-400'
                 }`}
               >
                 Comparacion
@@ -191,7 +191,7 @@ export default function QuotationPanel({ request, currentUser, onClose, onSave }
           ) : (
             <button
               onClick={() => setShowAddForm(true)}
-              className="w-full py-3.5 rounded-xl border border-dashed border-emerald-500/25 bg-emerald-500/[0.04] text-emerald-400 text-[13px] font-semibold cursor-pointer mt-2"
+              className="w-full py-3.5 rounded-xl border border-dashed border-[#C8A03A]/25 bg-[#C8A03A]/[0.04] text-[#C8A03A] text-[13px] font-semibold cursor-pointer mt-2"
             >
               + Agregar Cotizacion
             </button>

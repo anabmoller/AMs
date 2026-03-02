@@ -57,7 +57,7 @@ export default function QuotationComparisonTable({
             {quotations.map(q => {
               const isFastest = q.id === fastest?.id;
               return (
-                <td key={q.id} className={`px-3 py-2 text-center ${isFastest ? 'text-emerald-400 font-semibold' : 'text-slate-400'}`}>
+                <td key={q.id} className={`px-3 py-2 text-center ${isFastest ? 'text-[#C8A03A] font-semibold' : 'text-slate-400'}`}>
                   {q.deliveryDays > 0 ? `${q.deliveryDays}d` : "—"}
                 </td>
               );
