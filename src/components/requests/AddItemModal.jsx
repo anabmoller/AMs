@@ -52,7 +52,7 @@ export default function AddItemModal({ onClose, onAdd }) {
               key={t.key}
               onClick={() => setTab(t.key)}
               className={`flex-1 py-2.5 border-none text-xs font-semibold cursor-pointer ${
-                tab === t.key ? 'bg-emerald-500 text-white' : 'bg-white/[0.03] text-white'
+                tab === t.key ? 'bg-[#6B1E2F] text-white' : 'bg-white/[0.03] text-white'
               } ${t.key === "catalogo" ? 'rounded-l-lg' : 'rounded-r-lg'}`}
             >
               {t.label}
@@ -123,7 +123,7 @@ export default function AddItemModal({ onClose, onAdd }) {
                 disabled={!manual.nombre}
                 className={`w-full py-3.5 rounded-xl border-none text-[13px] font-semibold mt-1 ${
                   manual.nombre
-                    ? 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white cursor-pointer'
+                    ? 'bg-[#6B1E2F] hover:bg-[#8A2A3F] text-white cursor-pointer shadow-md shadow-[#6B1E2F]/35 transition-colors'
                     : 'bg-white/[0.06] text-slate-500 cursor-default'
                 }`}
               >

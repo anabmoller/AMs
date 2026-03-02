@@ -84,7 +84,7 @@ export default function RequestComments({
               disabled={!commentText.trim()}
               className={`border-none rounded-lg px-3.5 text-xs font-semibold ${
                 commentText.trim()
-                  ? 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white cursor-pointer'
+                  ? 'bg-[#6B1E2F] hover:bg-[#8A2A3F] text-white cursor-pointer shadow-md shadow-[#6B1E2F]/35 transition-colors'
                   : 'bg-white/[0.06] text-slate-500 cursor-default'
               }`}
             >

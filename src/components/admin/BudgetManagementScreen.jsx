@@ -161,7 +161,7 @@ export default function BudgetManagementScreen({ onBack }) {
               setForm({ ...DEFAULT_FORM });
               setShowForm(true);
             }}
-            className="bg-gradient-to-br from-emerald-500 to-emerald-600 text-white border-none rounded-lg px-4 py-2.5 text-xs font-semibold cursor-pointer whitespace-nowrap shadow-md shadow-emerald-500/20"
+            className="bg-[#6B1E2F] hover:bg-[#8A2A3F] text-white border-none rounded-lg px-4 py-2.5 text-xs font-semibold cursor-pointer whitespace-nowrap shadow-md shadow-[#6B1E2F]/35 transition-colors"
           >
             + Nuevo
           </button>
@@ -206,7 +206,7 @@ export default function BudgetManagementScreen({ onBack }) {
               <button
                 onClick={handleReset}
                 disabled={saving}
-                className={`flex-1 py-3 rounded-lg border-none bg-emerald-500 text-white text-[13px] font-semibold ${saving ? 'cursor-default' : 'cursor-pointer'}`}
+                className={`flex-1 py-3 rounded-lg border-none bg-[#6B1E2F] hover:bg-[#8A2A3F] text-white text-[13px] font-semibold transition-colors ${saving ? 'cursor-default' : 'cursor-pointer'}`}
               >
                 {saving ? "Cargando..." : "Refrescar"}
               </button>

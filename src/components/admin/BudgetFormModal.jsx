@@ -217,7 +217,7 @@ export default function BudgetFormModal({
               disabled={!form.name || !form.establishment || !form.planned || saving}
               className={`flex-1 py-3 rounded-lg border-none text-[13px] font-semibold ${
                 form.name && form.establishment && form.planned && !saving
-                  ? 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white cursor-pointer shadow-md shadow-emerald-500/20'
+                  ? 'bg-[#6B1E2F] hover:bg-[#8A2A3F] text-white cursor-pointer shadow-md shadow-[#6B1E2F]/35 transition-colors'
                   : 'bg-white/[0.06] text-slate-500 cursor-default'
               }`}
             >
