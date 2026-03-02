@@ -37,7 +37,7 @@ export default function DesktopSidebar({ screen, onNavigate, onNewRequest, curre
         className="px-5 pt-5 pb-4 border-b border-white/[0.06] flex items-center gap-2.5 cursor-pointer hover:opacity-80 transition-opacity"
       >
         <div className="w-9 h-9 rounded-lg bg-[#1F2A44] flex items-center justify-center text-white font-bold text-base">
-          Y
+          AMs
         </div>
         <div>
           <h1 className="text-lg font-bold text-white tracking-tight leading-tight m-0">AM Soluciones</h1>
