@@ -24,14 +24,14 @@ export default function NotificationsScreen({ onBack, onNavigate }) {
       <div className="px-5 py-3 flex items-center justify-between">
         <button
           onClick={onBack}
-          className="bg-transparent border-none cursor-pointer text-sm text-emerald-400 font-medium"
+          className="bg-transparent border-none cursor-pointer text-sm text-[#C8A03A] font-medium"
         >
           ← Volver
         </button>
         {unreadCount > 0 && (
           <button
             onClick={markAllAsRead}
-            className="bg-transparent border-none cursor-pointer text-xs text-emerald-400 font-medium"
+            className="bg-transparent border-none cursor-pointer text-xs text-[#C8A03A] font-medium"
           >
             Marcar todas como leídas
           </button>

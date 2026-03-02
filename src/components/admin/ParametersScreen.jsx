@@ -128,7 +128,7 @@ export default function ParametersScreen({ onBack }) {
     <div className="animate-fadeIn">
       {/* Header */}
       <div className="px-5 py-3 flex justify-between items-center">
-        <button onClick={onBack} className="bg-transparent border-none cursor-pointer text-sm text-emerald-400 font-medium">
+        <button onClick={onBack} className="bg-transparent border-none cursor-pointer text-sm text-[#C8A03A] font-medium">
           {"←"} Volver
         </button>
         <button onClick={handleReset} disabled={saving} className={`bg-transparent border-none text-xs font-medium ${saving ? 'cursor-default text-slate-500 opacity-60' : 'cursor-pointer text-amber-400'}`}>

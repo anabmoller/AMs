@@ -136,7 +136,7 @@ export default function UserManagementScreen({ onBack }) {
           </h2>
           <button
             onClick={() => { setShowAddForm(true); setEditingUser(null); setActionError(""); }}
-            className="px-4 py-2 rounded-lg border-none bg-emerald-500 text-white text-[13px] font-semibold cursor-pointer"
+            className="px-4 py-2 rounded-lg border-none bg-[#6B1E2F] hover:bg-[#8A2A3F] text-white text-[13px] font-semibold cursor-pointer shadow-[0_4px_14px_rgba(107,30,47,0.35)]"
           >
             + Nuevo
           </button>
@@ -157,8 +157,8 @@ export default function UserManagementScreen({ onBack }) {
               onClick={() => setFilterRole(filterRole === key ? "all" : key)}
               className="px-2.5 py-1 rounded-lg border-none text-[11px] font-semibold cursor-pointer transition-all duration-150"
               style={{
-                background: filterRole === key ? (role.color || '#10b981') : (role.color || '#10b981') + "12",
-                color: filterRole === key ? '#fff' : (role.color || '#10b981'),
+                background: filterRole === key ? (role.color || '#C8A03A') : (role.color || '#C8A03A') + "12",
+                color: filterRole === key ? '#fff' : (role.color || '#C8A03A'),
               }}
             >
               {role.label} ({roleCounts[key] || 0})
@@ -173,7 +173,7 @@ export default function UserManagementScreen({ onBack }) {
             placeholder="Buscar nombre, usuario o cargo..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="flex-1 min-w-[180px] h-10 px-3 rounded-lg border border-white/[0.1] bg-white/[0.05] text-[13px] text-white outline-none transition-colors focus:border-emerald-500/50"
+            className="flex-1 min-w-[180px] h-10 px-3 rounded-lg border border-white/[0.1] bg-white/[0.05] text-[13px] text-white outline-none transition-colors focus:border-[#6B1E2F]/50"
           />
           <select
             value={filterEstab}
@@ -224,7 +224,7 @@ export default function UserManagementScreen({ onBack }) {
           <button
             onClick={() => setShowResetConfirm(true)}
             disabled={actionLoading}
-            className="w-full p-3 rounded-xl border border-emerald-500/[0.19] bg-emerald-500/[0.05] text-emerald-400 text-[13px] font-semibold cursor-pointer"
+            className="w-full p-3 rounded-xl border border-white/[0.08] bg-white/[0.04] text-[#C8A03A] text-[13px] font-semibold cursor-pointer"
           >
             Refrescar lista de usuarios desde servidor
           </button>

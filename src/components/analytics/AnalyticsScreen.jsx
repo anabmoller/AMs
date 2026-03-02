@@ -84,7 +84,7 @@ export default function AnalyticsScreen({ requests, statusCounts, onBack, defaul
   return (
     <div className="animate-fade-in">
       <div className="py-3 px-5">
-        <button onClick={onBack} className="bg-transparent border-none cursor-pointer text-sm text-emerald-400 font-medium p-0">
+        <button onClick={onBack} className="bg-transparent border-none cursor-pointer text-sm text-[#C8A03A] font-medium p-0">
           ← Volver
         </button>
       </div>
