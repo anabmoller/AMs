@@ -27,7 +27,7 @@ function NameComboBox({ value, onChange, existingNames = [] }) {
         value={filter}
         onChange={e => { setFilter(e.target.value); onChange(e.target.value); setOpen(true); }}
         onFocus={() => setOpen(true)}
-        className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-emerald-500/50 h-[42px]"
+        className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-[#6B1E2F]/50 h-[42px]"
         placeholder="Buscar o escribir nombre..."
       />
       {open && filtered.length > 0 && (
@@ -80,7 +80,7 @@ function RoleCheckboxes({ selectedRoles, onChange }) {
                 type="checkbox"
                 checked={checked}
                 onChange={() => toggle(key)}
-                className="w-3.5 h-3.5 accent-emerald-500 cursor-pointer"
+                className="w-3.5 h-3.5 accent-[#6B1E2F] cursor-pointer"
               />
               <div className="flex-1 min-w-0">
                 <div className="text-xs font-semibold" style={{ color: checked ? role.color : '#94a3b8' }}>
@@ -129,7 +129,7 @@ function PositionSelect({ value, onChange }) {
         value={filter}
         onChange={e => { setFilter(e.target.value); onChange(e.target.value); setOpen(true); }}
         onFocus={() => setOpen(true)}
-        className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-emerald-500/50 h-[42px]"
+        className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-[#6B1E2F]/50 h-[42px]"
         placeholder="Buscar o escribir cargo..."
       />
       {open && filtered.length > 0 && (
@@ -224,7 +224,7 @@ export default function UserFormModal({ user, title, establishments, existingNam
               <input
                 value={form.email}
                 onChange={e => set("email", e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-emerald-500/50 h-[42px]"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-[#6B1E2F]/50 h-[42px]"
                 placeholder="Ej: juan.rodriguez"
                 autoCapitalize="none"
                 autoCorrect="off"
@@ -256,7 +256,7 @@ export default function UserFormModal({ user, title, establishments, existingNam
             <select
               value={form.establishment}
               onChange={e => set("establishment", e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-emerald-500/50 h-[42px] cursor-pointer"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-[#6B1E2F]/50 h-[42px] cursor-pointer"
             >
               <option value="">Sin asignar</option>
               {establishments.map(e => <option key={e} value={e}>{e}</option>)}
