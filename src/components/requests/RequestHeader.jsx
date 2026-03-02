@@ -10,7 +10,7 @@ function NavBtn({ icon, label, onClick, disabled }) {
       onClick={onClick}
       disabled={disabled}
       className={`bg-transparent border-none text-[13px] font-medium px-2 py-1.5 flex items-center gap-0.5 ${
-        disabled ? 'cursor-default text-white/[0.15] opacity-40' : 'cursor-pointer text-emerald-400'
+        disabled ? 'cursor-default text-white/[0.15] opacity-40' : 'cursor-pointer text-[#C8A03A]'
       }`}
     >
       {icon} {label}
@@ -61,7 +61,7 @@ export default function RequestHeader({
           {/* WhatsApp share */}
           <button
             onClick={() => shareViaWhatsApp(r, rate)}
-            className="w-7 h-7 rounded-md bg-white/[0.06] border-none cursor-pointer flex items-center justify-center text-slate-400 hover:bg-emerald-500/20 hover:text-emerald-400 transition-colors"
+            className="w-7 h-7 rounded-md bg-white/[0.06] border-none cursor-pointer flex items-center justify-center text-slate-400 hover:bg-[#C8A03A]/20 hover:text-[#C8A03A] transition-colors"
             title="Compartir por WhatsApp"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">

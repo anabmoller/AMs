@@ -68,7 +68,7 @@ function ActionBtn({ label, icon, color, bg, outline, onClick, flex }) {
         flex: flex || 1,
         ...(outline
           ? { borderColor: color || 'rgba(255,255,255,0.06)', color: color || '#fff' }
-          : { background: bg || color || '#10b981' }),
+          : { background: bg || color || '#6B1E2F' }),
       }}
     >
       {icon && <span>{icon}</span>}{label}
@@ -250,12 +250,12 @@ export default function RequestDetail({
       {/* ===== DESKTOP ACTION BAR (hidden on mobile) ===== */}
       <div className="hidden md:flex px-5 py-2 gap-2 items-center">
         {isBorrador && onConfirm && (
-          <button onClick={() => onConfirm(r.id)} className="px-4 py-2 rounded-lg border-none text-white text-xs font-semibold cursor-pointer shadow-sm" style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}>
+          <button onClick={() => onConfirm(r.id)} className="px-4 py-2 rounded-lg border-none text-white text-xs font-semibold cursor-pointer shadow-sm" style={{ background: '#6B1E2F' }}>
             Confirmar ✓
           </button>
         )}
         {!isBorrador && !isInApproval && !isLast && !isRejected && !isCancelado && onAdvance && (
-          <button onClick={() => onAdvance(r.id)} className="px-4 py-2 rounded-lg border-none text-white text-xs font-semibold cursor-pointer shadow-sm" style={{ background: STATUS_FLOW[statusIdx + 1]?.color || '#10b981' }}>
+          <button onClick={() => onAdvance(r.id)} className="px-4 py-2 rounded-lg border-none text-white text-xs font-semibold cursor-pointer shadow-sm" style={{ background: STATUS_FLOW[statusIdx + 1]?.color || '#6B1E2F' }}>
             → {STATUS_FLOW[statusIdx + 1]?.label || "Avanzar"}
           </button>
         )}
@@ -323,7 +323,7 @@ export default function RequestDetail({
                 <InfoCell
                   label="Total Estimado"
                   value={`${formatGuaranies(displayTotal)} / USD ${Math.round(displayTotal / rate).toLocaleString("es-PY")}`}
-                  color="#10b981"
+                  color="#C8A03A"
                   span2
                 />
               )}
@@ -384,7 +384,7 @@ export default function RequestDetail({
               <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide flex items-center gap-1.5">
                 📎 Adjuntos
                 {attachments.length > 0 && (
-                  <span className="bg-emerald-500/[0.08] text-emerald-400 text-[10px] font-bold px-1.5 py-px rounded-md">
+                  <span className="bg-[#C8A03A]/[0.08] text-[#C8A03A] text-[10px] font-bold px-1.5 py-px rounded-md">
                     {attachments.length}
                   </span>
                 )}
@@ -402,7 +402,7 @@ export default function RequestDetail({
                       <div className="flex flex-col gap-1.5">
                         {attachments.map(att => (
                           <div key={att.id} className="flex items-center gap-2.5 bg-white/[0.02] rounded-lg px-3 py-2 border border-white/[0.06]">
-                            <div className="w-11 h-11 rounded bg-emerald-500/[0.06] flex items-center justify-center text-lg flex-shrink-0">
+                            <div className="w-11 h-11 rounded bg-[#1F2A44] flex items-center justify-center text-lg flex-shrink-0">
                               {att.type?.startsWith("image/") ? "🖼" : "📄"}
                             </div>
                             <div className="flex-1 min-w-0">
@@ -419,7 +419,7 @@ export default function RequestDetail({
                                   }
                                   if (att.url) window.open(att.url, "_blank");
                                 }}
-                                className="bg-emerald-500/[0.06] border-none rounded px-2 py-1 text-[10px] text-emerald-400 font-semibold cursor-pointer">
+                                className="bg-[#C8A03A]/[0.08] border-none rounded px-2 py-1 text-[10px] text-[#C8A03A] font-semibold cursor-pointer">
                                 Ver
                               </button>
                             )}
@@ -532,12 +532,12 @@ export default function RequestDetail({
       {/* ===== MOBILE BOTTOM ACTION BAR (hidden on md+) ===== */}
       <div className="mobile-bottom-action-bar fixed bottom-16 left-0 right-0 px-5 py-2.5 bg-[rgba(10,11,15,0.95)] backdrop-blur-xl border-t border-white/[0.06] flex gap-2 z-30">
         {isBorrador && onConfirm && (
-          <ActionBtn label="Confirmar ✓" color="#10b981" bg="linear-gradient(135deg, #10b981, #059669)" onClick={() => onConfirm(r.id)} flex={2} />
+          <ActionBtn label="Confirmar ✓" color="#6B1E2F" bg="#6B1E2F" onClick={() => onConfirm(r.id)} flex={2} />
         )}
         {!isBorrador && !isInApproval && !isLast && !isRejected && !isCancelado && onAdvance && (
           <ActionBtn
             label={`→ ${STATUS_FLOW[statusIdx + 1]?.label || "Avanzar"}`}
-            color={STATUS_FLOW[statusIdx + 1]?.color || "#10b981"}
+            color={STATUS_FLOW[statusIdx + 1]?.color || "#6B1E2F"}
             onClick={() => onAdvance(r.id)}
             flex={2}
           />
