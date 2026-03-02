@@ -5,13 +5,23 @@
    Dark mode, Inter font, custom animations
    ============================================================ */
 
+:root {
+  /* AM Soluciones — Design Tokens */
+  --am-navy-900: #0B1120;
+  --am-navy-800: #111827;
+  --am-navy-700: #1F2A44;
+  --am-burgundy: #6B1E2F;
+  --am-gold: #C8A03A;
+  --am-gold-dim: #A6842F;
+}
+
 @theme {
   --font-sans: 'Inter', 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
 
-  --color-brand: #10b981;
-  --color-brand-dark: #059669;
-  --color-brand-light: #34d399;
+  --color-brand: #C8A03A;
+  --color-brand-dark: #A6842F;
+  --color-brand-light: #D4B04E;
 
   --color-surface: rgba(255, 255, 255, 0.03);
   --color-surface-hover: rgba(255, 255, 255, 0.06);
@@ -73,7 +83,7 @@
 
 body {
   margin: 0;
-  background: var(--color-bg, #0a0b0f);
+  background: var(--color-bg, var(--am-navy-900, #0B1120));
   font-family: 'Inter', 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -171,7 +181,7 @@ body {
 
 /* Custom focus */
 *:focus-visible {
-  outline: 2px solid rgba(16, 185, 129, 0.5);
+  outline: 2px solid rgba(200, 160, 58, 0.5);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -181,8 +191,8 @@ select, input, textarea { color-scheme: dark; }
 select { -webkit-appearance: none; appearance: none; }
 
 input:focus, select:focus, textarea:focus {
-  border-color: rgba(16, 185, 129, 0.5) !important;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+  border-color: rgba(200, 160, 58, 0.5) !important;
+  box-shadow: 0 0 0 3px rgba(200, 160, 58, 0.1) !important;
   outline: none;
 }
 
@@ -208,7 +218,7 @@ input:focus, select:focus, textarea:focus {
     position: fixed;
     left: 0;
     top: 0;
-    background: var(--color-sidebar-bg, #0d0e14);
+    background: var(--color-sidebar-bg, var(--am-navy-800, #111827));
     border-right: 1px solid var(--color-border, rgba(255,255,255,0.06));
     z-index: 50;
   }
