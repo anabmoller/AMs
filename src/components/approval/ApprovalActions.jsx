@@ -59,7 +59,7 @@ export default function ApprovalActions({ request, currentUser, onApprove, onRej
 
           <button
             onClick={() => onApprove(request.id)}
-            className="rounded-xl border-none bg-gradient-to-br from-[#6B1E2F] to-[#8A2A3F] text-white text-[13px] font-bold cursor-pointer shadow-md shadow-[#6B1E2F]/30"
+            className="rounded-xl border-none bg-gradient-to-br from-[#6B1E2F] to-[#8A2A3F] text-white text-[13px] font-medium tracking-[0.02em] cursor-pointer shadow-[0_4px_14px_rgba(107,30,47,0.35)]"
             style={{ flex: 1.5, padding: "12px 8px" }}
           >
             ✓ Aprobar

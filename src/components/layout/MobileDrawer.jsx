@@ -141,7 +141,7 @@ export default function MobileDrawer({ open, onClose, screen, onNavigate, onNewR
         <div className="px-4 pb-4 pt-2">
           <button
             onClick={() => { onNewRequest(); onClose(); }}
-            className="w-full py-2.5 rounded-lg bg-[#6B1E2F] hover:bg-[#8A2A3F] text-white text-sm font-semibold flex items-center justify-center gap-1.5 transition-colors border-none cursor-pointer"
+            className="w-full py-2.5 rounded-lg bg-[#6B1E2F] hover:bg-[#8A2A3F] text-white text-sm font-medium tracking-[0.02em] flex items-center justify-center gap-1.5 transition-colors border-none cursor-pointer shadow-[0_4px_14px_rgba(107,30,47,0.35)]"
           >
             + Nueva Solicitud
           </button>

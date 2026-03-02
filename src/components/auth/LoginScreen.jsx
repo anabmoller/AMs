@@ -33,9 +33,9 @@ export default function LoginScreen() {
     <div className="bg-[#0B1120] min-h-screen flex items-center justify-center p-5">
       <div className="w-full max-w-[440px]">
         {/* Brand header */}
-        <div className="text-center mb-10">
-          <BrandMark size="xl" className="inline-flex mb-4 shadow-lg shadow-[#1F2A44]/30" />
-          <h1 className="text-[28px] font-bold text-white mb-1 tracking-tight">
+        <div className="text-center mb-12">
+          <BrandMark size="xl" className="inline-flex mb-4 shadow-[0_4px_12px_rgba(0,0,0,0.25)]" />
+          <h1 className="text-[28px] font-semibold text-white mb-1 tracking-[-0.01em]">
             {SYSTEM_NAME}
           </h1>
           <p className="text-sm text-slate-400 m-0">
@@ -44,17 +44,18 @@ export default function LoginScreen() {
         </div>
 
         {/* Login card */}
-        <div className="bg-white/[0.03] rounded-2xl border border-white/[0.06] shadow-xl px-8 py-9">
-          <h2 className="text-lg font-semibold text-white mb-1">
+        <div className="bg-white/[0.03] rounded-2xl border border-white/[0.06] p-8"
+          style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.03)' }}>
+          <h2 className="text-lg font-medium text-white mb-1">
             Iniciar sesi&oacute;n
           </h2>
-          <p className="text-[13px] text-slate-400 mb-7 mt-0">
+          <p className="text-sm text-slate-400 mb-7 mt-0">
             Ingresa tus credenciales para acceder
           </p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div>
-              <label className="block text-[13px] font-medium text-slate-300 mb-1.5">
+              <label className="block text-sm font-medium text-slate-400 mb-1.5">
                 Usuario
               </label>
               <input
@@ -62,12 +63,12 @@ export default function LoginScreen() {
                 onChange={(e) => { setUsername(e.target.value); setError(""); }}
                 placeholder="ej: ana.moller"
                 autoComplete="username" autoCapitalize="none"
-                className={`w-full px-3.5 py-2.5 rounded-lg border bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-[#6B1E2F]/50 h-11 ${error && !username.trim() ? 'border-red-500' : 'border-white/[0.1]'}`}
+                className={`w-full px-3.5 py-2.5 rounded-lg border bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-[#6B1E2F]/50 h-11 placeholder:opacity-40 ${error && !username.trim() ? 'border-red-500' : 'border-white/[0.1]'}`}
               />
             </div>
 
             <div>
-              <label className="block text-[13px] font-medium text-slate-300 mb-1.5">
+              <label className="block text-sm font-medium text-slate-400 mb-1.5">
                 Contrase&ntilde;a
               </label>
               <div className="relative">
@@ -76,7 +77,7 @@ export default function LoginScreen() {
                   onChange={(e) => { setPassword(e.target.value); setError(""); }}
                   placeholder="Ingresa tu contraseña"
                   autoComplete="current-password"
-                  className={`w-full px-3.5 py-2.5 rounded-lg border bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-[#6B1E2F]/50 h-11 pr-11 ${error && !password ? 'border-red-500' : 'border-white/[0.1]'}`}
+                  className={`w-full px-3.5 py-2.5 rounded-lg border bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-[#6B1E2F]/50 h-11 pr-11 placeholder:opacity-40 ${error && !password ? 'border-red-500' : 'border-white/[0.1]'}`}
                 />
                 <button type="button" onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-0.5 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer px-2.5 py-2 text-sm text-slate-500"
@@ -96,7 +97,7 @@ export default function LoginScreen() {
               </div>
             )}
 
-            <button type="submit" disabled={loading} className={`w-full h-11 rounded-lg border-none text-white text-sm font-semibold transition-all duration-150 flex items-center justify-center gap-2 mt-1 ${loading ? 'bg-slate-500 cursor-default' : 'bg-[#6B1E2F] cursor-pointer'}`}>
+            <button type="submit" disabled={loading} className={`w-full h-11 rounded-lg border-none text-white text-sm font-medium tracking-[0.02em] transition-all duration-150 flex items-center justify-center gap-2 mt-2 ${loading ? 'bg-slate-500 cursor-default' : 'bg-[#6B1E2F] cursor-pointer shadow-[0_4px_14px_rgba(107,30,47,0.35)]'}`}>
               {loading ? (
                 <>
                   <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full inline-block animate-spin" />

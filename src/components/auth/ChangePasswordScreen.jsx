@@ -53,9 +53,9 @@ export default function ChangePasswordScreen() {
     <div className="bg-[#0B1120] min-h-screen flex items-center justify-center p-5">
       <div className="w-full max-w-[440px]">
         {/* Brand header */}
-        <div className="text-center mb-10">
-          <BrandMark size="xl" className="inline-flex mb-4 shadow-lg shadow-[#1F2A44]/30" />
-          <h1 className="text-[28px] font-bold text-white mb-1 tracking-tight">
+        <div className="text-center mb-12">
+          <BrandMark size="xl" className="inline-flex mb-4 shadow-[0_4px_12px_rgba(0,0,0,0.25)]" />
+          <h1 className="text-[28px] font-semibold text-white mb-1 tracking-[-0.01em]">
             {SYSTEM_NAME}
           </h1>
           <p className="text-sm text-slate-400 m-0">
@@ -64,7 +64,8 @@ export default function ChangePasswordScreen() {
         </div>
 
         {/* Change password card */}
-        <div className="bg-white/[0.03] rounded-2xl border border-white/[0.06] shadow-xl px-8 py-9">
+        <div className="bg-white/[0.03] rounded-2xl border border-white/[0.06] p-8"
+          style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.03)' }}>
           {/* Security icon */}
           <div className="w-11 h-11 rounded-lg bg-amber-500/[0.08] flex items-center justify-center mb-4">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -73,7 +74,7 @@ export default function ChangePasswordScreen() {
             </svg>
           </div>
 
-          <h2 className="text-lg font-semibold text-white mb-1">
+          <h2 className="text-lg font-medium text-white mb-1">
             Cambiar contrase&ntilde;a
           </h2>
           <p className="text-[13px] text-slate-400 mb-1.5 mt-0">
@@ -86,7 +87,7 @@ export default function ChangePasswordScreen() {
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div>
-              <label className="block text-[13px] font-medium text-slate-300 mb-1.5">
+              <label className="block text-sm font-medium text-slate-400 mb-1.5">
                 Nueva contrase&ntilde;a
               </label>
               <input
@@ -95,12 +96,12 @@ export default function ChangePasswordScreen() {
                 placeholder="Mínimo 8 caracteres"
                 autoComplete="new-password"
                 autoFocus
-                className={`w-full px-3.5 py-2.5 rounded-lg border bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-[#6B1E2F]/50 h-11 ${error && !newPassword ? 'border-red-500' : 'border-white/[0.1]'}`}
+                className={`w-full px-3.5 py-2.5 rounded-lg border bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-[#6B1E2F]/50 h-11 placeholder:opacity-40 ${error && !newPassword ? 'border-red-500' : 'border-white/[0.1]'}`}
               />
             </div>
 
             <div>
-              <label className="block text-[13px] font-medium text-slate-300 mb-1.5">
+              <label className="block text-sm font-medium text-slate-400 mb-1.5">
                 Confirmar contrase&ntilde;a
               </label>
               <input
@@ -108,7 +109,7 @@ export default function ChangePasswordScreen() {
                 onChange={(e) => { setConfirmPassword(e.target.value); setError(""); }}
                 placeholder="Repite la nueva contraseña"
                 autoComplete="new-password"
-                className={`w-full px-3.5 py-2.5 rounded-lg border bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-[#6B1E2F]/50 h-11 ${error && newPassword && !confirmPassword ? 'border-red-500' : 'border-white/[0.1]'}`}
+                className={`w-full px-3.5 py-2.5 rounded-lg border bg-white/[0.05] text-sm text-white outline-none transition-colors focus:border-[#6B1E2F]/50 h-11 placeholder:opacity-40 ${error && newPassword && !confirmPassword ? 'border-red-500' : 'border-white/[0.1]'}`}
               />
             </div>
 
@@ -121,7 +122,7 @@ export default function ChangePasswordScreen() {
               </div>
             )}
 
-            <button type="submit" disabled={loading} className={`w-full h-11 rounded-lg border-none text-white text-sm font-semibold transition-all duration-150 flex items-center justify-center gap-2 mt-1 ${loading ? 'bg-slate-500 cursor-default' : 'bg-[#6B1E2F] cursor-pointer'}`}>
+            <button type="submit" disabled={loading} className={`w-full h-11 rounded-lg border-none text-white text-sm font-medium tracking-[0.02em] transition-all duration-150 flex items-center justify-center gap-2 mt-2 ${loading ? 'bg-slate-500 cursor-default' : 'bg-[#6B1E2F] cursor-pointer shadow-[0_4px_14px_rgba(107,30,47,0.35)]'}`}>
               {loading ? (
                 <>
                   <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full inline-block animate-spin" />

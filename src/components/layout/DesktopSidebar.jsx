@@ -104,7 +104,7 @@ export default function DesktopSidebar({ screen, onNavigate, onNewRequest, curre
       <div className="px-4 pb-3 pt-3">
         <button
           onClick={onNewRequest}
-          className="w-full py-2.5 rounded-lg bg-[#6B1E2F] hover:bg-[#8A2A3F] text-white text-sm font-semibold flex items-center justify-center gap-1.5 transition-colors border-none cursor-pointer"
+          className="w-full py-2.5 rounded-lg bg-[#6B1E2F] hover:bg-[#8A2A3F] text-white text-sm font-medium tracking-[0.02em] flex items-center justify-center gap-1.5 transition-colors border-none cursor-pointer shadow-[0_4px_14px_rgba(107,30,47,0.35)]"
           aria-label="Nueva Solicitud"
         >
           <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
