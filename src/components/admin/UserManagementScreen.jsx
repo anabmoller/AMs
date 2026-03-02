@@ -157,8 +157,8 @@ export default function UserManagementScreen({ onBack }) {
               onClick={() => setFilterRole(filterRole === key ? "all" : key)}
               className="px-2.5 py-1 rounded-lg border-none text-[11px] font-semibold cursor-pointer transition-all duration-150"
               style={{
-                background: filterRole === key ? (role.color || '#10b981') : (role.color || '#10b981') + "12",
-                color: filterRole === key ? '#fff' : (role.color || '#10b981'),
+                background: filterRole === key ? (role.color || '#5B0B14') : (role.color || '#5B0B14') + "12",
+                color: filterRole === key ? '#fff' : (role.color || '#5B0B14'),
               }}
             >
               {role.label} ({roleCounts[key] || 0})

@@ -17,7 +17,7 @@ const STEPS_DISPLAY = [
   {
     num: 2, label: "Director", type: "director", icon: "🏢",
     description: "Aprueba compras mayores a ₲5M según la empresa",
-    color: "#10b981",
+    color: "#5B0B14",
   },
   {
     num: 3, label: "Presidente", type: "president", icon: "👑",
@@ -197,7 +197,7 @@ export default function ApprovalConfigScreen({ onBack }) {
         <Card title="Resumen de Reglas" icon="📜">
           {[
             { id: "R1", desc: "Toda SC requiere autorización del Gerente de Área asignado al establecimiento", color: "#f59e0b" },
-            { id: "R2", desc: `SC >= ${formatGuaranies(THRESHOLDS.DIRECTOR_REQUIRED)} requiere aprobación del Director de la empresa`, color: "#10b981" },
+            { id: "R2", desc: `SC >= ${formatGuaranies(THRESHOLDS.DIRECTOR_REQUIRED)} requiere aprobación del Director de la empresa`, color: "#5B0B14" },
             { id: "R3", desc: `SC >= ${formatGuaranies(THRESHOLDS.PRESIDENT_REQUIRED)} requiere aprobación del Presidente de la empresa`, color: "#ef4444" },
             { id: "R4", desc: "Emergencias: SLA reducido (Gerente 4h, Director 8h)", color: "#6366f1" },
             { id: "R5", desc: "Sectores Vet/Farmacia requieren autorización de especialista", color: "#7c6bb5" },

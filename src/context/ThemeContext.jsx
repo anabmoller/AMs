@@ -9,7 +9,7 @@ const THEMES = {
     border: "rgba(255,255,255,0.06)",
     text: "#ffffff",
     textMuted: "#94a3b8",
-    accent: "#10b981",
+    accent: "#5B0B14",
     sidebarBg: "#0d0e14",
   },
   light: {
@@ -18,7 +18,7 @@ const THEMES = {
     border: "#e5e7eb",
     text: "#111827",
     textMuted: "#6b7280",
-    accent: "#059669",
+    accent: "#4A0910",
     sidebarBg: "#ffffff",
   },
 };

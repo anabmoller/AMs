@@ -193,7 +193,7 @@ export default function NewRequestForm({ onSubmit, onCancel, usdRate = 7800, usd
             <div
               key={s}
               className="flex-1 h-1 rounded-sm transition-colors duration-300"
-              style={{ background: s <= step ? (s < step ? '#22c55e' : '#10b981') : 'rgba(255,255,255,0.06)' }}
+              style={{ background: s <= step ? (s < step ? '#5B0B14' : '#C8A03A') : 'rgba(255,255,255,0.06)' }}
             />
           ))}
         </div>
@@ -255,7 +255,7 @@ export default function NewRequestForm({ onSubmit, onCancel, usdRate = 7800, usd
             style={{
               flex: step > 1 ? 1 : undefined,
               width: step === 1 ? "100%" : undefined,
-              background: step === 3 ? '#6366f1' : '#10b981',
+              background: step === 3 ? '#6366f1' : '#5B0B14',
             }}
           >
             {step === 3 ? "Crear Solicitud ✓" : "Siguiente →"}

@@ -22,7 +22,7 @@ export const STATUS_FLOW = [
   { key: "autorizado", label: "Autorizado", color: "#3a7fd4", colorLight: "#EFF6FF", icon: "✅", step: 2 },
   { key: "en_cotizacion", label: "En Cotización", color: "#7c6bb5", colorLight: "#F5F3FF", icon: "💰", step: 3 },
   { key: "pend_aprobacion", label: "Pend. Aprobación", color: "#f59e0b", colorLight: "#FFFBEB", icon: "📋", step: 4 },
-  { key: "aprobado", label: "Aprobado", color: "#10b981", colorLight: "#ECFDF5", icon: "✔", step: 5 },
+  { key: "aprobado", label: "Aprobado", color: "#5B0B14", colorLight: "#FDF5F5", icon: "✔", step: 5 },
   { key: "orden_compra", label: "Orden de Compra", color: "#2a8c6d", colorLight: "#ECFDF5", icon: "📦", step: 6 },
   { key: "recibido", label: "Recibido", color: "#4a9c6d", colorLight: "#ECFDF5", icon: "📥", step: 7 },
   { key: "sap", label: "Registrado SAP", color: "#1a6b4a", colorLight: "#E8F5EE", icon: "🏁", step: 8 },
@@ -37,7 +37,7 @@ export const EXTRA_STATUSES = [
 // ---- Product group colors (UI only) ----
 export const GROUP_COLORS = {
   Veterinaria: "#DC2626",
-  "Nutrición": "#059669",
+  "Nutrición": "#1F2A44",
   "Agrícola": "#2563EB",
   "Mercadería": "#8B5CF6",
   Operacional: "#F97316",

@@ -169,16 +169,16 @@ export default function InventoryScreen({ onBack }) {
               className="flex-none min-w-[80px] rounded-xl px-3 py-2.5 cursor-pointer text-center transition-all shadow-[0_1px_2px_rgba(0,0,0,0.3)]"
               style={{
                 background: filterGroup === g
-                  ? (ALL_GROUP_COLORS[g] || "#10b981") + "12"
+                  ? (ALL_GROUP_COLORS[g] || "#5B0B14") + "12"
                   : "rgba(255,255,255,0.03)",
                 border: `1px solid ${filterGroup === g
-                  ? (ALL_GROUP_COLORS[g] || "#10b981") + "40"
+                  ? (ALL_GROUP_COLORS[g] || "#5B0B14") + "40"
                   : "rgba(255,255,255,0.06)"}`,
               }}
             >
               <div
                 className="text-lg font-bold"
-                style={{ color: ALL_GROUP_COLORS[g] || "#10b981" }}
+                style={{ color: ALL_GROUP_COLORS[g] || "#5B0B14" }}
               >
                 {count}
               </div>

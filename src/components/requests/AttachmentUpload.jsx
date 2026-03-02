@@ -166,7 +166,7 @@ export default function AttachmentUpload({ requestUuid, attachments = [], onAtta
       <div className={`border-2 border-dashed rounded-xl p-4 transition-colors duration-200 ${uploading ? 'border-[#C8A03A]' : 'border-white/[0.06]'}`}>
         {uploading ? (
           <div className="text-center py-2">
-            <div className="w-6 h-6 border-[3px] border-white/[0.06] border-t-emerald-500 rounded-full animate-spin mx-auto mb-2" />
+            <div className="w-6 h-6 border-[3px] border-white/[0.06] border-t-[#C8A03A] rounded-full animate-spin mx-auto mb-2" />
             <div className="text-xs text-[#C8A03A] font-medium">
               Subiendo...
             </div>

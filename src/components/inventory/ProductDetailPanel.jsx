@@ -95,8 +95,8 @@ export default function ProductDetailPanel({ product, onClose }) {
                 <span
                   className="px-2 py-0.5 rounded-md text-[10px] font-semibold"
                   style={{
-                    background: (ALL_GROUP_COLORS[product.group] || "#10b981") + "15",
-                    color: ALL_GROUP_COLORS[product.group] || "#10b981",
+                    background: (ALL_GROUP_COLORS[product.group] || "#5B0B14") + "15",
+                    color: ALL_GROUP_COLORS[product.group] || "#5B0B14",
                   }}
                 >
                   {product.group}
@@ -187,7 +187,7 @@ export default function ProductDetailPanel({ product, onClose }) {
                     <div className="text-right">
                       <div
                         className="text-[15px] font-bold"
-                        style={{ color: idx === 0 ? "#10b981" : "#ffffff" }}
+                        style={{ color: idx === 0 ? "#5B0B14" : "#ffffff" }}
                       >
                         {fmt(s.avgPrice, s.currency)}
                       </div>

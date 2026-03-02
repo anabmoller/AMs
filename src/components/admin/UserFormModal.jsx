@@ -298,7 +298,7 @@ export default function UserFormModal({ user, title, establishments, existingNam
               className={`flex-1 py-3 rounded-xl border-none text-sm font-semibold ${
                 loading
                   ? 'bg-slate-500 text-white cursor-default'
-                  : 'bg-gradient-to-br from-emerald-500 to-[#C8A03A] text-white cursor-pointer shadow-md shadow-emerald-500/20'
+                  : 'bg-gradient-to-br from-[#5B0B14] to-[#1F2A44] text-white cursor-pointer shadow-md shadow-black/20'
               }`}
             >
               {loading ? "Guardando..." : "Guardar"}

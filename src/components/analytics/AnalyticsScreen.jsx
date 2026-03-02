@@ -153,9 +153,9 @@ function OverviewTab({ stats, requests, statusCounts }) {
   return (
     <>
       <div className="grid grid-cols-2 gap-2.5 mb-4">
-        <KPICard label="Total Solicitudes" value={requests.length} color="#10b981" />
+        <KPICard label="Total Solicitudes" value={requests.length} color="#5B0B14" />
         <KPICard label="Pendientes" value={stats.pendingCount} color={stats.pendingCount > 5 ? "#ef4444" : "#f59e0b"} />
-        <KPICard label="Completadas" value={stats.completedCount} color="#10b981" />
+        <KPICard label="Completadas" value={stats.completedCount} color="#5B0B14" />
         <KPICard label="Emergencias" value={stats.emergencyCount} color="#ef4444" />
       </div>
 
@@ -224,7 +224,7 @@ function PurchasesTab({ stats }) {
                 <span className="text-xs font-semibold text-[#C8A03A]">{formatGuaranies(data.amount)}</span>
               </div>
             </div>
-            <ProgressBar value={data.amount} max={maxEstAmount} color="#10b981" />
+            <ProgressBar value={data.amount} max={maxEstAmount} color="#5B0B14" />
           </div>
         ))}
       </AnalyticsCard>
@@ -266,7 +266,7 @@ function PurchasesTab({ stats }) {
                     {formatGuaranies(data.amount)} ({data.count})
                   </span>
                 </div>
-                <ProgressBar value={data.amount} max={maxM} color="#10b981" />
+                <ProgressBar value={data.amount} max={maxM} color="#5B0B14" />
               </div>
             );
           })}
@@ -323,7 +323,7 @@ function BudgetsTab() {
       </div>
 
       <div className="grid grid-cols-2 gap-2.5 mb-4">
-        <KPICard label="Presupuestos Activos" value={budgets.length} color="#10b981" />
+        <KPICard label="Presupuestos Activos" value={budgets.length} color="#5B0B14" />
         <KPICard label="Sobre 80%" value={budgets.filter(b => (b.consumed / b.planned) * 100 > 80).length} color="#ef4444" />
       </div>
 
@@ -336,7 +336,7 @@ function BudgetsTab() {
           <AnalyticsCard key={est} title={`📍 ${est}`} subtitle={`${estPct}% ejecutado`}>
             {estBudgets.map(b => {
               const pct = b.planned > 0 ? Math.round((b.consumed / b.planned) * 100) : 0;
-              const barColor = pct > 90 ? '#ef4444' : pct > 70 ? '#f59e0b' : '#10b981';
+              const barColor = pct > 90 ? '#ef4444' : pct > 70 ? '#f59e0b' : '#5B0B14';
               return (
                 <div key={b.id} className="mb-3">
                   <div className="flex justify-between mb-0.5">

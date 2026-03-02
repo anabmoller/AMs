@@ -10,20 +10,20 @@ import {
 const STYLES = `
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1a1a1a; font-size: 12px; line-height: 1.5; padding: 24px; }
-  .header { border-bottom: 3px solid #059669; padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-start; }
-  .header-left h1 { font-size: 18px; font-weight: 700; color: #059669; margin-bottom: 2px; }
+  .header { border-bottom: 3px solid #1F2A44; padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-start; }
+  .header-left h1 { font-size: 18px; font-weight: 700; color: #1F2A44; margin-bottom: 2px; }
   .header-left p { font-size: 10px; color: #666; }
   .company-data { font-size: 9px; color: #888; margin-top: 2px; }
   .legal-notice { background: #fffbeb; border: 1px solid #fde68a; border-radius: 4px; padding: 6px 10px; font-size: 10px; color: #92400e; margin-top: 12px; text-align: center; font-weight: 600; }
   .header-right { text-align: right; font-size: 11px; color: #666; }
   .header-right .sc-number { font-size: 16px; font-weight: 700; color: #1a1a1a; }
   .section { margin-bottom: 16px; }
-  .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #059669; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px; margin-bottom: 8px; }
+  .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #1F2A44; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px; margin-bottom: 8px; }
   .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; }
   .info-item label { font-size: 10px; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
   .info-item span { font-size: 12px; color: #1a1a1a; display: block; }
   table { width: 100%; border-collapse: collapse; margin: 8px 0; }
-  th { background: #f0fdf4; color: #059669; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; padding: 8px 10px; text-align: left; border: 1px solid #d1fae5; }
+  th { background: #F0EDE6; color: #1F2A44; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; padding: 8px 10px; text-align: left; border: 1px solid #E0D8C8; }
   td { padding: 7px 10px; border: 1px solid #e5e7eb; font-size: 11px; }
   tr:nth-child(even) { background: #fafafa; }
   .total-row td { font-weight: 700; background: #f0fdf4; border-color: #d1fae5; }

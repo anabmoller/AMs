@@ -60,7 +60,7 @@ export default function RequestTimeline({
                 approved: { icon: "✅", color: "#22c55e", label: "Aprobada" },
                 rejected: { icon: "❌", color: "#ef4444", label: "Rechazada" },
                 revision: { icon: "↩", color: "#f59e0b", label: "Devuelta" },
-                advanced: { icon: "→", color: "#10b981", label: "Avanzada" },
+                advanced: { icon: "→", color: "#5B0B14", label: "Avanzada" },
                 cancelled: { icon: "🚫", color: "#ef4444", label: "Cancelada" },
               };
               const a = actionStyles[entry.action] || { icon: "•", color: "#94a3b8", label: entry.action };

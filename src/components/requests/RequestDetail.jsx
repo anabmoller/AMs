@@ -68,7 +68,7 @@ function ActionBtn({ label, icon, color, bg, outline, onClick, flex }) {
         flex: flex || 1,
         ...(outline
           ? { borderColor: color || 'rgba(255,255,255,0.06)', color: color || '#fff' }
-          : { background: bg || color || '#10b981' }),
+          : { background: bg || color || '#5B0B14' }),
       }}
     >
       {icon && <span>{icon}</span>}{label}
@@ -250,12 +250,12 @@ export default function RequestDetail({
       {/* ===== DESKTOP ACTION BAR (hidden on mobile) ===== */}
       <div className="hidden md:flex px-5 py-2 gap-2 items-center">
         {isBorrador && onConfirm && (
-          <button onClick={() => onConfirm(r.id)} className="px-4 py-2 rounded-lg border-none text-white text-xs font-semibold cursor-pointer shadow-sm" style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}>
+          <button onClick={() => onConfirm(r.id)} className="px-4 py-2 rounded-lg border-none text-white text-xs font-semibold cursor-pointer shadow-sm" style={{ background: 'linear-gradient(135deg, #5B0B14, #4A0910)' }}>
             Confirmar ✓
           </button>
         )}
         {!isBorrador && !isInApproval && !isLast && !isRejected && !isCancelado && onAdvance && (
-          <button onClick={() => onAdvance(r.id)} className="px-4 py-2 rounded-lg border-none text-white text-xs font-semibold cursor-pointer shadow-sm" style={{ background: STATUS_FLOW[statusIdx + 1]?.color || '#10b981' }}>
+          <button onClick={() => onAdvance(r.id)} className="px-4 py-2 rounded-lg border-none text-white text-xs font-semibold cursor-pointer shadow-sm" style={{ background: STATUS_FLOW[statusIdx + 1]?.color || '#5B0B14' }}>
             → {STATUS_FLOW[statusIdx + 1]?.label || "Avanzar"}
           </button>
         )}
@@ -323,7 +323,7 @@ export default function RequestDetail({
                 <InfoCell
                   label="Total Estimado"
                   value={`${formatGuaranies(displayTotal)} / USD ${Math.round(displayTotal / rate).toLocaleString("es-PY")}`}
-                  color="#10b981"
+                  color="#C8A03A"
                   span2
                 />
               )}
@@ -532,12 +532,12 @@ export default function RequestDetail({
       {/* ===== MOBILE BOTTOM ACTION BAR (hidden on md+) ===== */}
       <div className="mobile-bottom-action-bar fixed bottom-16 left-0 right-0 px-5 py-2.5 bg-[rgba(10,11,15,0.95)] backdrop-blur-xl border-t border-white/[0.06] flex gap-2 z-30">
         {isBorrador && onConfirm && (
-          <ActionBtn label="Confirmar ✓" color="#10b981" bg="linear-gradient(135deg, #10b981, #059669)" onClick={() => onConfirm(r.id)} flex={2} />
+          <ActionBtn label="Confirmar ✓" color="#C8A03A" bg="linear-gradient(135deg, #10b981, #059669)" onClick={() => onConfirm(r.id)} flex={2} />
         )}
         {!isBorrador && !isInApproval && !isLast && !isRejected && !isCancelado && onAdvance && (
           <ActionBtn
             label={`→ ${STATUS_FLOW[statusIdx + 1]?.label || "Avanzar"}`}
-            color={STATUS_FLOW[statusIdx + 1]?.color || "#10b981"}
+            color={STATUS_FLOW[statusIdx + 1]?.color || "#5B0B14"}
             onClick={() => onAdvance(r.id)}
             flex={2}
           />
