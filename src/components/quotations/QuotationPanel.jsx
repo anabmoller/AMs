@@ -101,9 +101,9 @@ export default function QuotationPanel({ request, currentUser, onClose, onSave }
           {/* Summary badges */}
           {quotations.length > 0 && (
             <div className="flex gap-2 mb-3.5">
-              <div className="flex-1 bg-green-500/[0.06] rounded-xl px-3 py-2.5 border border-green-500/[0.12]">
-                <div className="text-[10px] text-green-400 font-semibold uppercase">Mas barato</div>
-                <div className="text-sm font-bold text-green-400 mt-0.5">
+              <div className="flex-1 bg-[#C8A03A]/[0.06] rounded-xl px-3 py-2.5 border border-[#C8A03A]/[0.12]">
+                <div className="text-[10px] text-[#C8A03A] font-semibold uppercase">Mas barato</div>
+                <div className="text-sm font-bold text-[#C8A03A] mt-0.5">
                   {cheapest?.currency} {cheapest?.price?.toLocaleString()}
                 </div>
                 <div className="text-[10px] text-slate-400 mt-px">{cheapest?.supplier}</div>
