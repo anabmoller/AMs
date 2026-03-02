@@ -12,7 +12,7 @@ export default function UserCard({ user, onEdit, onToggleActive, disabled }) {
       {/* Avatar */}
       <div
         className="w-[38px] h-[38px] rounded-lg flex-shrink-0 flex items-center justify-center text-white font-bold text-[13px]"
-        style={{ background: `linear-gradient(135deg, ${role?.color || '#10b981'} 0%, ${role?.color || '#10b981'}cc 100%)` }}
+        style={{ background: `linear-gradient(135deg, ${role?.color || '#C8A03A'} 0%, ${role?.color || '#C8A03A'}cc 100%)` }}
       >
         {user.avatar || getUserInitials(user.name)}
       </div>
@@ -31,8 +31,8 @@ export default function UserCard({ user, onEdit, onToggleActive, disabled }) {
       <div
         className="text-[10px] font-semibold px-2 py-0.5 rounded whitespace-nowrap flex-shrink-0"
         style={{
-          background: (role?.color || '#10b981') + "15",
-          color: role?.color || '#10b981',
+          background: (role?.color || '#C8A03A') + "15",
+          color: role?.color || '#C8A03A',
         }}
       >
         {role?.label || user.role}

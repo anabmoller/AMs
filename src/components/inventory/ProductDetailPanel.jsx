@@ -95,8 +95,8 @@ export default function ProductDetailPanel({ product, onClose }) {
                 <span
                   className="px-2 py-0.5 rounded-md text-[10px] font-semibold"
                   style={{
-                    background: (ALL_GROUP_COLORS[product.group] || "#10b981") + "15",
-                    color: ALL_GROUP_COLORS[product.group] || "#10b981",
+                    background: (ALL_GROUP_COLORS[product.group] || "#C8A03A") + "15",
+                    color: ALL_GROUP_COLORS[product.group] || "#C8A03A",
                   }}
                 >
                   {product.group}
@@ -169,8 +169,8 @@ export default function ProductDetailPanel({ product, onClose }) {
                   key={s.name}
                   className="rounded-xl px-3.5 py-3"
                   style={{
-                    background: idx === 0 ? "rgba(16,185,129,0.1)" : "rgba(255,255,255,0.05)",
-                    border: `1px solid ${idx === 0 ? "rgba(16,185,129,0.19)" : "rgba(255,255,255,0.06)"}`,
+                    background: idx === 0 ? "rgba(200,160,58,0.1)" : "rgba(255,255,255,0.05)",
+                    border: `1px solid ${idx === 0 ? "rgba(200,160,58,0.19)" : "rgba(255,255,255,0.06)"}`,
                   }}
                 >
                   <div className="flex justify-between items-center">
@@ -187,7 +187,7 @@ export default function ProductDetailPanel({ product, onClose }) {
                     <div className="text-right">
                       <div
                         className="text-[15px] font-bold"
-                        style={{ color: idx === 0 ? "#10b981" : "#ffffff" }}
+                        style={{ color: idx === 0 ? "#C8A03A" : "#ffffff" }}
                       >
                         {fmt(s.avgPrice, s.currency)}
                       </div>
@@ -202,7 +202,7 @@ export default function ProductDetailPanel({ product, onClose }) {
                     <div className="mt-2 flex items-center gap-2 text-[10px] text-slate-400">
                       <span>{fmt(s.minPrice, s.currency)}</span>
                       <div className="flex-1 h-[3px] bg-white/[0.08] rounded-full relative">
-                        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-emerald-500/25 to-emerald-500" />
+                        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#C8A03A]/25 to-[#C8A03A]" />
                       </div>
                       <span>{fmt(s.maxPrice, s.currency)}</span>
                     </div>

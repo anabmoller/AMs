@@ -9,7 +9,7 @@ function SectionTitle({ children, count }) {
       <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide flex items-center gap-1.5">
         {children}
         {count != null && (
-          <span className="bg-emerald-500/[0.08] text-emerald-400 text-[10px] font-bold px-1.5 py-px rounded-md min-w-[18px] text-center">
+          <span className="bg-[#C8A03A]/[0.08] text-[#C8A03A] text-[10px] font-bold px-1.5 py-px rounded-md min-w-[18px] text-center">
             {count}
           </span>
         )}
@@ -35,8 +35,8 @@ export default function QuotationComparison({
           <div
             className="rounded-xl p-4"
             style={{
-              background: normalizedStatus === "en_cotizacion" ? 'rgba(16,185,129,0.04)' : 'rgba(255,255,255,0.03)',
-              border: `1px solid ${normalizedStatus === "en_cotizacion" ? 'rgba(16,185,129,0.19)' : 'rgba(255,255,255,0.06)'}`,
+              background: normalizedStatus === "en_cotizacion" ? 'rgba(200,160,58,0.04)' : 'rgba(255,255,255,0.03)',
+              border: `1px solid ${normalizedStatus === "en_cotizacion" ? 'rgba(200,160,58,0.19)' : 'rgba(255,255,255,0.06)'}`,
             }}
           >
             <div className={`flex justify-between items-center ${quotationCount > 0 ? 'mb-2.5' : ''}`}>
@@ -44,7 +44,7 @@ export default function QuotationComparison({
               {canManageQuotations && (
                 <button
                   onClick={onShowQuotations}
-                  className="bg-gradient-to-br from-emerald-500 to-emerald-600 text-white border-none rounded-lg px-3.5 py-1.5 text-[11px] font-semibold cursor-pointer"
+                  className="bg-[#6B1E2F] hover:bg-[#8A2A3F] text-white border-none rounded-lg px-3.5 py-1.5 text-[11px] font-semibold cursor-pointer shadow-md shadow-[#6B1E2F]/35 transition-colors"
                 >
                   {quotationCount > 0 ? "Ver / Editar" : "+ Agregar"}
                 </button>
@@ -120,14 +120,14 @@ export default function QuotationComparison({
                     key={q.id}
                     className={`grid grid-cols-[1fr_auto_auto] gap-2 px-4 py-2.5 items-center ${
                       i < sorted.length - 1 ? 'border-b border-white/[0.06]' : ''
-                    } ${isBest ? 'bg-emerald-500/[0.04]' : ''}`}
+                    } ${isBest ? 'bg-[#C8A03A]/[0.04]' : ''}`}
                   >
                     <span className="text-xs text-white font-medium flex items-center gap-1.5 truncate">
                       {isBest && <span className="text-amber-400 text-sm">★</span>}
                       {q.supplier}
-                      {q.selected && <span className="text-[9px] bg-emerald-500/10 text-emerald-400 px-1.5 py-px rounded font-bold">SEL</span>}
+                      {q.selected && <span className="text-[9px] bg-[#C8A03A]/10 text-[#C8A03A] px-1.5 py-px rounded font-bold">SEL</span>}
                     </span>
-                    <span className={`text-xs font-semibold text-right whitespace-nowrap ${isBest ? 'text-emerald-400' : 'text-white'}`}>
+                    <span className={`text-xs font-semibold text-right whitespace-nowrap ${isBest ? 'text-[#C8A03A]' : 'text-white'}`}>
                       {q.currency || "₲"} {(q.price || 0).toLocaleString()}
                     </span>
                     <span className="text-[11px] text-slate-400 text-right w-16">
@@ -137,12 +137,12 @@ export default function QuotationComparison({
                 );
               })}
               {/* Recommendation footer */}
-              <div className="px-4 py-2.5 border-t border-white/[0.06] bg-emerald-500/[0.03] flex items-center justify-between">
-                <span className="text-[11px] text-emerald-400 font-semibold">
+              <div className="px-4 py-2.5 border-t border-white/[0.06] bg-[#C8A03A]/[0.03] flex items-center justify-between">
+                <span className="text-[11px] text-[#C8A03A] font-semibold">
                   ★ Recomendado: {cheapest.supplier}
                 </span>
                 {savings > 0 && (
-                  <span className="text-[10px] text-emerald-400/70 font-medium">
+                  <span className="text-[10px] text-[#C8A03A]/70 font-medium">
                     {savings}% más económico
                   </span>
                 )}

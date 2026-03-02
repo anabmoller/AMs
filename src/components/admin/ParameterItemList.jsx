@@ -13,7 +13,7 @@ function SortHeader({ label, sortKey, active, dir, onClick, flex = "flex-1" }) {
     <button
       onClick={() => onClick(sortKey)}
       className={`${flex} flex items-center gap-1 px-1 py-1 text-[10px] font-semibold uppercase tracking-wider border-none bg-transparent cursor-pointer transition-colors ${
-        isActive ? 'text-emerald-400' : 'text-slate-500 hover:text-slate-300'
+        isActive ? 'text-[#C8A03A]' : 'text-slate-500 hover:text-slate-300'
       }`}
     >
       {label}
@@ -56,7 +56,7 @@ export default function ParameterItemList({
             </div>
           </div>
           <div className="flex gap-1.5 flex-shrink-0">
-            <button onClick={() => onEdit(item)} disabled={saving} className={`bg-emerald-500/[0.06] border-none rounded-lg px-2.5 py-1.5 cursor-pointer text-xs text-emerald-400 font-medium ${saving ? 'opacity-50' : ''}`}>
+            <button onClick={() => onEdit(item)} disabled={saving} className={`bg-[#C8A03A]/[0.06] border-none rounded-lg px-2.5 py-1.5 cursor-pointer text-xs text-[#C8A03A] font-medium ${saving ? 'opacity-50' : ''}`}>
               Editar
             </button>
             <button onClick={() => onToggle(item.id)} disabled={saving} className={`border-none rounded-lg px-2.5 py-1.5 cursor-pointer text-xs font-medium ${saving ? 'opacity-50' : ''} ${(item.active !== false) ? 'bg-red-500/[0.06] text-red-400' : 'bg-green-500/[0.06] text-green-400'}`}>

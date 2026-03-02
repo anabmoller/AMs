@@ -148,7 +148,7 @@ export default function ParameterForm({ tab, item, onSave, onCancel, saving }) {
   }, [codeManuallyEdited, tab]);
 
   return (
-    <div className="bg-white/[0.02] rounded-2xl p-5 border border-emerald-500/[0.19] mb-4">
+    <div className="bg-white/[0.02] rounded-2xl p-5 border border-[#C8A03A]/[0.19] mb-4">
       <div className="text-sm font-semibold text-white mb-4">
         {item ? `Editar: ${item.name}` : "Nuevo Registro"}
       </div>

@@ -81,7 +81,7 @@ export default function AddItemModal({ onClose, onAdd }) {
                     onClick={() => handleSelectCatalog(it)}
                     className="w-full text-left px-3 py-2.5 bg-white/[0.03] rounded-lg border border-white/[0.06] mb-1.5 cursor-pointer"
                   >
-                    <div className="text-[10px] text-emerald-400 font-semibold">{it.code}</div>
+                    <div className="text-[10px] text-[#C8A03A] font-semibold">{it.code}</div>
                     <div className="text-[13px] font-medium text-white">{it.name}</div>
                     <div className="text-[10px] text-slate-400">{it.type} · {it.group}</div>
                   </button>

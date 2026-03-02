@@ -58,8 +58,8 @@ export default function InventoryProductList({ groupedItems, onSelectProduct }) 
                     <span
                       className="text-[10px] px-2 py-[3px] rounded-md font-semibold whitespace-nowrap"
                       style={{
-                        background: (ALL_GROUP_COLORS[item.group] || "#10b981") + "12",
-                        color: ALL_GROUP_COLORS[item.group] || "#10b981",
+                        background: (ALL_GROUP_COLORS[item.group] || "#C8A03A") + "12",
+                        color: ALL_GROUP_COLORS[item.group] || "#C8A03A",
                       }}
                     >
                       {item.presentation || item.unit || item.category}

@@ -22,15 +22,15 @@ export default function RequestStepReview({
               <div className="text-[10px] text-slate-500">{it.code} &middot; {it.qty} {it.unit}</div>
             </div>
             <div className="text-right">
-              <div className="text-sm font-semibold text-emerald-400">{fmtGs(it.estimatedAmount)}</div>
+              <div className="text-sm font-semibold text-[#C8A03A]">{fmtGs(it.estimatedAmount)}</div>
               <div className="text-[10px] text-slate-500">$ {Math.round(it.estimatedAmount / usdRate).toLocaleString("en-US")}</div>
             </div>
           </div>
         ))}
-        <div className="px-4 py-3 bg-emerald-500/[0.04] flex justify-between items-center">
+        <div className="px-4 py-3 bg-[#C8A03A]/[0.04] flex justify-between items-center">
           <span className="text-xs font-bold text-white">TOTAL</span>
           <div className="text-right">
-            <div className="text-base font-bold text-emerald-400">{fmtGs(totalAmount)}</div>
+            <div className="text-base font-bold text-[#C8A03A]">{fmtGs(totalAmount)}</div>
             <div className="text-[10px] text-slate-400">$ {Math.round(totalAmount / usdRate).toLocaleString("en-US")} USD</div>
           </div>
         </div>
@@ -48,8 +48,8 @@ export default function RequestStepReview({
       </div>
 
       {/* Approval flow visual (C8 / Task 7) */}
-      <div className="bg-emerald-500/[0.04] rounded-xl px-3.5 py-3 border border-emerald-500/[0.08]">
-        <div className="text-xs font-semibold text-emerald-400 mb-2.5">{"🔄"} Flujo de Aprobaci{"ó"}n</div>
+      <div className="bg-[#C8A03A]/[0.04] rounded-xl px-3.5 py-3 border border-[#C8A03A]/[0.08]">
+        <div className="text-xs font-semibold text-[#C8A03A] mb-2.5">{"🔄"} Flujo de Aprobaci{"ó"}n</div>
         <div className="flex items-center gap-0">
           {approvalSteps.map((s, i) => (
             <div key={i} className="flex items-center">

@@ -38,7 +38,7 @@ function FilterPill({ label, active, onClick }) {
       onClick={onClick}
       className={`px-3 py-[5px] rounded-full text-[11px] font-semibold cursor-pointer whitespace-nowrap shrink-0 transition-colors ${
         active
-          ? "bg-emerald-500/10 text-emerald-400 border-2 border-emerald-400"
+          ? "bg-[#C8A03A]/10 text-[#C8A03A] border-2 border-[#C8A03A]"
           : "bg-white/[0.03] text-slate-400 border border-white/[0.06] hover:bg-white/[0.06]"
       }`}
     >
@@ -169,16 +169,16 @@ export default function InventoryScreen({ onBack }) {
               className="flex-none min-w-[80px] rounded-xl px-3 py-2.5 cursor-pointer text-center transition-all shadow-[0_1px_2px_rgba(0,0,0,0.3)]"
               style={{
                 background: filterGroup === g
-                  ? (ALL_GROUP_COLORS[g] || "#10b981") + "12"
+                  ? (ALL_GROUP_COLORS[g] || "#C8A03A") + "12"
                   : "rgba(255,255,255,0.03)",
                 border: `1px solid ${filterGroup === g
-                  ? (ALL_GROUP_COLORS[g] || "#10b981") + "40"
+                  ? (ALL_GROUP_COLORS[g] || "#C8A03A") + "40"
                   : "rgba(255,255,255,0.06)"}`,
               }}
             >
               <div
                 className="text-lg font-bold"
-                style={{ color: ALL_GROUP_COLORS[g] || "#10b981" }}
+                style={{ color: ALL_GROUP_COLORS[g] || "#C8A03A" }}
               >
                 {count}
               </div>

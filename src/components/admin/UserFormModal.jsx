@@ -37,7 +37,7 @@ function NameComboBox({ value, onChange, existingNames = [] }) {
               key={n}
               onClick={() => { onChange(n); setFilter(n); setOpen(false); }}
               className={`w-full text-left px-3.5 py-2 text-sm border-none cursor-pointer transition-colors ${
-                n === value ? 'bg-emerald-500/10 text-emerald-400 font-medium' : 'bg-transparent text-slate-300 hover:bg-white/[0.06]'
+                n === value ? 'bg-[#C8A03A]/10 text-[#C8A03A] font-medium' : 'bg-transparent text-slate-300 hover:bg-white/[0.06]'
               }`}
             >
               {n}
@@ -72,7 +72,7 @@ function RoleCheckboxes({ selectedRoles, onChange }) {
               key={key}
               className={`flex items-center gap-2 px-3 py-2.5 rounded-lg cursor-pointer transition-all border ${
                 checked
-                  ? 'bg-white/[0.06] border-emerald-500/30'
+                  ? 'bg-white/[0.06] border-[#C8A03A]/30'
                   : 'bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04]'
               }`}
             >
@@ -139,7 +139,7 @@ function PositionSelect({ value, onChange }) {
               key={o}
               onClick={() => { onChange(o); setFilter(o); setOpen(false); }}
               className={`w-full text-left px-3.5 py-2 text-sm border-none cursor-pointer transition-colors ${
-                o === value ? 'bg-emerald-500/10 text-emerald-400 font-medium' : 'bg-transparent text-slate-300 hover:bg-white/[0.06]'
+                o === value ? 'bg-[#C8A03A]/10 text-[#C8A03A] font-medium' : 'bg-transparent text-slate-300 hover:bg-white/[0.06]'
               }`}
             >
               {o}
