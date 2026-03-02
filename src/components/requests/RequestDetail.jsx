@@ -532,7 +532,7 @@ export default function RequestDetail({
       {/* ===== MOBILE BOTTOM ACTION BAR (hidden on md+) ===== */}
       <div className="mobile-bottom-action-bar fixed bottom-16 left-0 right-0 px-5 py-2.5 bg-[rgba(10,11,15,0.95)] backdrop-blur-xl border-t border-white/[0.06] flex gap-2 z-30">
         {isBorrador && onConfirm && (
-          <ActionBtn label="Confirmar ✓" color="#C8A03A" bg="linear-gradient(135deg, #10b981, #059669)" onClick={() => onConfirm(r.id)} flex={2} />
+          <ActionBtn label="Confirmar ✓" color="#C8A03A" bg="linear-gradient(135deg, #5B0B14, #4A0910)" onClick={() => onConfirm(r.id)} flex={2} />
         )}
         {!isBorrador && !isInApproval && !isLast && !isRejected && !isCancelado && onAdvance && (
           <ActionBtn

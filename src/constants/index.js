@@ -23,8 +23,8 @@ export const STATUS_FLOW = [
   { key: "en_cotizacion", label: "En Cotización", color: "#7c6bb5", colorLight: "#F5F3FF", icon: "💰", step: 3 },
   { key: "pend_aprobacion", label: "Pend. Aprobación", color: "#f59e0b", colorLight: "#FFFBEB", icon: "📋", step: 4 },
   { key: "aprobado", label: "Aprobado", color: "#5B0B14", colorLight: "#FDF5F5", icon: "✔", step: 5 },
-  { key: "orden_compra", label: "Orden de Compra", color: "#2a8c6d", colorLight: "#ECFDF5", icon: "📦", step: 6 },
-  { key: "recibido", label: "Recibido", color: "#4a9c6d", colorLight: "#ECFDF5", icon: "📥", step: 7 },
+  { key: "orden_compra", label: "Orden de Compra", color: "#2a8c6d", colorLight: "#FDF5F5", icon: "📦", step: 6 },
+  { key: "recibido", label: "Recibido", color: "#4a9c6d", colorLight: "#FDF5F5", icon: "📥", step: 7 },
   { key: "sap", label: "Registrado SAP", color: "#1a6b4a", colorLight: "#E8F5EE", icon: "🏁", step: 8 },
 ];
 

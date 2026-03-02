@@ -26,11 +26,11 @@ const STYLES = `
   th { background: #F0EDE6; color: #1F2A44; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; padding: 8px 10px; text-align: left; border: 1px solid #E0D8C8; }
   td { padding: 7px 10px; border: 1px solid #e5e7eb; font-size: 11px; }
   tr:nth-child(even) { background: #fafafa; }
-  .total-row td { font-weight: 700; background: #f0fdf4; border-color: #d1fae5; }
+  .total-row td { font-weight: 700; background: #F0EDE6; border-color: #E0D8C8; }
   .amount { text-align: right; font-variant-numeric: tabular-nums; }
   .approval-steps { display: flex; gap: 8px; margin: 8px 0; }
   .step { flex: 1; border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px; text-align: center; font-size: 10px; }
-  .step.approved { border-color: #22c55e; background: #f0fdf4; }
+  .step.approved { border-color: #22c55e; background: #F0EDE6; }
   .step.pending { border-color: #eab308; background: #fefce8; }
   .step.future { border-color: #e5e7eb; background: #fafafa; color: #999; }
   .step-icon { font-size: 16px; margin-bottom: 2px; }
