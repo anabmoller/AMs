@@ -61,7 +61,7 @@ export const ROLES = {
     permissions: [
       "create_request", "view_all_requests", "approve_manager",
       "approve_purchase", "manage_quotations", "advance_status",
-      "view_analytics", "view_inventory", "manage_settings",
+      "view_analytics", "view_inventory", "manage_settings", "manage_users",
     ],
   },
   // Legacy alias — maps to director
@@ -132,7 +132,7 @@ export const ROLES = {
     description: "Soporte administrativo y seguimiento",
     color: "#64748b",
     permissions: [
-      "create_request", "view_all_requests", "view_inventory",
+      "create_request", "view_own_requests", "view_inventory",
     ],
   },
   solicitante: {
@@ -150,7 +150,7 @@ export const ROLES = {
     description: "Personal operativo con acceso básico",
     color: "#78716c",
     permissions: [
-      "create_request", "view_own_requests",
+      "create_request", "view_own_requests", "view_inventory",
     ],
   },
 };

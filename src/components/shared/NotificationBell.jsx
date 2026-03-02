@@ -48,7 +48,7 @@ export default function NotificationBell({ onNavigate }) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-[340px] bg-[#14151c] border border-white/[0.08] rounded-xl shadow-2xl z-[200] overflow-hidden">
+        <div className="absolute right-0 top-full mt-2 w-[340px] max-w-[calc(100vw-1rem)] bg-[#14151c] border border-white/[0.08] rounded-xl shadow-2xl z-[200] overflow-hidden">
           {/* Header */}
           <div className="px-4 py-3 border-b border-white/[0.06] flex justify-between items-center">
             <span className="text-sm font-semibold text-white">Notificaciones</span>
@@ -63,7 +63,7 @@ export default function NotificationBell({ onNavigate }) {
           </div>
 
           {/* List */}
-          <div className="max-h-[360px] overflow-y-auto">
+          <div className="max-h-[min(360px,60vh)] overflow-y-auto">
             {visible.length === 0 ? (
               <div className="p-6 text-center text-sm text-slate-500">
                 Sin notificaciones

@@ -73,6 +73,7 @@ export default function ApprovalActions({ request, currentUser, onApprove, onRej
           placeholder="Motivo del rechazo..."
           confirmLabel="Rechazar"
           confirmColor="#ef4444"
+          requireReason
           reason={reason}
           setReason={setReason}
           onConfirm={() => {
@@ -104,7 +105,7 @@ export default function ApprovalActions({ request, currentUser, onApprove, onRej
   );
 }
 
-function ReasonModal({ title, placeholder, confirmLabel, confirmColor, reason, setReason, onConfirm, onCancel }) {
+function ReasonModal({ title, placeholder, confirmLabel, confirmColor, reason, setReason, onConfirm, onCancel, requireReason = false }) {
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-end md:items-center justify-center z-[1000] p-0 md:p-4">
       <div className="w-full max-w-md rounded-t-2xl md:rounded-2xl px-5 pt-6 pb-8 animate-slideUp shadow-2xl"
@@ -130,7 +131,8 @@ function ReasonModal({ title, placeholder, confirmLabel, confirmColor, reason, s
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 py-3.5 rounded-xl border-none text-white text-sm font-semibold cursor-pointer"
+            disabled={requireReason && !reason.trim()}
+            className="flex-1 py-3.5 rounded-xl border-none text-white text-sm font-semibold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
             style={{ background: confirmColor, boxShadow: `0 2px 8px ${confirmColor}40` }}
           >
             {confirmLabel}

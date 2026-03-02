@@ -217,14 +217,45 @@ export default function NewRequestForm({ onSubmit, onCancel, usdRate = 7800, usd
 
         {/* ============ Step 2: Detalles ============ */}
         {step === 2 && (
-          <RequestStepDetails
-            form={form}
-            errors={errors}
-            onUpdateForm={update}
-            FieldError={FieldError}
-            photos={photos}
-            onSetPhotos={setPhotos}
-          />
+          <>
+            {/* Item summary strip — keeps context between steps */}
+            {items.length > 0 && (
+              <div className="bg-white/[0.03] rounded-xl border border-white/[0.06] px-3.5 py-2.5 mb-4">
+                <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1.5">
+                  Items seleccionados ({items.length})
+                </div>
+                <div className="flex flex-col gap-1">
+                  {items.map((it, idx) => (
+                    <div key={idx} className="flex items-center justify-between text-[12px]">
+                      <span className="text-white font-medium truncate mr-2">{it.product}</span>
+                      <span className="text-slate-400 flex-shrink-0">
+                        {it.qty} {it.unit}
+                        {it.estimatedAmount > 0 && (
+                          <span className="text-[#C8A03A] ml-1.5">
+                            {Number(it.estimatedAmount).toLocaleString("es-PY")} ₲
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                {totalAmount > 0 && (
+                  <div className="flex justify-between mt-1.5 pt-1.5 border-t border-white/[0.06] text-[12px] font-semibold">
+                    <span className="text-slate-400">Total</span>
+                    <span className="text-[#C8A03A]">{totalAmount.toLocaleString("es-PY")} ₲</span>
+                  </div>
+                )}
+              </div>
+            )}
+            <RequestStepDetails
+              form={form}
+              errors={errors}
+              onUpdateForm={update}
+              FieldError={FieldError}
+              photos={photos}
+              onSetPhotos={setPhotos}
+            />
+          </>
         )}
 
         {/* ============ Step 3: Revision ============ */}

@@ -82,8 +82,16 @@ export function assertRole(
 }
 
 // ---- Permissions (mirrors frontend ROLES) ----
+// NOTE: Legacy aliases kept for backward compatibility:
+//   - "diretoria" ↔ "director" (same permissions)
+//   - "comprador" ↔ "compras" (same permissions)
 const ROLE_PERMISSIONS: Record<string, string[]> = {
   admin: [
+    "create_request", "view_all_requests", "approve_manager",
+    "approve_purchase", "manage_quotations", "advance_status",
+    "view_analytics", "view_inventory", "manage_settings", "manage_users",
+  ],
+  super_approver: [
     "create_request", "view_all_requests", "approve_manager",
     "approve_purchase", "manage_quotations", "advance_status",
     "view_analytics", "view_inventory", "manage_settings", "manage_users",
@@ -91,6 +99,22 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
   diretoria: [
     "create_request", "view_all_requests", "approve_manager",
     "approve_purchase", "view_analytics", "view_inventory", "advance_status",
+  ],
+  director: [
+    "create_request", "view_all_requests", "approve_manager",
+    "approve_purchase", "view_analytics", "view_inventory", "advance_status",
+  ],
+  presidente: [
+    "create_request", "view_all_requests", "approve_manager",
+    "approve_purchase", "view_analytics", "view_inventory", "advance_status",
+  ],
+  conselho: [
+    "create_request", "view_all_requests", "approve_manager",
+    "approve_purchase", "view_analytics", "view_inventory",
+  ],
+  socio: [
+    "create_request", "view_all_requests", "approve_manager",
+    "approve_purchase", "view_analytics", "view_inventory",
   ],
   gerente: [
     "create_request", "view_all_requests", "approve_manager",
@@ -103,6 +127,16 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
   comprador: [
     "create_request", "view_all_requests", "manage_quotations",
     "advance_status", "view_inventory",
+  ],
+  compras: [
+    "create_request", "view_all_requests", "manage_quotations",
+    "advance_status", "view_inventory",
+  ],
+  administrativo: [
+    "create_request", "view_own_requests", "view_inventory",
+  ],
+  operacional: [
+    "create_request", "view_own_requests", "view_inventory",
   ],
   solicitante: [
     "create_request", "view_own_requests", "view_inventory",

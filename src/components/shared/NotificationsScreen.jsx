@@ -20,7 +20,7 @@ export default function NotificationsScreen({ onBack, onNavigate }) {
   };
 
   return (
-    <div className="animate-fadeIn pb-10">
+    <div className="animate-fadeIn pb-[120px]">
       <div className="px-5 py-3 flex items-center justify-between">
         <button
           onClick={onBack}
