@@ -4,7 +4,7 @@
  * seeds sample notifications for demo.
  */
 import { createContext, useContext, useState, useCallback } from "react";
-import { MANAGER_MAP, COMPANY_MAP } from "../constants/approvalConfig";
+import { MANAGER_MAP, COMPANY_MAP, THRESHOLDS } from "../constants/approvalConfig";
 import { formatGuaranies } from "../constants/budgets";
 
 const NotificationContext = createContext(null);
@@ -163,7 +163,7 @@ export function NotificationProvider({ children }) {
           targetRole: "diretoria",
           requestId: scNumber,
         });
-        if ((request.totalAmount || 0) > 50_000_000) {
+        if ((request.totalAmount || 0) > THRESHOLDS.PRESIDENT_REQUIRED) {
           addNotification({
             type: "new_request",
             message: `Cotización requiere aprobación final: ${scNumber} — ${amount} (>50M)`,

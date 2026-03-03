@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { FULL_PRODUCT_CATALOG } from "../../constants";
 import { useAuth } from "../../context/AuthContext";
 import { useApp } from "../../context/AppContext";
-import { MANAGER_MAP, COMPANY_MAP, PRESIDENT_MAP, ESTABLISHMENT_COMPANY, USER_DISPLAY_NAMES } from "../../constants/approvalConfig";
+import { MANAGER_MAP, COMPANY_MAP, PRESIDENT_MAP, ESTABLISHMENT_COMPANY, USER_DISPLAY_NAMES, THRESHOLDS } from "../../constants/approvalConfig";
 import { findBudgetForPR, wouldExceedBudget } from "../../constants/budgets";
 import { supabase } from "../../lib/supabase";
 import RequestStepItems from "./RequestStepItems";
@@ -21,12 +21,12 @@ function getApprovalPreview(amount, establishment) {
   const dn = (u) => USER_DISPLAY_NAMES[u] || u;
   const managerUsername = MANAGER_MAP[establishment] || "ronei";
   const steps = [{ label: "Autorización — Gerente de Área", person: dn(managerUsername), icon: "①" }];
-  if (amount >= 5_000_000) {
+  if (amount >= THRESHOLDS.DIRECTOR_REQUIRED) {
     const company = ESTABLISHMENT_COMPANY[establishment] || "Rural Bioenergia S.A.";
     const directorUsername = COMPANY_MAP[company] || "ronei";
     steps.push({ label: "Aprobación Director", person: dn(directorUsername), icon: "②" });
   }
-  if (amount >= 50_000_000) {
+  if (amount >= THRESHOLDS.PRESIDENT_REQUIRED) {
     const company = ESTABLISHMENT_COMPANY[establishment] || "Rural Bioenergia S.A.";
     const presidentUsername = PRESIDENT_MAP[company];
     if (presidentUsername) {

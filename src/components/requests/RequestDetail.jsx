@@ -17,7 +17,7 @@ import { formatGuaranies } from "../../constants/budgets";
 import { getStatusDisplay, getPriorityDisplay, normalizeStatus } from "../../utils/statusHelpers";
 import { fmtDate } from "../../utils/dateFormatters";
 import { getSectors, getProductTypes } from "../../constants/parameters";
-import { MANAGER_MAP, COMPANY_MAP, PRESIDENT_MAP, ESTABLISHMENT_COMPANY, USER_DISPLAY_NAMES, SUPER_APPROVERS } from "../../constants/approvalConfig";
+import { MANAGER_MAP, COMPANY_MAP, PRESIDENT_MAP, ESTABLISHMENT_COMPANY, USER_DISPLAY_NAMES, SUPER_APPROVERS, THRESHOLDS } from "../../constants/approvalConfig";
 import { supabase } from "../../lib/supabase";
 
 // ---- Extracted sub-components ----
@@ -80,12 +80,12 @@ function getApprovalChain(amount, establishment) {
   const dn = (u) => USER_DISPLAY_NAMES[u] || u;
   const managerUsername = MANAGER_MAP[establishment] || "ronei";
   const steps = [{ label: "Autorización Gerente", person: dn(managerUsername), icon: "①" }];
-  if (amount >= 5_000_000) {
+  if (amount >= THRESHOLDS.DIRECTOR_REQUIRED) {
     const company = ESTABLISHMENT_COMPANY[establishment] || "Rural Bioenergia S.A.";
     const directorUsername = COMPANY_MAP[company] || "ronei";
     steps.push({ label: "Aprobación Director", person: dn(directorUsername), icon: "②" });
   }
-  if (amount >= 50_000_000) {
+  if (amount >= THRESHOLDS.PRESIDENT_REQUIRED) {
     const company = ESTABLISHMENT_COMPANY[establishment] || "Rural Bioenergia S.A.";
     const presidentUsername = PRESIDENT_MAP[company];
     if (presidentUsername) {

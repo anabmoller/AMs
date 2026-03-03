@@ -53,7 +53,7 @@ export function ThemeProvider({ children }) {
   const toggleTheme = useCallback(() => {
     setThemeState(prev => {
       const next = prev === "dark" ? "light" : "dark";
-      try { localStorage.setItem("ypoti-theme", next); } catch {}
+      try { localStorage.setItem("ypoti-theme", next); } catch (error) { console.warn("[Theme] localStorage write falló:", error.message); }
       return next;
     });
   }, []);

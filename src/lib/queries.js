@@ -9,7 +9,8 @@
 import { supabase, supabaseUrl, supabaseAnonKey, getStoredToken, setStoredToken } from "./supabase";
 
 // ---- Edge Function helper: direct fetch, no supabase-js dependency ----
-async function invokeEdgeFunction(functionName, body) {
+// Exported for reuse in constants/users.js, constants/budgets.js, constants/parameters.js
+export async function invokeEdgeFunction(functionName, body) {
   // Primary: use the in-memory stored token (set by login or onAuthStateChange)
   let token = getStoredToken();
 
@@ -25,8 +26,8 @@ async function invokeEdgeFunction(functionName, body) {
       if (token) {
         setStoredToken(token);
       }
-    } catch {
-      // getSession timed out or failed — try localStorage directly
+    } catch (error) {
+      console.warn("[Queries] getSession falló, intentando localStorage:", error.message);
     }
   }
 
@@ -41,7 +42,9 @@ async function invokeEdgeFunction(functionName, body) {
           token = parsed?.access_token;
         }
       }
-    } catch {}
+    } catch (error) {
+      console.warn("[Queries] localStorage token read falló:", error.message);
+    }
   }
 
   if (!token) {

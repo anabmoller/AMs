@@ -281,7 +281,9 @@ export function AuthProvider({ children }) {
               user: authUser,
             }));
           }
-        } catch {}
+        } catch (error) {
+          console.warn("[Auth] localStorage session write falló:", error.message);
+        }
       }
 
       // Step 5: Update React state
@@ -309,7 +311,7 @@ export function AuthProvider({ children }) {
   const logout = useCallback(async () => {
     if (inactivityTimer.current) clearTimeout(inactivityTimer.current);
     setStoredToken(null);
-    try { await supabase.auth.signOut(); } catch {}
+    try { await supabase.auth.signOut(); } catch (error) { console.warn("[Auth] signOut falló:", error.message); }
     setSession(null);
     setProfile(null);
     setAuthError(null);

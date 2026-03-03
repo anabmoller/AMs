@@ -67,9 +67,12 @@ function AppContent() {
   const [devMode, setDevMode] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  // Effective user: when dev mode is active, override currentUser (name, role, email)
+  // Dev mode impersonation: only available in development builds
+  const isDevModeActive = import.meta.env.DEV && devMode;
+
+  // Effective user: when dev mode is active (DEV only), override currentUser
   const effectiveUser = useMemo(() => {
-    if (!devMode) return currentUser;
+    if (!isDevModeActive) return currentUser;
     return {
       ...currentUser,
       name: devMode.name,
@@ -77,11 +80,11 @@ function AppContent() {
       email: devMode.username || currentUser.email,
       avatar: devMode.name.split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase(),
     };
-  }, [currentUser, devMode]);
+  }, [currentUser, isDevModeActive, devMode]);
 
   // Sync dev mode override to AppContext for permission checks in mutations
   useEffect(() => {
-    if (devMode) {
+    if (isDevModeActive) {
       setDevOverride({
         ...currentUser,
         name: devMode.name,
@@ -92,12 +95,12 @@ function AppContent() {
     } else {
       setDevOverride(null);
     }
-  }, [devMode, currentUser, setDevOverride]);
+  }, [isDevModeActive, devMode, currentUser, setDevOverride]);
 
   const effectiveCan = useCallback((permission) => {
-    if (!devMode) return can(permission);
+    if (!isDevModeActive) return can(permission);
     return hasPermission(effectiveUser, permission);
-  }, [can, devMode, effectiveUser]);
+  }, [can, isDevModeActive, effectiveUser]);
 
   // Fetch live USD→PYG rate with auto-refresh every 30 min + retry on failure
   const fetchUsdRate = useCallback((retryCount = 0) => {
@@ -311,9 +314,9 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-[#0a0b0f]">
-      {devMode && (
+      {isDevModeActive && (
         <div className="bg-red-600 text-white text-sm font-medium text-center py-2 px-4 flex items-center justify-center gap-3 sticky top-0 z-50">
-          <span>🔧 Modo Dev: Viendo como {devMode.name} ({devMode.label})</span>
+          <span>Modo Dev: Viendo como {devMode.name} ({devMode.label})</span>
           <button
             onClick={() => { setDevMode(null); setScreen("settings"); }}
             className="underline ml-2 bg-transparent text-white border-none cursor-pointer text-sm font-medium"

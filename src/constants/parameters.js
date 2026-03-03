@@ -3,7 +3,8 @@
 // Reads via anon client (RLS), writes via Edge Functions
 // ============================================================
 
-import { supabase, supabaseUrl, supabaseAnonKey, getStoredToken } from "../lib/supabase";
+import { supabase } from "../lib/supabase";
+import { invokeEdgeFunction } from "../lib/queries";
 
 // Strip emoji text prefixes from DB names (e.g. "wheat Agricultura" → "Agricultura")
 function cleanName(name) {
@@ -13,40 +14,9 @@ function cleanName(name) {
     .replace(/^[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}]\s*/u, "");
 }
 
-// ---- Edge Function helper (same pattern as queries.js) ----
+// ---- Edge Function helper (delegates to shared invokeEdgeFunction) ----
 async function invokeAdminData(body) {
-  let token = getStoredToken();
-
-  if (!token) {
-    try {
-      const result = await Promise.race([
-        supabase.auth.getSession(),
-        new Promise((_, reject) => setTimeout(() => reject(new Error("TIMEOUT")), 5000)),
-      ]);
-      token = result?.data?.session?.access_token;
-    } catch { /* timeout */ }
-  }
-
-  if (!token) throw new Error("No hay sesión activa.");
-
-  const res = await fetch(`${supabaseUrl}/functions/v1/admin-data`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
-      "apikey": supabaseAnonKey,
-    },
-    body: JSON.stringify(body),
-  });
-
-  if (!res.ok) {
-    const errBody = await res.json().catch(() => ({}));
-    throw new Error(errBody.error || errBody.message || `Error ${res.status}`);
-  }
-
-  const data = await res.json();
-  if (data?.error) throw new Error(data.error);
-  return data;
+  return invokeEdgeFunction("admin-data", body);
 }
 
 // ---- Module-level cache ----
