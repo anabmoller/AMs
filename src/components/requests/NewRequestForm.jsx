@@ -4,6 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useApp } from "../../context/AppContext";
 import { MANAGER_MAP, COMPANY_MAP, PRESIDENT_MAP, ESTABLISHMENT_COMPANY, USER_DISPLAY_NAMES } from "../../constants/approvalConfig";
 import { findBudgetForPR, wouldExceedBudget } from "../../constants/budgets";
+import { cleanName } from "../../constants/parameters";
 import { supabase } from "../../lib/supabase";
 import RequestStepItems from "./RequestStepItems";
 import RequestStepDetails from "./RequestStepDetails";
@@ -62,7 +63,7 @@ export default function NewRequestForm({ onSubmit, onCancel, usdRate = 7800, usd
         return {
           n: p.name || "Sin nombre",
           c: p.code || "—",
-          g: ref.g || p.categories?.name || "",
+          g: ref.g || cleanName(p.categories?.name) || "",
           u: ref.u || p.unit_of_measure || "unidad",
           up: ref.up || 0,
           lp: ref.lp || 0,

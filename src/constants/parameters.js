@@ -6,10 +6,10 @@
 import { supabase, supabaseUrl, supabaseAnonKey, getStoredToken } from "../lib/supabase";
 
 // Strip legacy icon-text prefixes from DB names (DB stores prefixed names from old system)
-function cleanName(name) {
+export function cleanName(name) {
   if (!name) return "";
   return name
-    .replace(/^(wheat|office|building|pill|cow|tractor|wrench|truck|factory|seedling|ear_of_rice|syringe|package|hammer|gear|fuel|bolt)\s+/i, "")
+    .replace(/^(wheat|office|building|pill|cow|tractor|wrench|truck|factory|seedling|ear_of_rice|syringe|package|hammer|gear|fuel|bolt|range|warehouse)[\s_:\-]+/i, "")
     .replace(/^[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}]\s*/u, "");
 }
 
@@ -109,7 +109,7 @@ export async function initParameters() {
       productTypes: (types.data || []).map(t => ({
         id: t.legacy_id || t.id,
         _uuid: t.id,
-        name: t.name,
+        name: cleanName(t.name),
         icon: t.icon,
         description: t.description,
         active: t.active !== false,

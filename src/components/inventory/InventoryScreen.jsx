@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { GROUP_COLORS } from "../../constants";
 import { supabase } from "../../lib/supabase";
+import { cleanName } from "../../constants/parameters";
 import BackButton from "../common/BackButton";
 import SearchInput from "../common/SearchInput";
 import PageHeader from "../common/PageHeader";
@@ -75,7 +76,7 @@ export default function InventoryScreen({ onBack }) {
       }
 
       const mapped = (data || []).map(p => {
-        const catName = p.categories?.name || "";
+        const catName = cleanName(p.categories?.name);
         const group = CATEGORY_TO_GROUP[catName] || catName || "Otro";
         return {
           id: p.id,
