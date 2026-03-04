@@ -48,12 +48,12 @@ export default function MobileDrawer({ open, onClose, screen, onNavigate, onNewR
         {/* Header */}
         <div className="px-5 pt-5 pb-4 border-b border-white/[0.06] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-lg bg-[#1F2A44] flex items-center justify-center text-white font-bold text-xs">
-              SIGAM
+            <div className="w-9 h-9 rounded-lg bg-[#1F2A44] flex items-center justify-center text-white font-bold text-base">
+              AM
             </div>
             <div>
               <div className="text-lg font-bold text-white tracking-tight leading-tight">SIGAM</div>
-              <div className="text-[10px] font-medium text-slate-500 tracking-wide">Sistema Integrado de Gestión AM</div>
+              <div className="text-[10px] font-medium text-slate-500 tracking-wide">Sistema Integrado de Gestión</div>
             </div>
           </div>
           <button

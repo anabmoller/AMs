@@ -21,8 +21,8 @@ export default function Header({ currentUser, onToggleDrawer, onNavigate }) {
         onClick={() => onNavigate && onNavigate('dashboard')}
         className="flex items-center gap-2 cursor-pointer"
       >
-        <div className="w-7 h-7 rounded-md bg-[#1F2A44] flex items-center justify-center text-white font-bold text-[8px]">
-          SIGAM
+        <div className="w-7 h-7 rounded-md bg-[#1F2A44] flex items-center justify-center text-white font-bold text-xs">
+          AM
         </div>
         <div className="text-sm font-bold text-white tracking-tight">SIGAM</div>
       </div>
@@ -33,7 +33,7 @@ export default function Header({ currentUser, onToggleDrawer, onNavigate }) {
         className="w-8 h-8 rounded-full bg-[#1F2A44]/10 flex items-center justify-center text-xs font-semibold text-[#C8A03A] border-none cursor-pointer"
         aria-label="Perfil"
       >
-        {"SIGAM"}
+        {"AM"}
       </button>
     </header>
   );
