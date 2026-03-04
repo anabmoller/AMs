@@ -39,7 +39,7 @@ export default function LoginScreen() {
             
           </h1>
           <p className="text-sm text-slate-400 m-0">
-            Sistema de Gesti&oacute;n de Compras
+            Sistema Integrado de Gesti&oacute;n
           </p>
         </div>
 
