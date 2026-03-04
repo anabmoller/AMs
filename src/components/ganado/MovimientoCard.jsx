@@ -8,13 +8,21 @@ function getStatusInfo(estado) {
 
 export default function MovimientoCard({ movimiento, onClick }) {
   const status = getStatusInfo(movimiento.estado);
-  const categoria = getCategorias().find(c => c.id === movimiento.categoriaId);
+  const allCategorias = getCategorias();
   const origen = getEstablishments().find(e => e._uuid === movimiento.establecimientoOrigenId);
 
   const destino = movimiento.destinoNombre
     || getCompanies().find(c => c._uuid === movimiento.empresaDestinoId)?.name
     || getEstablishments().find(e => e._uuid === movimiento.establecimientoDestinoId)?.name
     || "—";
+
+  // Build category summary from detail rows
+  const categoriaSummary = (movimiento.categorias || [])
+    .map(d => {
+      const cat = allCategorias.find(c => c.id === d.categoriaId);
+      return cat ? `${d.cantidad} ${cat.codigo}` : `${d.cantidad}`;
+    })
+    .join(", ") || "—";
 
   const formatCurrency = (val, mon) => {
     if (!val) return "—";
@@ -51,14 +59,20 @@ export default function MovimientoCard({ movimiento, onClick }) {
           <span className="text-slate-500">Destino: </span>
           <span className="text-slate-300">{destino}</span>
         </div>
-        <div>
-          <span className="text-slate-500">Categoría: </span>
-          <span className="text-slate-300">{categoria?.nombre || "—"}</span>
+        <div className="col-span-2">
+          <span className="text-slate-500">Categorías: </span>
+          <span className="text-slate-300">{categoriaSummary}</span>
         </div>
         <div>
-          <span className="text-slate-500">Cantidad: </span>
-          <span className="text-white font-semibold">{movimiento.cantidad} cab.</span>
+          <span className="text-slate-500">Total: </span>
+          <span className="text-white font-semibold">{movimiento.cantidadTotal} cab.</span>
         </div>
+        {movimiento.pesoTotalKg > 0 && (
+          <div>
+            <span className="text-slate-500">Peso: </span>
+            <span className="text-slate-300">{movimiento.pesoTotalKg.toLocaleString("es-PY")} kg</span>
+          </div>
+        )}
       </div>
 
       {/* Footer */}

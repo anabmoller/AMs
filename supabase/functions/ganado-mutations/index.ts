@@ -1,7 +1,10 @@
 // ============================================================
 // YPOTI — Edge Function: ganado-mutations
 // Actions: create, update, validate, advance-status,
-//          add-divergence, add-attachment, anular
+//          add-categories, update-category, remove-category,
+//          add-divergence, resolve-divergence,
+//          add-attachment, anular,
+//          add-pesaje, update-pesaje, delete-pesaje
 // ============================================================
 
 import { corsHeaders } from "../_shared/cors.ts";
@@ -21,6 +24,25 @@ const GANADO_STATUS_FLOW = [
   "recibido",
   "cerrado",
 ];
+
+// Helper: log a status change
+async function logStatusChange(
+  supabaseAdmin: ReturnType<typeof createAdminClient>,
+  movimientoId: string,
+  estadoAnterior: string,
+  estadoNuevo: string,
+  caller: { id: string; name: string },
+  comentario?: string,
+) {
+  await supabaseAdmin.from("movimiento_estados_log").insert({
+    movimiento_id: movimientoId,
+    estado_anterior: estadoAnterior,
+    estado_nuevo: estadoNuevo,
+    comentario: comentario || null,
+    changed_by: caller.id,
+    changed_by_name: caller.name,
+  });
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -44,6 +66,7 @@ Deno.serve(async (req) => {
         const m = payload.movimiento;
         if (!m) throw new Error("movimiento object is required");
 
+        // Insert main movement (without animal details - those go in detalle)
         const { data, error } = await supabaseAdmin
           .from("movimientos_ganado")
           .insert({
@@ -53,9 +76,8 @@ Deno.serve(async (req) => {
             empresa_destino_id: m.empresaDestinoId || null,
             establecimiento_destino_id: m.establecimientoDestinoId || null,
             destino_nombre: sanitizeName(m.destinoNombre),
-            categoria_id: m.categoriaId,
-            cantidad: sanitizeNumber(m.cantidad, { min: 1 }),
-            peso_total_kg: m.pesoTotalKg ? sanitizeNumber(m.pesoTotalKg, { min: 0 }) : null,
+            cantidad_total: 0,
+            peso_total_kg: 0,
             nro_guia: sanitizeText(m.nroGuia, 100),
             nro_cota: sanitizeText(m.nroCota, 100),
             fecha_emision: m.fechaEmision || new Date().toISOString().slice(0, 10),
@@ -72,6 +94,26 @@ Deno.serve(async (req) => {
 
         if (error) throw error;
 
+        // Insert category details if provided
+        if (Array.isArray(m.categorias) && m.categorias.length > 0) {
+          const rows = m.categorias.map((c: Record<string, unknown>) => ({
+            movimiento_id: data.id,
+            categoria_id: c.categoriaId,
+            cantidad: sanitizeNumber(c.cantidad as number, { min: 1 }),
+            peso_kg: c.pesoKg ? sanitizeNumber(c.pesoKg as number, { min: 0 }) : null,
+            precio_por_kg: c.precioPorKg ? sanitizeNumber(c.precioPorKg as number, { min: 0 }) : null,
+            precio_subtotal: c.precioSubtotal ? sanitizeNumber(c.precioSubtotal as number, { min: 0 }) : null,
+            observaciones: c.observaciones ? sanitizeMultiline(c.observaciones as string, 500) : null,
+          }));
+          const { error: catError } = await supabaseAdmin
+            .from("detalle_movimiento_categorias")
+            .insert(rows);
+          if (catError) throw catError;
+        }
+
+        // Log initial status
+        await logStatusChange(supabaseAdmin, data.id, "", "borrador", caller, "Movimiento creado");
+
         return new Response(
           JSON.stringify({ ok: true, movimientoUuid: data.id }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } },
@@ -79,7 +121,7 @@ Deno.serve(async (req) => {
       }
 
       // ─────────────────────────────────────────────────
-      // UPDATE MOVIMIENTO
+      // UPDATE MOVIMIENTO (only in borrador)
       // ─────────────────────────────────────────────────
       case "update": {
         const { movimientoUuid, updates } = payload;
@@ -108,9 +150,6 @@ Deno.serve(async (req) => {
           if (updates.empresaDestinoId !== undefined) dbUpdates.empresa_destino_id = updates.empresaDestinoId;
           if (updates.establecimientoDestinoId !== undefined) dbUpdates.establecimiento_destino_id = updates.establecimientoDestinoId;
           if (updates.destinoNombre !== undefined) dbUpdates.destino_nombre = sanitizeName(updates.destinoNombre);
-          if (updates.categoriaId !== undefined) dbUpdates.categoria_id = updates.categoriaId;
-          if (updates.cantidad !== undefined) dbUpdates.cantidad = sanitizeNumber(updates.cantidad, { min: 1 });
-          if (updates.pesoTotalKg !== undefined) dbUpdates.peso_total_kg = updates.pesoTotalKg ? sanitizeNumber(updates.pesoTotalKg, { min: 0 }) : null;
           if (updates.precioPorKg !== undefined) dbUpdates.precio_por_kg = updates.precioPorKg ? sanitizeNumber(updates.precioPorKg, { min: 0 }) : null;
           if (updates.precioTotal !== undefined) dbUpdates.precio_total = updates.precioTotal ? sanitizeNumber(updates.precioTotal, { min: 0 }) : null;
           if (updates.moneda !== undefined) dbUpdates.moneda = ["PYG", "USD", "BRL"].includes(updates.moneda) ? updates.moneda : "PYG";
@@ -136,7 +175,100 @@ Deno.serve(async (req) => {
       }
 
       // ─────────────────────────────────────────────────
-      // VALIDATE MOVIMIENTO (borrador → validado)
+      // ADD CATEGORIES (batch upsert detalle rows)
+      // ─────────────────────────────────────────────────
+      case "add-categories": {
+        if (!hasPermission(caller, "create_movimiento_ganado")) {
+          throw new Error("No permission");
+        }
+        const { movimientoUuid: catUuid, categorias } = payload;
+        if (!catUuid || !Array.isArray(categorias) || categorias.length === 0) {
+          throw new Error("movimientoUuid and categorias array are required");
+        }
+
+        // Check movement exists and is in borrador
+        const { data: catMov, error: catMovErr } = await supabaseAdmin
+          .from("movimientos_ganado")
+          .select("estado")
+          .eq("id", catUuid)
+          .single();
+        if (catMovErr) throw catMovErr;
+        if (catMov.estado !== "borrador") {
+          throw new Error("Can only add categories in borrador state");
+        }
+
+        const rows = categorias.map((c: Record<string, unknown>) => ({
+          movimiento_id: catUuid,
+          categoria_id: c.categoriaId,
+          cantidad: sanitizeNumber(c.cantidad as number, { min: 1 }),
+          peso_kg: c.pesoKg ? sanitizeNumber(c.pesoKg as number, { min: 0 }) : null,
+          precio_por_kg: c.precioPorKg ? sanitizeNumber(c.precioPorKg as number, { min: 0 }) : null,
+          precio_subtotal: c.precioSubtotal ? sanitizeNumber(c.precioSubtotal as number, { min: 0 }) : null,
+          observaciones: c.observaciones ? sanitizeMultiline(c.observaciones as string, 500) : null,
+        }));
+
+        const { error } = await supabaseAdmin
+          .from("detalle_movimiento_categorias")
+          .upsert(rows, { onConflict: "movimiento_id,categoria_id" });
+        if (error) throw error;
+
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // ─────────────────────────────────────────────────
+      // UPDATE CATEGORY (single detail row)
+      // ─────────────────────────────────────────────────
+      case "update-category": {
+        if (!hasPermission(caller, "create_movimiento_ganado")) {
+          throw new Error("No permission");
+        }
+        const { detalleId, updates: catUpdates } = payload;
+        if (!detalleId) throw new Error("detalleId is required");
+
+        const dbCat: Record<string, unknown> = {};
+        if (catUpdates.cantidad !== undefined) dbCat.cantidad = sanitizeNumber(catUpdates.cantidad, { min: 1 });
+        if (catUpdates.pesoKg !== undefined) dbCat.peso_kg = catUpdates.pesoKg ? sanitizeNumber(catUpdates.pesoKg, { min: 0 }) : null;
+        if (catUpdates.precioPorKg !== undefined) dbCat.precio_por_kg = catUpdates.precioPorKg ? sanitizeNumber(catUpdates.precioPorKg, { min: 0 }) : null;
+        if (catUpdates.precioSubtotal !== undefined) dbCat.precio_subtotal = catUpdates.precioSubtotal ? sanitizeNumber(catUpdates.precioSubtotal, { min: 0 }) : null;
+
+        if (Object.keys(dbCat).length > 0) {
+          const { error } = await supabaseAdmin
+            .from("detalle_movimiento_categorias")
+            .update(dbCat)
+            .eq("id", detalleId);
+          if (error) throw error;
+        }
+
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // ─────────────────────────────────────────────────
+      // REMOVE CATEGORY (delete detail row)
+      // ─────────────────────────────────────────────────
+      case "remove-category": {
+        if (!hasPermission(caller, "create_movimiento_ganado")) {
+          throw new Error("No permission");
+        }
+        const { detalleId: delId } = payload;
+        if (!delId) throw new Error("detalleId is required");
+
+        const { error } = await supabaseAdmin
+          .from("detalle_movimiento_categorias")
+          .delete()
+          .eq("id", delId);
+        if (error) throw error;
+
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // ─────────────────────────────────────────────────
+      // VALIDATE MOVIMIENTO (borrador/pendiente → validado)
       // ─────────────────────────────────────────────────
       case "validate": {
         if (!hasPermission(caller, "validate_movimiento_ganado")) {
@@ -168,6 +300,8 @@ Deno.serve(async (req) => {
           .eq("id", valUuid);
         if (valError) throw valError;
 
+        await logStatusChange(supabaseAdmin, valUuid, mov.estado, "validado", caller);
+
         return new Response(JSON.stringify({ ok: true }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -181,7 +315,7 @@ Deno.serve(async (req) => {
           throw new Error("No permission to advance cattle movement status");
         }
 
-        const { movimientoUuid: advUuid, newStatus } = payload;
+        const { movimientoUuid: advUuid, newStatus, comentario } = payload;
         if (!advUuid || !newStatus) throw new Error("movimientoUuid and newStatus are required");
 
         const { data: advMov, error: advErr } = await supabaseAdmin
@@ -204,6 +338,8 @@ Deno.serve(async (req) => {
           .eq("id", advUuid);
         if (advError) throw advError;
 
+        await logStatusChange(supabaseAdmin, advUuid, advMov.estado, newStatus, caller, comentario);
+
         return new Response(JSON.stringify({ ok: true }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -225,6 +361,27 @@ Deno.serve(async (req) => {
           reportado_por: caller.id,
           reportado_por_nombre: caller.name,
         });
+        if (error) throw error;
+
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // ─────────────────────────────────────────────────
+      // RESOLVE DIVERGENCE
+      // ─────────────────────────────────────────────────
+      case "resolve-divergence": {
+        const { divergenciaId, resolucion } = payload;
+        if (!divergenciaId) throw new Error("divergenciaId is required");
+
+        const { error } = await supabaseAdmin
+          .from("movimiento_divergencias")
+          .update({
+            resuelto: true,
+            resolucion: resolucion ? sanitizeMultiline(resolucion, 1000) : "Resuelto",
+          })
+          .eq("id", divergenciaId);
         if (error) throw error;
 
         return new Response(JSON.stringify({ ok: true }), {
@@ -280,16 +437,138 @@ Deno.serve(async (req) => {
           throw new Error("Not authorized to annul this movement");
         }
 
+        const sanitizedReason = reason ? sanitizeMultiline(reason, 2000) : undefined;
+
         const { error: anulError } = await supabaseAdmin
           .from("movimientos_ganado")
           .update({
             estado: "anulado",
-            observaciones: reason
-              ? sanitizeMultiline(reason, 2000)
-              : undefined,
+            observaciones: sanitizedReason,
           })
           .eq("id", anulUuid);
         if (anulError) throw anulError;
+
+        await logStatusChange(supabaseAdmin, anulUuid, anulMov.estado, "anulado", caller, sanitizedReason);
+
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // ─────────────────────────────────────────────────
+      // ADD PESAJE (weighing record)
+      // ─────────────────────────────────────────────────
+      case "add-pesaje": {
+        if (!hasPermission(caller, "create_movimiento_ganado")) {
+          throw new Error("No permission to add weighing records");
+        }
+
+        const { movimientoUuid: pesUuid, pesaje } = payload;
+        if (!pesUuid || !pesaje) throw new Error("movimientoUuid and pesaje are required");
+
+        // Verify movement exists and is in appropriate state (recibido or en_transito)
+        const { data: pesMov, error: pesMovErr } = await supabaseAdmin
+          .from("movimientos_ganado")
+          .select("estado")
+          .eq("id", pesUuid)
+          .single();
+        if (pesMovErr) throw pesMovErr;
+
+        const allowedStates = ["en_transito", "recibido", "validado"];
+        if (!allowedStates.includes(pesMov.estado)) {
+          throw new Error(`Cannot add weighing in estado '${pesMov.estado}'`);
+        }
+
+        const { data: pesData, error: pesError } = await supabaseAdmin
+          .from("pesajes_ganado")
+          .insert({
+            movimiento_id: pesUuid,
+            detalle_categoria_id: pesaje.detalleCategoriaId || null,
+            fecha_pesaje: pesaje.fechaPesaje || new Date().toISOString().slice(0, 10),
+            hora_pesaje: pesaje.horaPesaje || null,
+            cantidad_pesada: sanitizeNumber(pesaje.cantidadPesada, { min: 1 }),
+            peso_bruto_kg: sanitizeNumber(pesaje.pesoBrutoKg, { min: 0.01 }),
+            peso_tara_kg: pesaje.pesoTaraKg ? sanitizeNumber(pesaje.pesoTaraKg, { min: 0 }) : 0,
+            nro_tropa: pesaje.nroTropa ? sanitizeText(pesaje.nroTropa, 50) : null,
+            nro_lote: pesaje.nroLote ? sanitizeText(pesaje.nroLote, 50) : null,
+            categoria_id: pesaje.categoriaId || null,
+            tipo_pesaje: ["recepcion", "despacho", "intermedio", "verificacion"].includes(pesaje.tipoPesaje)
+              ? pesaje.tipoPesaje : "recepcion",
+            cantidad_esperada: pesaje.cantidadEsperada ? sanitizeNumber(pesaje.cantidadEsperada, { min: 0 }) : null,
+            peso_esperado_kg: pesaje.pesoEsperadoKg ? sanitizeNumber(pesaje.pesoEsperadoKg, { min: 0 }) : null,
+            balanza_id: pesaje.balanzaId ? sanitizeText(pesaje.balanzaId, 50) : null,
+            balanza_nombre: pesaje.balanzaNombre ? sanitizeName(pesaje.balanzaNombre) : null,
+            ticket_nro: pesaje.ticketNro ? sanitizeText(pesaje.ticketNro, 50) : null,
+            conforme: pesaje.conforme ?? false,
+            observaciones: pesaje.observaciones ? sanitizeMultiline(pesaje.observaciones, 1000) : null,
+            pesado_por: caller.id,
+            pesado_por_nombre: caller.name,
+          })
+          .select()
+          .single();
+
+        if (pesError) throw pesError;
+
+        return new Response(
+          JSON.stringify({ ok: true, pesajeId: pesData.id }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+
+      // ─────────────────────────────────────────────────
+      // UPDATE PESAJE
+      // ─────────────────────────────────────────────────
+      case "update-pesaje": {
+        if (!hasPermission(caller, "create_movimiento_ganado")) {
+          throw new Error("No permission to update weighing records");
+        }
+
+        const { pesajeId: upPesId, updates: pesUpdates } = payload;
+        if (!upPesId) throw new Error("pesajeId is required");
+
+        const dbPes: Record<string, unknown> = {};
+        if (pesUpdates.cantidadPesada !== undefined) dbPes.cantidad_pesada = sanitizeNumber(pesUpdates.cantidadPesada, { min: 1 });
+        if (pesUpdates.pesoBrutoKg !== undefined) dbPes.peso_bruto_kg = sanitizeNumber(pesUpdates.pesoBrutoKg, { min: 0.01 });
+        if (pesUpdates.pesoTaraKg !== undefined) dbPes.peso_tara_kg = sanitizeNumber(pesUpdates.pesoTaraKg, { min: 0 });
+        if (pesUpdates.conforme !== undefined) dbPes.conforme = !!pesUpdates.conforme;
+        if (pesUpdates.observaciones !== undefined) dbPes.observaciones = pesUpdates.observaciones ? sanitizeMultiline(pesUpdates.observaciones, 1000) : null;
+        if (pesUpdates.ticketNro !== undefined) dbPes.ticket_nro = pesUpdates.ticketNro ? sanitizeText(pesUpdates.ticketNro, 50) : null;
+        if (pesUpdates.nroTropa !== undefined) dbPes.nro_tropa = pesUpdates.nroTropa ? sanitizeText(pesUpdates.nroTropa, 50) : null;
+        if (pesUpdates.nroLote !== undefined) dbPes.nro_lote = pesUpdates.nroLote ? sanitizeText(pesUpdates.nroLote, 50) : null;
+        if (pesUpdates.verificadoPor !== undefined) {
+          dbPes.verificado_por = caller.id;
+          dbPes.verificado_por_nombre = caller.name;
+        }
+
+        if (Object.keys(dbPes).length > 0) {
+          const { error } = await supabaseAdmin
+            .from("pesajes_ganado")
+            .update(dbPes)
+            .eq("id", upPesId);
+          if (error) throw error;
+        }
+
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // ─────────────────────────────────────────────────
+      // DELETE PESAJE
+      // ─────────────────────────────────────────────────
+      case "delete-pesaje": {
+        if (!hasPermission(caller, "create_movimiento_ganado")) {
+          throw new Error("No permission to delete weighing records");
+        }
+
+        const { pesajeId: delPesId } = payload;
+        if (!delPesId) throw new Error("pesajeId is required");
+
+        const { error } = await supabaseAdmin
+          .from("pesajes_ganado")
+          .delete()
+          .eq("id", delPesId);
+        if (error) throw error;
 
         return new Response(JSON.stringify({ ok: true }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },

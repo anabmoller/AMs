@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { getEstablishments, getCompanies } from "../../constants/parameters";
+import { getEstablishments } from "../../constants/parameters";
 import {
   FINALIDAD_OPTIONS, TIPO_OPERACION_OPTIONS,
   getCategorias, getFrigorificos,
@@ -50,6 +50,10 @@ function FormField({ label, required, children, error }) {
 
 const inputClass = "w-full bg-[#13141a] border border-white/[0.06] text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:border-[#C8A03A] focus:ring-1 focus:ring-[#C8A03A]/30 outline-none transition-colors";
 const selectClass = inputClass;
+const smallInputClass = "w-full bg-[#0d0e14] border border-white/[0.06] text-slate-200 text-xs rounded-lg px-2.5 py-2 focus:border-[#C8A03A] focus:ring-1 focus:ring-[#C8A03A]/30 outline-none transition-colors";
+
+// Empty category row template
+const emptyCatRow = () => ({ _key: Date.now() + Math.random(), categoriaId: "", cantidad: "", pesoKg: "" });
 
 export default function NuevoMovimientoForm({ onCancel, onCreated }) {
   const { currentUser } = useAuth();
@@ -64,9 +68,8 @@ export default function NuevoMovimientoForm({ onCancel, onCreated }) {
     empresaDestinoId: "",
     establecimientoDestinoId: "",
     destinoNombre: "",
-    categoriaId: "",
-    cantidad: "",
-    pesoTotalKg: "",
+    // Multi-category rows
+    categorias: [emptyCatRow()],
     nroGuia: "",
     nroCota: "",
     fechaEmision: new Date().toISOString().slice(0, 10),
@@ -78,25 +81,48 @@ export default function NuevoMovimientoForm({ onCancel, onCreated }) {
 
   const establishments = getEstablishments();
   const frigorificos = getFrigorificos();
-  const categorias = getCategorias();
+  const allCategorias = getCategorias();
 
   const set = (key, val) => setForm(prev => ({ ...prev, [key]: val }));
 
-  // Auto-calculate
-  const pesoPromedio = useMemo(() => {
-    const c = Number(form.cantidad);
-    const p = Number(form.pesoTotalKg);
-    return c > 0 && p > 0 ? (p / c).toFixed(2) : "—";
-  }, [form.cantidad, form.pesoTotalKg]);
+  // Update a specific category row
+  const setCatRow = (index, field, val) => {
+    setForm(prev => ({
+      ...prev,
+      categorias: prev.categorias.map((row, i) => i === index ? { ...row, [field]: val } : row),
+    }));
+  };
+
+  const addCatRow = () => {
+    setForm(prev => ({ ...prev, categorias: [...prev.categorias, emptyCatRow()] }));
+  };
+
+  const removeCatRow = (index) => {
+    setForm(prev => ({
+      ...prev,
+      categorias: prev.categorias.length > 1 ? prev.categorias.filter((_, i) => i !== index) : prev.categorias,
+    }));
+  };
+
+  // Totals from all category rows
+  const totalCabezas = useMemo(() => {
+    return form.categorias.reduce((sum, r) => sum + (Number(r.cantidad) || 0), 0);
+  }, [form.categorias]);
+
+  const totalPesoKg = useMemo(() => {
+    return form.categorias.reduce((sum, r) => sum + (Number(r.pesoKg) || 0), 0);
+  }, [form.categorias]);
 
   const precioTotalCalc = useMemo(() => {
     const ppk = Number(form.precioPorKg);
-    const pt = Number(form.pesoTotalKg);
-    return ppk > 0 && pt > 0 ? Math.round(ppk * pt) : null;
-  }, [form.precioPorKg, form.pesoTotalKg]);
+    return ppk > 0 && totalPesoKg > 0 ? Math.round(ppk * totalPesoKg) : null;
+  }, [form.precioPorKg, totalPesoKg]);
 
   // Show destination selector based on tipo_operacion
   const isInternal = form.tipoOperacion === "transferencia_interna";
+
+  // Available categorias for dropdown (exclude already-selected ones)
+  const usedCatIds = new Set(form.categorias.map(r => r.categoriaId).filter(Boolean));
 
   // Validation
   function validateStep1() {
@@ -113,8 +139,11 @@ export default function NuevoMovimientoForm({ onCancel, onCreated }) {
 
   function validateStep2() {
     const e = {};
-    if (!form.categoriaId) e.categoriaId = "Seleccione una categoría";
-    if (!form.cantidad || Number(form.cantidad) < 1) e.cantidad = "Mínimo 1 cabeza";
+    const validRows = form.categorias.filter(r => r.categoriaId && Number(r.cantidad) > 0);
+    if (validRows.length === 0) e.categorias = "Agregue al menos una categoría con cantidad";
+    // Check for duplicate categories
+    const catIds = validRows.map(r => r.categoriaId);
+    if (new Set(catIds).size !== catIds.length) e.categorias = "No puede repetir categorías";
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -133,16 +162,30 @@ export default function NuevoMovimientoForm({ onCancel, onCreated }) {
   async function handleSubmit() {
     setSubmitting(true);
     try {
+      // Build categorias array for the Edge Function
+      const categoriasPayload = form.categorias
+        .filter(r => r.categoriaId && Number(r.cantidad) > 0)
+        .map(r => ({
+          categoriaId: r.categoriaId,
+          cantidad: Number(r.cantidad),
+          pesoKg: r.pesoKg ? Number(r.pesoKg) : null,
+        }));
+
       const payload = {
-        ...form,
-        cantidad: Number(form.cantidad),
-        pesoTotalKg: form.pesoTotalKg ? Number(form.pesoTotalKg) : null,
-        precioPorKg: form.precioPorKg ? Number(form.precioPorKg) : null,
-        precioTotal: form.precioTotal ? Number(form.precioTotal) : precioTotalCalc,
+        tipoOperacion: form.tipoOperacion,
+        finalidad: form.finalidad,
         establecimientoOrigenId: form.establecimientoOrigenId || null,
         empresaDestinoId: isInternal ? null : (form.empresaDestinoId || null),
         establecimientoDestinoId: isInternal ? (form.establecimientoDestinoId || null) : null,
         destinoNombre: isInternal ? "" : form.destinoNombre,
+        categorias: categoriasPayload,
+        nroGuia: form.nroGuia,
+        nroCota: form.nroCota,
+        fechaEmision: form.fechaEmision || new Date().toISOString().slice(0, 10),
+        precioPorKg: form.precioPorKg ? Number(form.precioPorKg) : null,
+        precioTotal: form.precioTotal ? Number(form.precioTotal) : precioTotalCalc,
+        moneda: form.moneda,
+        observaciones: form.observaciones,
       };
       await insertMovimiento(payload);
       onCreated?.();
@@ -159,7 +202,6 @@ export default function NuevoMovimientoForm({ onCancel, onCreated }) {
   const destinoName = isInternal
     ? (establishments.find(e => e._uuid === form.establecimientoDestinoId)?.name || "—")
     : (frigorificos.find(f => f.id === form.empresaDestinoId)?.name || form.destinoNombre || "—");
-  const categoriaName = categorias.find(c => c.id === form.categoriaId)?.nombre || "—";
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
@@ -230,27 +272,108 @@ export default function NuevoMovimientoForm({ onCancel, onCreated }) {
       {/* STEP 2 — Animales y Documentos */}
       {step === 2 && (
         <div className="bg-[#13141a] border border-white/[0.06] rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-white mb-4">Animales y Documentos</h3>
+          <h3 className="text-sm font-semibold text-white mb-4">Categorías de Animales</h3>
+          {errors.categorias && <p className="text-red-400 text-[10px] mb-3">{errors.categorias}</p>}
 
-          <FormField label="Categoría Animal" required error={errors.categoriaId}>
-            <select className={selectClass} value={form.categoriaId} onChange={e => set("categoriaId", e.target.value)}>
-              <option value="">Seleccionar...</option>
-              {categorias.map(c => <option key={c.id} value={c.id}>{c.codigo} — {c.nombre}</option>)}
-            </select>
-          </FormField>
-
-          <div className="grid grid-cols-2 gap-3">
-            <FormField label="Cantidad (cabezas)" required error={errors.cantidad}>
-              <input className={inputClass} type="number" min="1" value={form.cantidad} onChange={e => set("cantidad", e.target.value)} placeholder="0" />
-            </FormField>
-            <FormField label="Peso Total (kg)">
-              <input className={inputClass} type="number" min="0" step="0.01" value={form.pesoTotalKg} onChange={e => set("pesoTotalKg", e.target.value)} placeholder="0.00" />
-            </FormField>
+          {/* Category rows */}
+          <div className="space-y-3 mb-4">
+            {form.categorias.map((row, idx) => (
+              <div key={row._key} className="bg-[#0d0e14] border border-white/[0.04] rounded-lg p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] text-slate-500 font-medium">Categoría {idx + 1}</span>
+                  {form.categorias.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeCatRow(idx)}
+                      className="text-red-400 hover:text-red-300 text-[10px] transition-colors"
+                    >
+                      ✕ Quitar
+                    </button>
+                  )}
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="col-span-3 sm:col-span-1">
+                    <select
+                      className={smallInputClass}
+                      value={row.categoriaId}
+                      onChange={e => setCatRow(idx, "categoriaId", e.target.value)}
+                    >
+                      <option value="">Categoría...</option>
+                      {allCategorias.map(c => (
+                        <option
+                          key={c.id}
+                          value={c.id}
+                          disabled={usedCatIds.has(c.id) && c.id !== row.categoriaId}
+                        >
+                          {c.codigo} — {c.nombre}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <input
+                      className={smallInputClass}
+                      type="number"
+                      min="1"
+                      value={row.cantidad}
+                      onChange={e => setCatRow(idx, "cantidad", e.target.value)}
+                      placeholder="Cantidad"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      className={smallInputClass}
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={row.pesoKg}
+                      onChange={e => setCatRow(idx, "pesoKg", e.target.value)}
+                      placeholder="Peso kg"
+                    />
+                  </div>
+                </div>
+                {/* Per-row peso promedio */}
+                {Number(row.cantidad) > 0 && Number(row.pesoKg) > 0 && (
+                  <div className="text-[10px] text-slate-500 mt-1.5">
+                    Promedio: {(Number(row.pesoKg) / Number(row.cantidad)).toFixed(1)} kg/cab
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
 
-          {pesoPromedio !== "—" && (
-            <div className="text-xs text-slate-400 mb-4 -mt-2">
-              Peso promedio: <span className="text-white font-medium">{pesoPromedio} kg/cab</span>
+          {/* Add category button */}
+          {form.categorias.length < 6 && (
+            <button
+              type="button"
+              onClick={addCatRow}
+              className="text-xs text-[#C8A03A] hover:text-[#b8922f] transition-colors mb-4"
+            >
+              + Agregar otra categoría
+            </button>
+          )}
+
+          {/* Totals summary */}
+          {totalCabezas > 0 && (
+            <div className="bg-[#0d0e14] border border-[#C8A03A]/20 rounded-lg p-3 mb-4">
+              <div className="flex items-center gap-4 text-xs">
+                <div>
+                  <span className="text-slate-500">Total cabezas: </span>
+                  <span className="text-white font-bold">{totalCabezas}</span>
+                </div>
+                {totalPesoKg > 0 && (
+                  <>
+                    <div>
+                      <span className="text-slate-500">Peso total: </span>
+                      <span className="text-white font-medium">{totalPesoKg.toLocaleString("es-PY")} kg</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-500">Promedio: </span>
+                      <span className="text-white font-medium">{(totalPesoKg / totalCabezas).toFixed(1)} kg/cab</span>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           )}
 
@@ -312,10 +435,24 @@ export default function NuevoMovimientoForm({ onCancel, onCreated }) {
             <ReviewRow label="Origen" value={origenName} />
             <ReviewRow label="Destino" value={destinoName} />
             <div className="border-t border-white/[0.04] my-2" />
-            <ReviewRow label="Categoría" value={categoriaName} />
-            <ReviewRow label="Cantidad" value={`${form.cantidad} cabezas`} highlight />
-            {form.pesoTotalKg && <ReviewRow label="Peso Total" value={`${form.pesoTotalKg} kg`} />}
-            {pesoPromedio !== "—" && <ReviewRow label="Peso Promedio" value={`${pesoPromedio} kg/cab`} />}
+
+            {/* Category rows review */}
+            <div className="text-xs text-slate-500 font-medium mb-1">Categorías</div>
+            {form.categorias.filter(r => r.categoriaId && Number(r.cantidad) > 0).map((row, idx) => {
+              const cat = allCategorias.find(c => c.id === row.categoriaId);
+              return (
+                <div key={row._key} className="flex items-center justify-between text-sm bg-[#0d0e14] rounded-lg px-3 py-2">
+                  <span className="text-slate-300">{cat?.codigo} — {cat?.nombre}</span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-white font-semibold">{row.cantidad} cab.</span>
+                    {Number(row.pesoKg) > 0 && <span className="text-slate-400 text-xs">{row.pesoKg} kg</span>}
+                  </div>
+                </div>
+              );
+            })}
+            <ReviewRow label="Total Cabezas" value={`${totalCabezas} cabezas`} highlight />
+            {totalPesoKg > 0 && <ReviewRow label="Peso Total" value={`${totalPesoKg.toLocaleString("es-PY")} kg`} />}
+
             <div className="border-t border-white/[0.04] my-2" />
             {form.nroGuia && <ReviewRow label="Nro. Guía" value={form.nroGuia} />}
             {form.nroCota && <ReviewRow label="Nro. COTA" value={form.nroCota} />}

@@ -60,7 +60,7 @@ export default function MovimientosScreen({ onBack, onNavigate }) {
   const kpis = useMemo(() => {
     const porValidar = movimientos.filter(m => m.estado === "borrador" || m.estado === "pendiente_validacion").length;
     const enTransito = movimientos.filter(m => m.estado === "en_transito").length;
-    const totalCabezas = movimientos.reduce((sum, m) => sum + (m.cantidad || 0), 0);
+    const totalCabezas = movimientos.reduce((sum, m) => sum + (m.cantidadTotal || 0), 0);
     const totalGs = movimientos
       .filter(m => m.moneda === "PYG" && m.estado !== "anulado")
       .reduce((sum, m) => sum + (m.precioTotal || 0), 0);
