@@ -24,7 +24,7 @@ INSERT INTO establishments (name, email) VALUES
   ('Estancia Ypoti', 'ypoti@ypoti.com'),
   ('Estancia Cerro Memby', 'cerromemby@ypoti.com'),
   ('Estancia Lusipar', 'lusipar@ypoti.com'),
-  ('Estancia Santa Clara', 'santaclara@ypoti.com'),
+  ('Santa Clara', 'santaclara@ypoti.com'),
   ('Estancia Cielo Azul', 'cieloazul@ypoti.com'),
   ('Estancia Ybyporã', 'ybypara@ypoti.com')
 ON CONFLICT (email) DO UPDATE SET

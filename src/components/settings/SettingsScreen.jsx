@@ -1,3 +1,4 @@
+import { Users, DollarSign, Settings, RefreshCw } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { ROLES } from "../../constants/users";
 import BackButton from "../common/BackButton";
@@ -73,16 +74,16 @@ export default function SettingsScreen({ onBack, onNavigate, devMode, onSetDevMo
               Administración
             </div>
             {can("manage_users") && (
-              <AdminButton icon="👥" label="Gestión de Usuarios" onClick={() => onNavigate("users")} />
+              <AdminButton icon={<Users size={16} />} label="Gestión de Usuarios" onClick={() => onNavigate("users")} />
             )}
             {can("view_analytics") && (
-              <AdminButton icon="💰" label="Gestión de Presupuestos" onClick={() => onNavigate("budgets")} />
+              <AdminButton icon={<DollarSign size={16} />} label="Gestión de Presupuestos" onClick={() => onNavigate("budgets")} />
             )}
             {can("manage_settings") && (
-              <AdminButton icon="⚙" label="Parámetros del Sistema" onClick={() => onNavigate("parameters")} />
+              <AdminButton icon={<Settings size={16} />} label="Parámetros del Sistema" onClick={() => onNavigate("parameters")} />
             )}
             {can("manage_settings") && (
-              <AdminButton icon="🔄" label="Autorización y Aprobación" onClick={() => onNavigate("approvalConfig")} />
+              <AdminButton icon={<RefreshCw size={16} />} label="Autorización y Aprobación" onClick={() => onNavigate("approvalConfig")} />
             )}
             <button
               onClick={() => {

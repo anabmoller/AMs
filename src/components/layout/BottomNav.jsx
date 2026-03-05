@@ -1,12 +1,17 @@
 /**
  * Mobile bottom navigation — dark mode
+ * Icons: lucide-react
  */
+import { LayoutDashboard, Package, BarChart3, Settings, Plus } from "lucide-react";
+
+const ICON_SIZE = 20;
+
 export default function BottomNav({ screen, onNavigate, onNewRequest }) {
   const items = [
-    { key: 'panel', icon: '🏠', label: 'Panel' },
-    { key: 'inventory', icon: '📦', label: 'Catálogo' },
-    { key: 'analytics', icon: '📊', label: 'Análisis' },
-    { key: 'settings', icon: '⚙️', label: 'Config' },
+    { key: 'panel', icon: <LayoutDashboard size={ICON_SIZE} />, label: 'Panel' },
+    { key: 'inventory', icon: <Package size={ICON_SIZE} />, label: 'Inventario' },
+    { key: 'analytics', icon: <BarChart3 size={ICON_SIZE} />, label: 'Análisis' },
+    { key: 'settings', icon: <Settings size={ICON_SIZE} />, label: 'Config' },
   ];
 
   return (
@@ -18,12 +23,10 @@ export default function BottomNav({ screen, onNavigate, onNewRequest }) {
       {/* Center FAB */}
       <button
         onClick={onNewRequest}
-        className="w-12 h-12 rounded-xl bg-[#1F2A44] flex items-center justify-center border-none cursor-pointer -mt-4 shadow-lg shadow-black/20 active:scale-95 transition-transform"
+        className="w-12 h-12 rounded-xl bg-[#1F2A44] flex items-center justify-center border-none cursor-pointer -mt-4 shadow-lg shadow-black/20 active:scale-95 transition-transform text-white"
         aria-label="Nueva Solicitud"
       >
-        <svg width="22" height="22" viewBox="0 0 20 20" fill="#fff">
-          <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd"/>
-        </svg>
+        <Plus size={22} />
       </button>
 
       {items.slice(2).map(item => (
@@ -39,7 +42,7 @@ function NavBtn({ item, active, onClick }) {
       onClick={onClick}
       className="bg-transparent border-none flex flex-col items-center gap-0.5 cursor-pointer px-3 py-1"
     >
-      <span className={`text-lg ${active ? 'opacity-100' : 'opacity-40'}`}>{item.icon}</span>
+      <span className={`${active ? 'text-[#C8A03A]' : 'text-slate-500'}`}>{item.icon}</span>
       <span className={`text-[10px] ${active ? 'font-semibold text-[#C8A03A]' : 'font-normal text-slate-500'}`}>
         {item.label}
       </span>

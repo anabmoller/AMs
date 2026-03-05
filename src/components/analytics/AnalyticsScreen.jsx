@@ -1,4 +1,5 @@
 import { useState, useMemo, lazy, Suspense } from "react";
+import { BarChart3, DollarSign, ClipboardList, TrendingUp, MapPin } from "lucide-react";
 import { PRIORITY_LEVELS } from "../../constants";
 import { formatGuaranies, getBudgets } from "../../constants/budgets";
 import KPICard from "../common/KPICard";
@@ -6,14 +7,14 @@ import KPICard from "../common/KPICard";
 const StrategicAnalysis = lazy(() => import("../analysis/AnalysisScreen.jsx"));
 
 const TABS = [
-  { key: "overview", label: "Vision General", icon: "📊" },
-  { key: "purchases", label: "Compras", icon: "💰" },
-  { key: "budgets", label: "Presupuestos", icon: "📋" },
+  { key: "overview", label: "Vision General", icon: <BarChart3 size={14} /> },
+  { key: "purchases", label: "Compras", icon: <DollarSign size={14} /> },
+  { key: "budgets", label: "Presupuestos", icon: <ClipboardList size={14} /> },
 ];
 
 const SECTIONS = [
-  { key: "operational", label: "Operativo", icon: "📊" },
-  { key: "strategic", label: "Estratégico Pro", icon: "📈" },
+  { key: "operational", label: "Operativo", icon: <BarChart3 size={14} /> },
+  { key: "strategic", label: "Estratégico Pro", icon: <TrendingUp size={14} /> },
 ];
 
 export default function AnalyticsScreen({ requests, statusCounts, onBack, defaultSection = "operational" }) {
@@ -218,7 +219,7 @@ function PurchasesTab({ stats }) {
         {estEntries.map(([est, data]) => (
           <div key={est} className="mb-2.5">
             <div className="flex justify-between mb-0.5">
-              <span className="text-xs text-white">📍 {est}</span>
+              <span className="text-xs text-white inline-flex items-center gap-1"><MapPin size={12} />{est}</span>
               <div className="flex gap-3">
                 <span className="text-[11px] text-slate-400">{data.count} sol.</span>
                 <span className="text-xs font-semibold text-[#C8A03A]">{formatGuaranies(data.amount)}</span>
@@ -333,7 +334,7 @@ function BudgetsTab() {
         const estPct = estPlanned > 0 ? Math.round((estConsumed / estPlanned) * 100) : 0;
 
         return (
-          <AnalyticsCard key={est} title={`📍 ${est}`} subtitle={`${estPct}% ejecutado`}>
+          <AnalyticsCard key={est} title={<span className="inline-flex items-center gap-1"><MapPin size={12} />{est}</span>} subtitle={`${estPct}% ejecutado`}>
             {estBudgets.map(b => {
               const pct = b.planned > 0 ? Math.round((b.consumed / b.planned) * 100) : 0;
               const barColor = pct > 90 ? '#ef4444' : pct > 70 ? '#f59e0b' : '#5B0B14';

@@ -1,4 +1,9 @@
 import { useState, useMemo } from "react";
+import {
+  RefreshCw, DollarSign, Package, AlertTriangle,
+  ShoppingCart, Fuel, CheckCircle, FileText,
+} from "lucide-react";
+import { BullIcon, CornIcon } from "../icons";
 import Card from "../shared/Card";
 import Badge from "../shared/Badge";
 import { ESTABLECIMIENTOS_PROPIOS } from "../../constants/establecimientos";
@@ -24,7 +29,7 @@ const PRIMARY_TILES = [
     key: "operaciones",
     label: "Operaciones activas",
     value: 25,
-    icon: "🔄",
+    icon: <RefreshCw size={18} />,
     color: "#3b82f6",
     subMetrics: [
       { label: "Compras pendientes", value: 12 },
@@ -35,21 +40,21 @@ const PRIMARY_TILES = [
     // Per-establishment mock breakdown (value overrides when filtered)
     byEstab: {
       ypoti:        { value: 8,  subMetrics: [{ label: "Compras pendientes", value: 4 }, { label: "Mov. ganado abiertos", value: 3 }, { label: "Recepciones MP pend.", value: 1 }] },
-      cerro_moimbi: { value: 5,  subMetrics: [{ label: "Compras pendientes", value: 2 }, { label: "Mov. ganado abiertos", value: 2 }, { label: "Recepciones MP pend.", value: 1 }] },
+      cerro_memby: { value: 5,  subMetrics: [{ label: "Compras pendientes", value: 2 }, { label: "Mov. ganado abiertos", value: 2 }, { label: "Recepciones MP pend.", value: 1 }] },
       santa_clara:  { value: 4,  subMetrics: [{ label: "Compras pendientes", value: 2 }, { label: "Mov. ganado abiertos", value: 1 }, { label: "Recepciones MP pend.", value: 1 }] },
-      ouro_verde:   { value: 3,  subMetrics: [{ label: "Compras pendientes", value: 1 }, { label: "Mov. ganado abiertos", value: 1 }, { label: "Recepciones MP pend.", value: 1 }] },
-      serrumbi:     { value: 2,  subMetrics: [{ label: "Compras pendientes", value: 1 }, { label: "Mov. ganado abiertos", value: 1 }, { label: "Recepciones MP pend.", value: 0 }] },
-      ibirora:      { value: 1,  subMetrics: [{ label: "Compras pendientes", value: 1 }, { label: "Mov. ganado abiertos", value: 0 }, { label: "Recepciones MP pend.", value: 0 }] },
-      ibirapita:    { value: 1,  subMetrics: [{ label: "Compras pendientes", value: 1 }, { label: "Mov. ganado abiertos", value: 0 }, { label: "Recepciones MP pend.", value: 0 }] },
-      vila_azul:    { value: 1,  subMetrics: [{ label: "Compras pendientes", value: 0 }, { label: "Mov. ganado abiertos", value: 1 }, { label: "Recepciones MP pend.", value: 0 }] },
-      santa_maria_das_neves: { value: 0, subMetrics: [{ label: "Compras pendientes", value: 0 }, { label: "Mov. ganado abiertos", value: 0 }, { label: "Recepciones MP pend.", value: 0 }] },
+      oro_verde:   { value: 3,  subMetrics: [{ label: "Compras pendientes", value: 1 }, { label: "Mov. ganado abiertos", value: 1 }, { label: "Recepciones MP pend.", value: 1 }] },
+      lusipar:     { value: 2,  subMetrics: [{ label: "Compras pendientes", value: 1 }, { label: "Mov. ganado abiertos", value: 1 }, { label: "Recepciones MP pend.", value: 0 }] },
+      ybypora:      { value: 1,  subMetrics: [{ label: "Compras pendientes", value: 1 }, { label: "Mov. ganado abiertos", value: 0 }, { label: "Recepciones MP pend.", value: 0 }] },
+      yby_pyta:    { value: 1,  subMetrics: [{ label: "Compras pendientes", value: 1 }, { label: "Mov. ganado abiertos", value: 0 }, { label: "Recepciones MP pend.", value: 0 }] },
+      cielo_azul:    { value: 1,  subMetrics: [{ label: "Compras pendientes", value: 0 }, { label: "Mov. ganado abiertos", value: 1 }, { label: "Recepciones MP pend.", value: 0 }] },
+      santa_maria: { value: 0, subMetrics: [{ label: "Compras pendientes", value: 0 }, { label: "Mov. ganado abiertos", value: 0 }, { label: "Recepciones MP pend.", value: 0 }] },
     },
   },
   {
     key: "monto",
     label: "Monto comprometido",
     value: "Gs 847M",
-    icon: "💰",
+    icon: <DollarSign size={18} />,
     color: "#f59e0b",
     subMetrics: [
       { label: "En aprobación", value: "Gs 320M" },
@@ -59,17 +64,17 @@ const PRIMARY_TILES = [
     drillRoute: "dashboard",
     byEstab: {
       ypoti:        { value: "Gs 280M", subMetrics: [{ label: "En aprobación", value: "Gs 95M" }, { label: "En proceso", value: "Gs 140M" }, { label: "Combustible mes", value: "Gs 45M" }] },
-      cerro_moimbi: { value: "Gs 185M", subMetrics: [{ label: "En aprobación", value: "Gs 75M" }, { label: "En proceso", value: "Gs 85M" }, { label: "Combustible mes", value: "Gs 25M" }] },
+      cerro_memby: { value: "Gs 185M", subMetrics: [{ label: "En aprobación", value: "Gs 75M" }, { label: "En proceso", value: "Gs 85M" }, { label: "Combustible mes", value: "Gs 25M" }] },
       santa_clara:  { value: "Gs 142M", subMetrics: [{ label: "En aprobación", value: "Gs 60M" }, { label: "En proceso", value: "Gs 65M" }, { label: "Combustible mes", value: "Gs 17M" }] },
-      ouro_verde:   { value: "Gs 98M",  subMetrics: [{ label: "En aprobación", value: "Gs 40M" }, { label: "En proceso", value: "Gs 48M" }, { label: "Combustible mes", value: "Gs 10M" }] },
-      serrumbi:     { value: "Gs 62M",  subMetrics: [{ label: "En aprobación", value: "Gs 25M" }, { label: "En proceso", value: "Gs 32M" }, { label: "Combustible mes", value: "Gs 5M" }] },
+      oro_verde:   { value: "Gs 98M",  subMetrics: [{ label: "En aprobación", value: "Gs 40M" }, { label: "En proceso", value: "Gs 48M" }, { label: "Combustible mes", value: "Gs 10M" }] },
+      lusipar:     { value: "Gs 62M",  subMetrics: [{ label: "En aprobación", value: "Gs 25M" }, { label: "En proceso", value: "Gs 32M" }, { label: "Combustible mes", value: "Gs 5M" }] },
     },
   },
   {
     key: "inventario",
     label: "Inventario crítico",
     value: 9,
-    icon: "📦",
+    icon: <Package size={18} />,
     color: "#ef4444",
     subMetrics: [
       { label: "Productos críticos", value: 4 },
@@ -79,17 +84,17 @@ const PRIMARY_TILES = [
     drillRoute: "inventory",
     byEstab: {
       ypoti:        { value: 3, subMetrics: [{ label: "Productos críticos", value: 1 }, { label: "Lotes por vencer", value: 1 }, { label: "Sin precio reciente", value: 1 }] },
-      cerro_moimbi: { value: 2, subMetrics: [{ label: "Productos críticos", value: 1 }, { label: "Lotes por vencer", value: 1 }, { label: "Sin precio reciente", value: 0 }] },
+      cerro_memby: { value: 2, subMetrics: [{ label: "Productos críticos", value: 1 }, { label: "Lotes por vencer", value: 1 }, { label: "Sin precio reciente", value: 0 }] },
       santa_clara:  { value: 2, subMetrics: [{ label: "Productos críticos", value: 1 }, { label: "Lotes por vencer", value: 0 }, { label: "Sin precio reciente", value: 1 }] },
-      ouro_verde:   { value: 1, subMetrics: [{ label: "Productos críticos", value: 1 }, { label: "Lotes por vencer", value: 0 }, { label: "Sin precio reciente", value: 0 }] },
-      serrumbi:     { value: 1, subMetrics: [{ label: "Productos críticos", value: 0 }, { label: "Lotes por vencer", value: 1 }, { label: "Sin precio reciente", value: 0 }] },
+      oro_verde:   { value: 1, subMetrics: [{ label: "Productos críticos", value: 1 }, { label: "Lotes por vencer", value: 0 }, { label: "Sin precio reciente", value: 0 }] },
+      lusipar:     { value: 1, subMetrics: [{ label: "Productos críticos", value: 0 }, { label: "Lotes por vencer", value: 1 }, { label: "Sin precio reciente", value: 0 }] },
     },
   },
   {
     key: "alertas",
     label: "Alertas",
     value: 7,
-    icon: "🚨",
+    icon: <AlertTriangle size={18} />,
     color: "#ef4444",
     subMetrics: [
       { label: "Alertas sanitarias", value: 3 },
@@ -99,9 +104,9 @@ const PRIMARY_TILES = [
     drillRoute: "notifications",
     byEstab: {
       ypoti:        { value: 3, subMetrics: [{ label: "Alertas sanitarias", value: 1 }, { label: "Docs pendientes", value: 1 }, { label: "Divergencias", value: 1 }] },
-      cerro_moimbi: { value: 2, subMetrics: [{ label: "Alertas sanitarias", value: 1 }, { label: "Docs pendientes", value: 1 }, { label: "Divergencias", value: 0 }] },
+      cerro_memby: { value: 2, subMetrics: [{ label: "Alertas sanitarias", value: 1 }, { label: "Docs pendientes", value: 1 }, { label: "Divergencias", value: 0 }] },
       santa_clara:  { value: 1, subMetrics: [{ label: "Alertas sanitarias", value: 1 }, { label: "Docs pendientes", value: 0 }, { label: "Divergencias", value: 0 }] },
-      serrumbi:     { value: 1, subMetrics: [{ label: "Alertas sanitarias", value: 0 }, { label: "Docs pendientes", value: 0 }, { label: "Divergencias", value: 1 }] },
+      lusipar:     { value: 1, subMetrics: [{ label: "Alertas sanitarias", value: 0 }, { label: "Docs pendientes", value: 0 }, { label: "Divergencias", value: 1 }] },
     },
   },
 ];
@@ -109,7 +114,7 @@ const PRIMARY_TILES = [
 const AREA_ROWS = [
   {
     key: "compras",
-    icon: "📋",
+    icon: <ShoppingCart size={18} />,
     label: "Compras",
     metrics: [
       { label: "Pendientes", value: 12 },
@@ -119,15 +124,15 @@ const AREA_ROWS = [
     route: "dashboard",
     byEstab: {
       ypoti:        { metrics: [{ label: "Pendientes", value: 4 }, { label: "En proceso", value: 2 }], status: { label: "4 pendientes", variant: "warning" } },
-      cerro_moimbi: { metrics: [{ label: "Pendientes", value: 3 }, { label: "En proceso", value: 1 }], status: { label: "3 pendientes", variant: "warning" } },
+      cerro_memby: { metrics: [{ label: "Pendientes", value: 3 }, { label: "En proceso", value: 1 }], status: { label: "3 pendientes", variant: "warning" } },
       santa_clara:  { metrics: [{ label: "Pendientes", value: 2 }, { label: "En proceso", value: 1 }], status: { label: "2 pendientes", variant: "warning" } },
-      ouro_verde:   { metrics: [{ label: "Pendientes", value: 2 }, { label: "En proceso", value: 1 }], status: { label: "2 pendientes", variant: "warning" } },
-      serrumbi:     { metrics: [{ label: "Pendientes", value: 1 }, { label: "En proceso", value: 0 }], status: { label: "1 pendiente", variant: "default" } },
+      oro_verde:   { metrics: [{ label: "Pendientes", value: 2 }, { label: "En proceso", value: 1 }], status: { label: "2 pendientes", variant: "warning" } },
+      lusipar:     { metrics: [{ label: "Pendientes", value: 1 }, { label: "En proceso", value: 0 }], status: { label: "1 pendiente", variant: "default" } },
     },
   },
   {
     key: "ganado",
-    icon: "🐄",
+    icon: <BullIcon size={18} />,
     label: "Ganado",
     metrics: [
       { label: "Por validar", value: 4 },
@@ -137,13 +142,13 @@ const AREA_ROWS = [
     route: "ganado",
     byEstab: {
       ypoti:        { metrics: [{ label: "Por validar", value: 2 }, { label: "En tránsito", value: 1 }], status: { label: "1 alerta", variant: "danger" } },
-      cerro_moimbi: { metrics: [{ label: "Por validar", value: 1 }, { label: "En tránsito", value: 1 }], status: { label: "1 alerta", variant: "danger" } },
+      cerro_memby: { metrics: [{ label: "Por validar", value: 1 }, { label: "En tránsito", value: 1 }], status: { label: "1 alerta", variant: "danger" } },
       santa_clara:  { metrics: [{ label: "Por validar", value: 1 }, { label: "En tránsito", value: 1 }], status: { label: "1 alerta", variant: "danger" } },
     },
   },
   {
     key: "materia_prima",
-    icon: "🧪",
+    icon: <CornIcon size={18} />,
     label: "Materia Prima",
     metrics: [
       { label: "Lotes activos", value: 15 },
@@ -153,14 +158,14 @@ const AREA_ROWS = [
     route: "materia_prima",
     byEstab: {
       ypoti:        { metrics: [{ label: "Lotes activos", value: 6 }, { label: "Por vencer", value: 1 }], status: { label: "1 por vencer", variant: "warning" } },
-      cerro_moimbi: { metrics: [{ label: "Lotes activos", value: 4 }, { label: "Por vencer", value: 1 }], status: { label: "1 por vencer", variant: "warning" } },
+      cerro_memby: { metrics: [{ label: "Lotes activos", value: 4 }, { label: "Por vencer", value: 1 }], status: { label: "1 por vencer", variant: "warning" } },
       santa_clara:  { metrics: [{ label: "Lotes activos", value: 3 }, { label: "Por vencer", value: 0 }], status: { label: "Normal", variant: "success" } },
-      ouro_verde:   { metrics: [{ label: "Lotes activos", value: 2 }, { label: "Por vencer", value: 0 }], status: { label: "Normal", variant: "success" } },
+      oro_verde:   { metrics: [{ label: "Lotes activos", value: 2 }, { label: "Por vencer", value: 0 }], status: { label: "Normal", variant: "success" } },
     },
   },
   {
     key: "combustible",
-    icon: "⛽",
+    icon: <Fuel size={18} />,
     label: "Combustible",
     metrics: [
       { label: "Consumo (L)", value: "12.450" },
@@ -170,15 +175,15 @@ const AREA_ROWS = [
     route: "combustible",
     byEstab: {
       ypoti:        { metrics: [{ label: "Consumo (L)", value: "4.200" }, { label: "Gasto (Gs)", value: "2.8M" }], status: { label: "Normal", variant: "success" } },
-      cerro_moimbi: { metrics: [{ label: "Consumo (L)", value: "3.100" }, { label: "Gasto (Gs)", value: "2.1M" }], status: { label: "+18%", variant: "warning" } },
+      cerro_memby: { metrics: [{ label: "Consumo (L)", value: "3.100" }, { label: "Gasto (Gs)", value: "2.1M" }], status: { label: "+18%", variant: "warning" } },
       santa_clara:  { metrics: [{ label: "Consumo (L)", value: "2.600" }, { label: "Gasto (Gs)", value: "1.7M" }], status: { label: "Normal", variant: "success" } },
-      ouro_verde:   { metrics: [{ label: "Consumo (L)", value: "1.550" }, { label: "Gasto (Gs)", value: "1.0M" }], status: { label: "Normal", variant: "success" } },
-      serrumbi:     { metrics: [{ label: "Consumo (L)", value: "1.000" }, { label: "Gasto (Gs)", value: "0.6M" }], status: { label: "Normal", variant: "success" } },
+      oro_verde:   { metrics: [{ label: "Consumo (L)", value: "1.550" }, { label: "Gasto (Gs)", value: "1.0M" }], status: { label: "Normal", variant: "success" } },
+      lusipar:     { metrics: [{ label: "Consumo (L)", value: "1.000" }, { label: "Gasto (Gs)", value: "0.6M" }], status: { label: "Normal", variant: "success" } },
     },
   },
   {
     key: "catalogo",
-    icon: "📦",
+    icon: <Package size={18} />,
     label: "Catálogo",
     metrics: [
       { label: "Productos", value: 211 },
@@ -200,22 +205,22 @@ const ACTIVITY_MODULES = [
 ];
 
 const MODULE_META = {
-  compras: { label: "Compras", variant: "info", icon: "📋" },
-  ganado: { label: "Ganado", variant: "purple", icon: "🐄" },
-  catalogo: { label: "Catálogo", variant: "info", icon: "📦" },
-  materia_prima: { label: "Materia Prima", variant: "success", icon: "🧪" },
-  combustible: { label: "Combustible", variant: "warning", icon: "⛽" },
+  compras: { label: "Compras", variant: "info", icon: <ShoppingCart size={14} /> },
+  ganado: { label: "Ganado", variant: "purple", icon: <BullIcon size={14} /> },
+  catalogo: { label: "Catálogo", variant: "info", icon: <Package size={14} /> },
+  materia_prima: { label: "Materia Prima", variant: "success", icon: <CornIcon size={14} /> },
+  combustible: { label: "Combustible", variant: "warning", icon: <Fuel size={14} /> },
 };
 
 const ACTIVITY_FEED = [
-  { id: 1, module: "compras", establecimiento: "ypoti", text: "Solicitud SC-2024-089 aprobada por Gerencia", time: "Hace 15 min", icon: "✅", route: "dashboard" },
-  { id: 2, module: "ganado", establecimiento: "cerro_moimbi", text: "Nuevo movimiento MG-0045 registrado — 120 cabezas", time: "Hace 32 min", icon: "🐄", route: "ganado" },
-  { id: 3, module: "catalogo", establecimiento: null, text: "Nuevo producto registrado: Ivermectina 3.15%", time: "Hace 1 hora", icon: "📦", route: "inventory" },
-  { id: 4, module: "compras", establecimiento: "santa_clara", text: "Cotización recibida de Proveedor ABC", time: "Hace 2 horas", icon: "📄", route: "dashboard" },
-  { id: 5, module: "ganado", establecimiento: "ypoti", text: "Alerta sanitaria: Vacunación pendiente Ypotí", time: "Hace 3 horas", icon: "🚨", route: "ganado" },
-  { id: 6, module: "combustible", establecimiento: "ypoti", text: "Carga de 3.200 L diésel — Ypotí", time: "Hace 5 horas", icon: "⛽", route: "combustible" },
-  { id: 7, module: "materia_prima", establecimiento: "ouro_verde", text: "Lote MP-0412 recibido — Maíz Amarillo 25 ton", time: "Hace 5 horas", icon: "🧪", route: "materia_prima" },
-  { id: 8, module: "combustible", establecimiento: "cerro_moimbi", text: "Alerta: consumo elevado en Cerro Moimbí (+18%)", time: "Hace 6 horas", icon: "🚨", route: "combustible" },
+  { id: 1, module: "compras", establecimiento: "ypoti", text: "Solicitud SC-2024-089 aprobada por Gerencia", time: "Hace 15 min", icon: <CheckCircle size={14} />, route: "dashboard" },
+  { id: 2, module: "ganado", establecimiento: "cerro_memby", text: "Nuevo movimiento MG-0045 registrado — 120 cabezas", time: "Hace 32 min", icon: <BullIcon size={14} />, route: "ganado" },
+  { id: 3, module: "catalogo", establecimiento: null, text: "Nuevo producto registrado: Ivermectina 3.15%", time: "Hace 1 hora", icon: <Package size={14} />, route: "inventory" },
+  { id: 4, module: "compras", establecimiento: "santa_clara", text: "Cotización recibida de Proveedor ABC", time: "Hace 2 horas", icon: <FileText size={14} />, route: "dashboard" },
+  { id: 5, module: "ganado", establecimiento: "ypoti", text: "Alerta sanitaria: Vacunación pendiente Ypoti", time: "Hace 3 horas", icon: <AlertTriangle size={14} />, route: "ganado" },
+  { id: 6, module: "combustible", establecimiento: "ypoti", text: "Carga de 3.200 L diésel — Ypoti", time: "Hace 5 horas", icon: <Fuel size={14} />, route: "combustible" },
+  { id: 7, module: "materia_prima", establecimiento: "oro_verde", text: "Lote MP-0412 recibido — Maíz Amarillo 25 ton", time: "Hace 5 horas", icon: <CornIcon size={14} />, route: "materia_prima" },
+  { id: 8, module: "combustible", establecimiento: "cerro_memby", text: "Alerta: consumo elevado en Cerro Memby (+18%)", time: "Hace 6 horas", icon: <AlertTriangle size={14} />, route: "combustible" },
 ];
 
 /* ── Sub-components ────────────────────────────────────────── */

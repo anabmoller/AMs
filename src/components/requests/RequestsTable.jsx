@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { MapPin } from "lucide-react";
 import { URGENCY_LEVELS } from "../../constants";
 import { formatGuaranies } from "../../constants/budgets";
 import { getStatusDisplay, getPriorityDisplay } from "../../utils/statusHelpers";
@@ -96,7 +97,7 @@ export default function RequestsTable({ requests, onSelectRequest }) {
                     </div>
                   </td>
                   <td className="px-3.5 py-2.5 text-white text-xs">
-                    📍 {r.establishment}
+                    <span className="inline-flex items-center gap-1"><MapPin size={12} />{r.establishment}</span>
                   </td>
                   <td className="px-3.5 py-2.5 text-slate-400 text-xs">
                     {r.requester}

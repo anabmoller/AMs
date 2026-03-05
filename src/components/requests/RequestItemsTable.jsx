@@ -2,6 +2,7 @@
 // RequestItemsTable — Items list with pricing, totals, add/remove
 // Extracted from RequestDetail.jsx
 // ============================================================
+import { Trash2 } from "lucide-react";
 import { formatGuaranies } from "../../constants/budgets";
 
 function SectionTitle({ children, count }) {
@@ -71,7 +72,7 @@ export default function RequestItemsTable({
                     onClick={() => onRemoveItem(idx)}
                     className="bg-transparent border-none text-sm cursor-pointer p-1 text-red-400 mt-0.5"
                   >
-                    🗑
+                    <Trash2 size={14} />
                   </button>
                 )}
               </div>

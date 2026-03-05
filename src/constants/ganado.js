@@ -9,16 +9,16 @@ import { invokeEdgeFunction } from "../lib/queries";
 
 // ---- Status flow ----
 export const GANADO_STATUS_FLOW = [
-  { key: "borrador",               label: "Borrador",       color: "#64748b", icon: "📝" },
-  { key: "pendiente_validacion",    label: "Pend. Validación", color: "#f59e0b", icon: "⏳" },
-  { key: "validado",               label: "Validado",       color: "#3b82f6", icon: "✅" },
-  { key: "en_transito",            label: "En Tránsito",    color: "#8b5cf6", icon: "🚚" },
-  { key: "recibido",               label: "Recibido",       color: "#10b981", icon: "📥" },
-  { key: "cerrado",                label: "Cerrado",        color: "#1e293b", icon: "🔒" },
+  { key: "borrador",               label: "Borrador",       color: "#64748b", icon: "✎" },
+  { key: "pendiente_validacion",    label: "Pend. Validación", color: "#f59e0b", icon: "◷" },
+  { key: "validado",               label: "Validado",       color: "#3b82f6", icon: "✓" },
+  { key: "en_transito",            label: "En Tránsito",    color: "#8b5cf6", icon: "⇢" },
+  { key: "recibido",               label: "Recibido",       color: "#10b981", icon: "↓" },
+  { key: "cerrado",                label: "Cerrado",        color: "#1e293b", icon: "▣" },
 ];
 
 export const GANADO_EXTRA_STATUSES = [
-  { key: "anulado", label: "Anulado", color: "#ef4444", icon: "❌" },
+  { key: "anulado", label: "Anulado", color: "#ef4444", icon: "✗" },
 ];
 
 export const FINALIDAD_OPTIONS = [

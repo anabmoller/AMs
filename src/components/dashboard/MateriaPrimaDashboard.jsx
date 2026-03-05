@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { Package, AlertTriangle, Scale, DollarSign, Building2, CheckCircle2, ClipboardList } from "lucide-react";
 import Card from "../shared/Card";
 import Badge from "../shared/Badge";
 import PageHeader from "../common/PageHeader";
@@ -8,22 +9,22 @@ import { ESTABLECIMIENTOS_PROPIOS } from "../../constants/establecimientos";
 
 const KPI_DATA = {
   todos: [
-    { key: "lotes_activos", label: "Lotes Activos", value: 15, icon: "📦", color: "#3b82f6" },
-    { key: "por_vencer", label: "Por Vencer", value: 2, icon: "⚠️", color: "#f59e0b" },
-    { key: "toneladas", label: "Toneladas", value: "342", icon: "⚖️", color: "#8b5cf6" },
-    { key: "gasto_mes", label: "Gasto Mes (Gs)", value: "48.5M", icon: "💰", color: "#C8A03A" },
+    { key: "lotes_activos", label: "Lotes Activos", value: 15, icon: <Package size={18} />, color: "#3b82f6" },
+    { key: "por_vencer", label: "Por Vencer", value: 2, icon: <AlertTriangle size={18} />, color: "#f59e0b" },
+    { key: "toneladas", label: "Toneladas", value: "342", icon: <Scale size={18} />, color: "#8b5cf6" },
+    { key: "gasto_mes", label: "Gasto Mes (Gs)", value: "48.5M", icon: <DollarSign size={18} />, color: "#C8A03A" },
   ],
   ypoti: [
-    { key: "lotes_activos", label: "Lotes Activos", value: 6, icon: "📦", color: "#3b82f6" },
-    { key: "por_vencer", label: "Por Vencer", value: 1, icon: "⚠️", color: "#f59e0b" },
-    { key: "toneladas", label: "Toneladas", value: "128", icon: "⚖️", color: "#8b5cf6" },
-    { key: "gasto_mes", label: "Gasto Mes (Gs)", value: "18.2M", icon: "💰", color: "#C8A03A" },
+    { key: "lotes_activos", label: "Lotes Activos", value: 6, icon: <Package size={18} />, color: "#3b82f6" },
+    { key: "por_vencer", label: "Por Vencer", value: 1, icon: <AlertTriangle size={18} />, color: "#f59e0b" },
+    { key: "toneladas", label: "Toneladas", value: "128", icon: <Scale size={18} />, color: "#8b5cf6" },
+    { key: "gasto_mes", label: "Gasto Mes (Gs)", value: "18.2M", icon: <DollarSign size={18} />, color: "#C8A03A" },
   ],
-  cerro_moimbi: [
-    { key: "lotes_activos", label: "Lotes Activos", value: 4, icon: "📦", color: "#3b82f6" },
-    { key: "por_vencer", label: "Por Vencer", value: 1, icon: "⚠️", color: "#f59e0b" },
-    { key: "toneladas", label: "Toneladas", value: "95", icon: "⚖️", color: "#8b5cf6" },
-    { key: "gasto_mes", label: "Gasto Mes (Gs)", value: "14.1M", icon: "💰", color: "#C8A03A" },
+  cerro_memby: [
+    { key: "lotes_activos", label: "Lotes Activos", value: 4, icon: <Package size={18} />, color: "#3b82f6" },
+    { key: "por_vencer", label: "Por Vencer", value: 1, icon: <AlertTriangle size={18} />, color: "#f59e0b" },
+    { key: "toneladas", label: "Toneladas", value: "95", icon: <Scale size={18} />, color: "#8b5cf6" },
+    { key: "gasto_mes", label: "Gasto Mes (Gs)", value: "14.1M", icon: <DollarSign size={18} />, color: "#C8A03A" },
   ],
 };
 
@@ -35,11 +36,11 @@ const PROVIDERS = [
 ];
 
 const RECENT_ACTIVITY = [
-  { id: 1, text: "Lote MP-0412 recibido — Maíz Amarillo 25 ton", time: "Hace 5 horas", icon: "📦", estab: "ouro_verde" },
-  { id: 2, text: "Lote MP-0410 por vencer — Sal Mineral (15 Mar)", time: "Hace 1 día", icon: "⚠️", estab: "ypoti" },
-  { id: 3, text: "Recepción confirmada — Heno de Alfalfa 12 ton", time: "Hace 2 días", icon: "✅", estab: "cerro_moimbi" },
-  { id: 4, text: "Nuevo pedido generado — Silo de Maíz 40 ton", time: "Hace 3 días", icon: "📋", estab: "ypoti" },
-  { id: 5, text: "Alerta: stock bajo Sal Mineral en Santa Clara", time: "Hace 3 días", icon: "🚨", estab: "santa_clara" },
+  { id: 1, text: "Lote MP-0412 recibido — Maíz Amarillo 25 ton", time: "Hace 5 horas", icon: <Package size={14} />, estab: "oro_verde" },
+  { id: 2, text: "Lote MP-0410 por vencer — Sal Mineral (15 Mar)", time: "Hace 1 día", icon: <AlertTriangle size={14} />, estab: "ypoti" },
+  { id: 3, text: "Recepción confirmada — Heno de Alfalfa 12 ton", time: "Hace 2 días", icon: <CheckCircle2 size={14} />, estab: "cerro_memby" },
+  { id: 4, text: "Nuevo pedido generado — Silo de Maíz 40 ton", time: "Hace 3 días", icon: <ClipboardList size={14} />, estab: "ypoti" },
+  { id: 5, text: "Alerta: stock bajo Sal Mineral en Santa Clara", time: "Hace 3 días", icon: <AlertTriangle size={14} />, estab: "santa_clara" },
 ];
 
 /* ── Sub-components ─────────────────────────────────────────── */
@@ -61,7 +62,7 @@ function KpiCard({ label, value, icon, color }) {
 function ProviderRow({ provider }) {
   return (
     <div className="flex items-center gap-3 px-4 py-3 hover:bg-[#F8F9FB]/[0.04] transition-colors">
-      <span className="text-lg shrink-0">🏢</span>
+      <span className="shrink-0"><Building2 size={18} /></span>
       <div className="flex-1 min-w-0">
         <div className="text-[13px] font-semibold text-white truncate">{provider.name}</div>
         <div className="text-[11px] text-slate-500">{provider.items} productos · Última entrega: {provider.lastDelivery}</div>

@@ -1,4 +1,5 @@
 import { useState, useRef, useMemo } from "react";
+import { FileText, Paperclip, AlertTriangle } from "lucide-react";
 import { FULL_SUPPLIER_CATALOG } from "../../constants/catalogs";
 
 // ---- Supplier autocomplete hook ----
@@ -194,8 +195,8 @@ export default function QuotationAddForm({ items, currency: initCurrency, onAdd,
                   if (!entered || !avg) return null;
                   const pct = ((entered - avg) / avg) * 100;
                   if (pct > 5) return (
-                    <div className="w-full text-[10px] text-amber-400 font-medium px-3 pb-1">
-                      ⚠ Precio {pct.toFixed(0)}% sobre promedio catálogo ({avg.toLocaleString()})
+                    <div className="w-full text-[10px] text-amber-400 font-medium px-3 pb-1 flex items-center gap-1">
+                      <AlertTriangle size={10} /> Precio {pct.toFixed(0)}% sobre promedio catálogo ({avg.toLocaleString()})
                     </div>
                   );
                   return null;
@@ -254,7 +255,7 @@ export default function QuotationAddForm({ items, currency: initCurrency, onAdd,
               {attachment.type.startsWith("image/") ? (
                 <img src={attachment.data} alt="" className="w-10 h-10 object-cover rounded" />
               ) : (
-                <div className="w-10 h-10 bg-red-500/[0.08] rounded flex items-center justify-center text-lg">{"📄"}</div>
+                <div className="w-10 h-10 bg-red-500/[0.08] rounded flex items-center justify-center"><FileText size={20} className="text-red-400" /></div>
               )}
               <div className="flex-1 min-w-0">
                 <div className="text-xs text-white truncate">{attachment.name}</div>
@@ -272,7 +273,7 @@ export default function QuotationAddForm({ items, currency: initCurrency, onAdd,
               onClick={() => fileRef.current?.click()}
               className="w-full py-2.5 rounded-lg border border-dashed border-white/[0.12] bg-[#F8F9FB]/[0.02] text-xs text-slate-400 cursor-pointer"
             >
-              {"📎"} Seleccionar archivo
+              <Paperclip size={14} className="inline mr-1" /> Seleccionar archivo
             </button>
           )}
         </div>

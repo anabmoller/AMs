@@ -19,7 +19,7 @@
 -- Mapeo basado en datos de GUIAS_ACTUALIZADAS:
 --   ESTANCIA YPOTI → cod_establecimiento: 0103780002
 --   ESTANCIA LUSIPAR → cod_establecimiento: 0210150003
---   ESTANCIA SANTA CLARA → cod_establecimiento: 0210150007 (estimado)
+--   Santa Clara → cod_establecimiento: 0210150007 (estimado)
 --   CERRO MEMBY → cod_establecimiento: 0210150010 (estimado)
 --   CIELO AZUL → determinado por datos de reconciliación
 --   YBY PORÃ → determinado por datos de pesaje

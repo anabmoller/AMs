@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+import { MapPin, Tag, Package, Store, Building2, Search } from "lucide-react";
 import {
   getParameters, addParameterItem, updateParameterItem,
   toggleParameterItem, initParameters,
@@ -9,11 +10,11 @@ import ParameterItemList from "./ParameterItemList";
 import EntityDetailModal from "./EntityDetailModal";
 
 const TABS = [
-  { key: "establishments", label: "Establecimientos", icon: "📍" },
-  { key: "sectors", label: "Sectores", icon: "🏷" },
-  { key: "productTypes", label: "Tipos Producto", icon: "📦" },
-  { key: "suppliers", label: "Proveedores", icon: "🏪" },
-  { key: "companies", label: "Empresas", icon: "🏢" },
+  { key: "establishments", label: "Establecimientos", icon: <MapPin size={14} /> },
+  { key: "sectors", label: "Sectores", icon: <Tag size={14} /> },
+  { key: "productTypes", label: "Tipos Producto", icon: <Package size={14} /> },
+  { key: "suppliers", label: "Proveedores", icon: <Store size={14} /> },
+  { key: "companies", label: "Empresas", icon: <Building2 size={14} /> },
 ];
 
 function formatName(raw) {
@@ -199,7 +200,7 @@ export default function ParametersScreen({ onBack }) {
         {/* Search + Add */}
         <div className="flex gap-2 mb-3">
           <div className="flex-1 flex items-center gap-2 bg-[#F8F9FB]/[0.03] border border-white/[0.06] rounded-xl px-3 py-2">
-            <span className="text-sm opacity-40">{"🔍"}</span>
+            <span className="text-sm opacity-40"><Search size={14} /></span>
             <input
               placeholder="Buscar..."
               value={search}

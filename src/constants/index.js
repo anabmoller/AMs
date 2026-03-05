@@ -17,21 +17,21 @@ export const URGENCY_LEVELS = PRIORITY_LEVELS;
 
 // ---- Status Flow — 9 lifecycle states (MEGA_PROMPT spec) ----
 export const STATUS_FLOW = [
-  { key: "borrador", label: "Borrador", color: "#6b7994", colorLight: "#F3F4F6", icon: "📝", step: 0 },
-  { key: "pend_autorizacion", label: "Pend. Autorización", color: "#c8922a", colorLight: "#FFFBEB", icon: "👤", step: 1 },
-  { key: "autorizado", label: "Autorizado", color: "#3a7fd4", colorLight: "#EFF6FF", icon: "✅", step: 2 },
-  { key: "en_cotizacion", label: "En Cotización", color: "#7c6bb5", colorLight: "#F5F3FF", icon: "💰", step: 3 },
-  { key: "pend_aprobacion", label: "Pend. Aprobación", color: "#f59e0b", colorLight: "#FFFBEB", icon: "📋", step: 4 },
-  { key: "aprobado", label: "Aprobado", color: "#5B0B14", colorLight: "#FDF5F5", icon: "✔", step: 5 },
-  { key: "orden_compra", label: "Orden de Compra", color: "#2a8c6d", colorLight: "#FDF5F5", icon: "📦", step: 6 },
-  { key: "recibido", label: "Recibido", color: "#4a9c6d", colorLight: "#FDF5F5", icon: "📥", step: 7 },
-  { key: "sap", label: "Registrado SAP", color: "#1a6b4a", colorLight: "#E8F5EE", icon: "🏁", step: 8 },
+  { key: "borrador", label: "Borrador", color: "#6b7994", colorLight: "#F3F4F6", icon: "✎", step: 0 },
+  { key: "pend_autorizacion", label: "Pend. Autorización", color: "#c8922a", colorLight: "#FFFBEB", icon: "◷", step: 1 },
+  { key: "autorizado", label: "Autorizado", color: "#3a7fd4", colorLight: "#EFF6FF", icon: "✓", step: 2 },
+  { key: "en_cotizacion", label: "En Cotización", color: "#7c6bb5", colorLight: "#F5F3FF", icon: "$", step: 3 },
+  { key: "pend_aprobacion", label: "Pend. Aprobación", color: "#f59e0b", colorLight: "#FFFBEB", icon: "≡", step: 4 },
+  { key: "aprobado", label: "Aprobado", color: "#5B0B14", colorLight: "#FDF5F5", icon: "✓", step: 5 },
+  { key: "orden_compra", label: "Orden de Compra", color: "#2a8c6d", colorLight: "#FDF5F5", icon: "▣", step: 6 },
+  { key: "recibido", label: "Recibido", color: "#4a9c6d", colorLight: "#FDF5F5", icon: "↓", step: 7 },
+  { key: "sap", label: "Registrado SAP", color: "#1a6b4a", colorLight: "#E8F5EE", icon: "◆", step: 8 },
 ];
 
 // Extra statuses
 export const EXTRA_STATUSES = [
-  { key: "rechazado", label: "Rechazado", color: "#DC2626", colorLight: "#FEF2F2", icon: "❌" },
-  { key: "cancelado", label: "Cancelado", color: "#6B7280", colorLight: "#F3F4F6", icon: "🚫" },
+  { key: "rechazado", label: "Rechazado", color: "#DC2626", colorLight: "#FEF2F2", icon: "✗" },
+  { key: "cancelado", label: "Cancelado", color: "#6B7280", colorLight: "#F3F4F6", icon: "⊘" },
 ];
 
 // ---- Master catalog group colors (6 categories + fallback) ----

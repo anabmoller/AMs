@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { BullIcon } from "../icons";
 import { useAuth } from "../../context/AuthContext";
 import { hasPermission } from "../../constants/users";
 import { getEstablishments, getCompanies } from "../../constants/parameters";
@@ -239,8 +240,8 @@ export default function MovimientoDetail({ movimientoUuid, onBack, onNavigate })
     return (
       <div className="max-w-4xl mx-auto px-4 py-6">
         <div className="text-center py-16">
-          <div className="w-8 h-8 rounded-lg bg-[#1F2A44] inline-flex items-center justify-center shadow-lg shadow-black/20 animate-pulse mb-3">
-            <span className="text-white text-sm font-bold">🐄</span>
+          <div className="w-8 h-8 rounded-lg bg-[#1F2A44] inline-flex items-center justify-center shadow-lg shadow-black/20 animate-pulse mb-3 text-white">
+            <BullIcon size={16} />
           </div>
           <p className="text-slate-500 text-sm">Cargando movimiento...</p>
         </div>

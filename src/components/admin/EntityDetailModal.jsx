@@ -1,3 +1,5 @@
+import { BarChart3, Package, ClipboardList, Factory } from "lucide-react";
+import { BullIcon } from "../icons";
 import { TIPO_ENTIDAD_LABELS, REGIMEN_CONTROL_LABELS } from "../../constants/establecimientos";
 
 const BADGE_COLORS = {
@@ -123,33 +125,33 @@ export default function EntityDetailModal({ item, onClose, onEdit }) {
               {tipo === "establecimiento" ? (
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-base">{"📊"}</span>
+                    <span className="text-base text-slate-400"><BarChart3 size={16} /></span>
                     <span>Panel General &rarr; ver indicadores de este establecimiento</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-base">{"🐄"}</span>
+                    <span className="text-base text-slate-400"><BullIcon size={16} /></span>
                     <span>Ganado &rarr; movimientos desde/hacia este establecimiento</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-base">{"📦"}</span>
+                    <span className="text-base text-slate-400"><Package size={16} /></span>
                     <span>Inventario &rarr; stock actual en este establecimiento</span>
                   </div>
                 </div>
               ) : tipo === "proveedor_ganado" ? (
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-base">{"🐄"}</span>
+                    <span className="text-base text-slate-400"><BullIcon size={16} /></span>
                     <span>Ganado &rarr; compras realizadas a este proveedor</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-base">{"📋"}</span>
+                    <span className="text-base text-slate-400"><ClipboardList size={16} /></span>
                     <span>Gu\u00edas SENACSA &rarr; documentos de este origen</span>
                   </div>
                 </div>
               ) : tipo === "industria" ? (
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-base">{"🏭"}</span>
+                    <span className="text-base text-slate-400"><Factory size={16} /></span>
                     <span>Ganado &rarr; ventas y env\u00edos a esta industria</span>
                   </div>
                 </div>

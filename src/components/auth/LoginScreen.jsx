@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 export default function LoginScreen() {
@@ -82,7 +83,7 @@ export default function LoginScreen() {
                   className="absolute right-0.5 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer px-2.5 py-2 text-sm text-slate-500"
                   tabIndex={-1}
                 >
-                  {showPassword ? "🙈" : "👁"}
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
             </div>

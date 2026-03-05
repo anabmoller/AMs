@@ -5,6 +5,7 @@
 // ============================================================
 import { STATUS_FLOW } from "../../constants";
 import { fmtDate, fmtDateTime } from "../../utils/dateFormatters";
+import { Send, CheckCircle, XCircle, RotateCcw, ArrowRight, Ban } from "lucide-react";
 
 
 function SectionTitle({ children, count, collapsed, onToggle }) {
@@ -56,12 +57,12 @@ export default function RequestTimeline({
           <div className={showTrazabilidad ? 'mb-2' : ''}>
             {(showTrazabilidad ? r.approvalHistory : r.approvalHistory.slice(-3)).map((entry, i) => {
               const actionStyles = {
-                confirmed: { icon: "📤", color: "#3b82f6", label: "Confirmada" },
-                approved: { icon: "✅", color: "#22c55e", label: "Aprobada" },
-                rejected: { icon: "❌", color: "#ef4444", label: "Rechazada" },
-                revision: { icon: "↩", color: "#f59e0b", label: "Devuelta" },
-                advanced: { icon: "→", color: "#5B0B14", label: "Avanzada" },
-                cancelled: { icon: "🚫", color: "#ef4444", label: "Cancelada" },
+                confirmed: { icon: <Send size={14} />, color: "#3b82f6", label: "Confirmada" },
+                approved: { icon: <CheckCircle size={14} />, color: "#22c55e", label: "Aprobada" },
+                rejected: { icon: <XCircle size={14} />, color: "#ef4444", label: "Rechazada" },
+                revision: { icon: <RotateCcw size={14} />, color: "#f59e0b", label: "Devuelta" },
+                advanced: { icon: <ArrowRight size={14} />, color: "#5B0B14", label: "Avanzada" },
+                cancelled: { icon: <Ban size={14} />, color: "#ef4444", label: "Cancelada" },
               };
               const a = actionStyles[entry.action] || { icon: "•", color: "#94a3b8", label: entry.action };
               return (

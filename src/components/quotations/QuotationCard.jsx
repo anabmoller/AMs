@@ -1,3 +1,5 @@
+import { Image, FileText } from "lucide-react";
+
 export default function QuotationCard({
   quotation, cheapest, bestItemPrices, onSelect, onRemove,
 }) {
@@ -95,7 +97,7 @@ export default function QuotationCard({
               : 'text-slate-500 bg-[#F8F9FB]/[0.02] cursor-default'
           }`}
         >
-          {q.attachment.type?.startsWith("image/") ? "🖼" : "📄"} {q.attachment.name}
+          {q.attachment.type?.startsWith("image/") ? <Image size={14} className="inline" /> : <FileText size={14} className="inline" />} {q.attachment.name}
           <span className="text-[10px] text-slate-500 ml-auto">
             {q.attachment.data || q.attachment.url ? "Abrir ↗" : "Sin archivo"}
           </span>

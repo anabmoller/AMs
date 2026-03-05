@@ -1,4 +1,5 @@
 import { ROLES } from "../../constants/users";
+import { Pencil, Ban, CheckCircle2 } from "lucide-react";
 
 export default function UserCard({ user, onEdit, onToggleActive, disabled }) {
   const role = ROLES[user.role];
@@ -45,7 +46,7 @@ export default function UserCard({ user, onEdit, onToggleActive, disabled }) {
           className="w-8 h-8 rounded-lg border-none bg-[#F8F9FB]/[0.02] cursor-pointer flex items-center justify-center text-sm"
           title="Editar"
         >
-          ✏
+          <Pencil size={14} />
         </button>
         <button
           onClick={onToggleActive}
@@ -53,7 +54,7 @@ export default function UserCard({ user, onEdit, onToggleActive, disabled }) {
           className={`w-8 h-8 rounded-lg border-none cursor-pointer flex items-center justify-center text-sm ${isActive ? 'bg-red-500/[0.06]' : 'bg-green-500/[0.06]'}`}
           title={isActive ? "Desactivar" : "Activar"}
         >
-          {isActive ? "🚫" : "✅"}
+          {isActive ? <Ban size={14} className="text-red-400" /> : <CheckCircle2 size={14} className="text-green-400" />}
         </button>
       </div>
     </div>

@@ -8,6 +8,8 @@ import {
   fetchMovimientos,
   fetchGanadoMetrics,
 } from "../../constants/ganado";
+import { Clock, Truck, DollarSign } from "lucide-react";
+import { BullIcon } from "../icons";
 import PageHeader from "../common/PageHeader";
 import SearchInput from "../common/SearchInput";
 import MovimientoCard from "./MovimientoCard";
@@ -157,13 +159,13 @@ export default function MovimientosScreen({ onBack, onNavigate }) {
 
       {/* KPI cards */}
       <div className="flex gap-3 overflow-x-auto pb-2 mb-6 scrollbar-hide">
-        <KpiCard label="Por Validar" value={kpis.porValidar} icon="⏳" color="#f59e0b" loading={metricsLoading} />
-        <KpiCard label="En Tránsito" value={kpis.enTransito} icon="🚚" color="#8b5cf6" loading={metricsLoading} />
-        <KpiCard label="Total Cabezas" value={kpis.totalCabezas.toLocaleString("es-PY")} icon="🐄" color="#3b82f6" loading={metricsLoading} />
+        <KpiCard label="Por Validar" value={kpis.porValidar} icon={<Clock size={18} />} color="#f59e0b" loading={metricsLoading} />
+        <KpiCard label="En Tránsito" value={kpis.enTransito} icon={<Truck size={18} />} color="#8b5cf6" loading={metricsLoading} />
+        <KpiCard label="Total Cabezas" value={kpis.totalCabezas.toLocaleString("es-PY")} icon={<BullIcon size={18} />} color="#3b82f6" loading={metricsLoading} />
         <KpiCard
           label="Total Gs."
           value={`Gs. ${kpis.totalGs.toLocaleString("es-PY")}`}
-          icon="💰"
+          icon={<DollarSign size={18} />}
           color="#C8A03A"
           loading={metricsLoading}
         />
@@ -205,8 +207,8 @@ export default function MovimientosScreen({ onBack, onNavigate }) {
       {/* Loading */}
       {loading && (
         <div className="text-center py-12">
-          <div className="w-8 h-8 rounded-lg bg-[#1F2A44] inline-flex items-center justify-center shadow-lg shadow-black/20 animate-pulse mb-3">
-            <span className="text-white text-sm font-bold">🐄</span>
+          <div className="w-8 h-8 rounded-lg bg-[#1F2A44] inline-flex items-center justify-center shadow-lg shadow-black/20 animate-pulse mb-3 text-white">
+            <BullIcon size={16} />
           </div>
           <p className="text-slate-500 text-sm">Cargando movimientos...</p>
         </div>
@@ -215,7 +217,7 @@ export default function MovimientosScreen({ onBack, onNavigate }) {
       {/* Empty state */}
       {!loading && filtered.length === 0 && (
         <div className="text-center py-16">
-          <div className="text-4xl mb-3">🐄</div>
+          <div className="mb-3 text-slate-500"><BullIcon size={40} /></div>
           <p className="text-slate-400 text-sm mb-1">No hay movimientos registrados</p>
           <p className="text-slate-600 text-xs">
             {canCreate ? "Crea el primer movimiento de ganado" : "Contacta al administrador"}

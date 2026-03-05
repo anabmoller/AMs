@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
+import { MapPin } from "lucide-react";
 import { getUsers } from "../../constants/users";
 import { getCompanies } from "../../constants/parameters";
 
@@ -252,7 +253,7 @@ export default function ParameterForm({ tab, item, onSave, onCancel, saving }) {
       {tab === "establishments" && form.latitude && form.longitude && (
         <div className="mt-3">
           <label className="block text-[11px] font-medium text-slate-400 mb-1 tracking-wide">
-            {"📍"} Vista previa ubicaci{"ó"}n
+            <MapPin size={14} className="inline" /> Vista previa ubicaci{"ó"}n
           </label>
           <div className="rounded-xl overflow-hidden border border-white/[0.06] h-[180px]">
             <iframe

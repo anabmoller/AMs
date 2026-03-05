@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { User, Building2, Crown, Syringe, Ruler, Clock, MapPin, Link, Zap, ScrollText, AlertTriangle } from "lucide-react";
 import BackButton from "../common/BackButton";
 import PageHeader from "../common/PageHeader";
 import {
@@ -10,17 +11,17 @@ import { formatGuaranies } from "../../constants/budgets";
 
 const STEPS_DISPLAY = [
   {
-    num: 1, label: "Gerente de Area", type: "manager", icon: "👤",
+    num: 1, label: "Gerente de Area", type: "manager", icon: <User size={16} />,
     description: "Aprueba solicitudes de su establecimiento asignado",
     color: "#f59e0b",
   },
   {
-    num: 2, label: "Director", type: "director", icon: "🏢",
+    num: 2, label: "Director", type: "director", icon: <Building2 size={16} />,
     description: "Aprueba compras mayores a ₲5M según la empresa",
     color: "#5B0B14",
   },
   {
-    num: 3, label: "Presidente", type: "president", icon: "👑",
+    num: 3, label: "Presidente", type: "president", icon: <Crown size={16} />,
     description: "Aprueba compras mayores a ₲50M según la empresa",
     color: "#ef4444",
   },
@@ -82,7 +83,7 @@ export default function ApprovalConfigScreen({ onBack }) {
               }}
             >
               <span className="text-[10px] font-bold" style={{ color: activeStep === 4 ? '#fff' : '#7c6bb5' }}>VET</span>
-              <span className="text-base">💉</span>
+              <Syringe size={16} />
             </div>
           </div>
         </div>
@@ -96,13 +97,13 @@ export default function ApprovalConfigScreen({ onBack }) {
         </div>
 
         {/* Thresholds Card */}
-        <Card title="Umbrales de Aprobación" icon="📐">
+        <Card title="Umbrales de Aprobación" icon={<Ruler size={14} />}>
           <ThresholdRow label="Director requerido" value={formatGuaranies(THRESHOLDS.DIRECTOR_REQUIRED)} desc="Compras >= este monto requieren aprobación del Director" />
           <ThresholdRow label="Overbudget" value={formatGuaranies(THRESHOLDS.PRESIDENT_REQUIRED)} desc="Compras >= este monto requieren aprobación extra" />
         </Card>
 
         {/* SLA Card */}
-        <Card title="SLA (Tiempos de Respuesta)" icon="⏱">
+        <Card title="SLA (Tiempos de Respuesta)" icon={<Clock size={14} />}>
           <ThresholdRow label="Gerente Normal" value={`${SLA.MANAGER_NORMAL}h`} desc="1 dia hábil" />
           <ThresholdRow label="Gerente Emergencia" value={`${SLA.MANAGER_EMERGENCY}h`} desc="4 horas" />
           <ThresholdRow label="Director Normal" value={`${SLA.DIRECTOR_NORMAL}h`} desc="2 días hábiles" />
@@ -111,10 +112,10 @@ export default function ApprovalConfigScreen({ onBack }) {
         </Card>
 
         {/* Manager Assignments */}
-        <Card title="Gerentes por Establecimiento" icon="👤">
+        <Card title="Gerentes por Establecimiento" icon={<User size={14} />}>
           {Object.entries(MANAGER_MAP).map(([est, mgr]) => (
             <div key={est} className="flex justify-between items-center py-2 border-b border-white/[0.06]">
-              <span className="text-[13px] text-white">📍 {est}</span>
+              <span className="text-[13px] text-white inline-flex items-center gap-1"><MapPin size={12} />{est}</span>
               <span className="text-xs font-semibold text-[#C8A03A] bg-[#1F2A44]/[0.06] px-2.5 py-0.5 rounded-lg">
                 {USER_DISPLAY_NAMES[mgr] || mgr}
               </span>
@@ -123,7 +124,7 @@ export default function ApprovalConfigScreen({ onBack }) {
         </Card>
 
         {/* Director Assignments */}
-        <Card title="Directores por Empresa" icon="🏢">
+        <Card title="Directores por Empresa" icon={<Building2 size={14} />}>
           {Object.entries(COMPANY_MAP).map(([company, dirUsername]) => (
             <div key={company} className="flex justify-between items-center py-2 border-b border-white/[0.06]">
               <div>
@@ -137,7 +138,7 @@ export default function ApprovalConfigScreen({ onBack }) {
         </Card>
 
         {/* President Assignments */}
-        <Card title="Presidentes por Empresa" icon="👑">
+        <Card title="Presidentes por Empresa" icon={<Crown size={14} />}>
           {Object.entries(PRESIDENT_MAP).map(([company, presUsername]) => (
             <div key={company} className="flex justify-between items-center py-2 border-b border-white/[0.06]">
               <div>
@@ -151,7 +152,7 @@ export default function ApprovalConfigScreen({ onBack }) {
         </Card>
 
         {/* Establishment → Company Mapping */}
-        <Card title="Establecimiento → Empresa" icon="🔗">
+        <Card title="Establecimiento → Empresa" icon={<Link size={14} />}>
           {Object.entries(ESTABLISHMENT_COMPANY).filter(([k]) => k !== "General").map(([est, company]) => (
             <div key={est} className="flex justify-between items-center py-1.5 border-b border-white/[0.06]">
               <span className="text-xs text-white">{est}</span>
@@ -161,10 +162,10 @@ export default function ApprovalConfigScreen({ onBack }) {
         </Card>
 
         {/* Special Rules */}
-        <Card title="Reglas Especiales" icon="⚡">
+        <Card title="Reglas Especiales" icon={<Zap size={14} />}>
           <div className="bg-[#F8F9FB]/[0.02] rounded-xl p-3.5 mb-2">
             <div className="text-xs font-semibold text-[#7c6bb5] mb-1">
-              💉 Regla Veterinaria (R5)
+              <Syringe size={12} className="inline mr-1" />Regla Veterinaria (R5)
             </div>
             <div className="text-xs text-white mb-1">
               Solicitudes de sectores veterinarios requieren autorización previa del especialista.
@@ -182,7 +183,7 @@ export default function ApprovalConfigScreen({ onBack }) {
 
           <div className="bg-[#F8F9FB]/[0.02] rounded-xl p-3.5">
             <div className="text-xs font-semibold text-red-400 mb-1">
-              ⚠ Regla Overbudget (R6)
+              <AlertTriangle size={12} className="inline mr-1" />Regla Overbudget (R6)
             </div>
             <div className="text-xs text-white mb-1">
               Cuando una solicitud excede el presupuesto del sector, se activa un paso adicional de aprobación.
@@ -194,7 +195,7 @@ export default function ApprovalConfigScreen({ onBack }) {
         </Card>
 
         {/* Rules Summary */}
-        <Card title="Resumen de Reglas" icon="📜">
+        <Card title="Resumen de Reglas" icon={<ScrollText size={14} />}>
           {[
             { id: "R1", desc: "Toda SC requiere autorización del Gerente de Área asignado al establecimiento", color: "#f59e0b" },
             { id: "R2", desc: `SC >= ${formatGuaranies(THRESHOLDS.DIRECTOR_REQUIRED)} requiere aprobación del Director de la empresa`, color: "#5B0B14" },

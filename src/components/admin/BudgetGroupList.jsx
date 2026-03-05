@@ -1,4 +1,5 @@
 import { getBudgetPercent, getBudgetRemaining, formatGuaranies } from "../../constants/budgets";
+import { MapPin } from "lucide-react";
 
 const barColor = (pct) => pct >= 90 ? '#ef4444' : pct >= 70 ? '#f59e0b' : '#22c55e';
 
@@ -13,7 +14,7 @@ export default function BudgetGroupList({ grouped, filterEst, onEdit }) {
           <div key={est} className="mb-5">
             <div className="flex justify-between items-center mb-2">
               <div className="text-[13px] font-bold text-white uppercase tracking-wide">
-                {"📍"} {est}
+                <MapPin size={14} className="inline" /> {est}
               </div>
               <div className="text-[11px] font-semibold" style={{ color: barColor(estPct) }}>
                 {formatGuaranies(estConsumed)} / {formatGuaranies(estTotal)} ({estPct}%)

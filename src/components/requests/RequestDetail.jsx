@@ -4,6 +4,7 @@
 // Trazabilidad, Approval, Budget, Quotations, Attachments
 // ============================================================
 import { useState, useEffect, useCallback, useRef } from "react";
+import { Ban, XCircle, CheckCircle2, User, Paperclip, Image, FileText } from "lucide-react";
 import { STATUS_FLOW, URGENCY_LEVELS } from "../../constants";
 import { generateCommentId } from "../../utils/ids";
 import AddItemModal from "./AddItemModal";
@@ -261,12 +262,12 @@ export default function RequestDetail({
         )}
         {canCancel && (
           <button onClick={() => setShowCancelModal(true)} className="px-4 py-2 rounded-lg border border-red-500/30 bg-transparent text-red-400 text-xs font-semibold cursor-pointer">
-            🚫 Cancelar Solicitud
+            <Ban size={12} className="inline" /> Cancelar Solicitud
           </button>
         )}
-        {isRejected && <span className="text-xs text-red-400 font-medium">❌ Solicitud rechazada</span>}
-        {isCancelado && <span className="text-xs text-red-400 font-medium">🚫 Solicitud cancelada</span>}
-        {isLast && <span className="text-xs text-green-400 font-medium">✅ Proceso completado</span>}
+        {isRejected && <span className="text-xs text-red-400 font-medium flex items-center gap-1"><XCircle size={12} /> Solicitud rechazada</span>}
+        {isCancelado && <span className="text-xs text-red-400 font-medium flex items-center gap-1"><Ban size={12} /> Solicitud cancelada</span>}
+        {isLast && <span className="text-xs text-green-400 font-medium flex items-center gap-1"><CheckCircle2 size={12} /> Proceso completado</span>}
       </div>
 
       {/* ===== RESPONSIVE GRID: main + sidebar ===== */}
@@ -297,7 +298,7 @@ export default function RequestDetail({
           {/* Info grid */}
           <div className="px-5 xl:px-0 py-2">
             <InfoGrid>
-              <InfoCell label="Solicitante" value={r.requester} icon="👤" />
+              <InfoCell label="Solicitante" value={r.requester} icon={<User size={12} />} />
               <InfoCell label="Fecha de Creación" value={fmtDate(r.date)} />
               <InfoCell label="Establecimiento" value={r.establishment} />
               <InfoCell
@@ -382,7 +383,7 @@ export default function RequestDetail({
           <div className="px-5 xl:px-0 py-2">
             <div className="flex items-center justify-between mb-2 cursor-pointer" onClick={() => setShowAttachments(!showAttachments)}>
               <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide flex items-center gap-1.5">
-                📎 Adjuntos
+                <Paperclip size={12} className="inline" /> Adjuntos
                 {attachments.length > 0 && (
                   <span className="bg-[#1F2A44]/[0.08] text-[#C8A03A] text-[10px] font-bold px-1.5 py-px rounded-md">
                     {attachments.length}
@@ -403,7 +404,7 @@ export default function RequestDetail({
                         {attachments.map(att => (
                           <div key={att.id} className="flex items-center gap-2.5 bg-[#F8F9FB]/[0.02] rounded-lg px-3 py-2 border border-white/[0.06]">
                             <div className="w-11 h-11 rounded bg-[#1F2A44]/[0.06] flex items-center justify-center text-lg flex-shrink-0">
-                              {att.type?.startsWith("image/") ? "🖼" : "📄"}
+                              {att.type?.startsWith("image/") ? <Image size={18} /> : <FileText size={18} />}
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="text-xs font-medium text-white truncate">{att.name}</div>
@@ -546,21 +547,21 @@ export default function RequestDetail({
           <ActionBtn label="✕" color="#ef4444" outline onClick={onBack} />
         )}
         {canCancel && (
-          <ActionBtn label="Cancelar" icon="🚫" color="#ef4444" outline onClick={() => setShowCancelModal(true)} />
+          <ActionBtn label="Cancelar" icon={<Ban size={12} />} color="#ef4444" outline onClick={() => setShowCancelModal(true)} />
         )}
         {isRejected && (
-          <div className="flex-1 text-xs text-red-400 flex items-center justify-center font-medium">
-            ❌ Solicitud rechazada
+          <div className="flex-1 text-xs text-red-400 flex items-center justify-center font-medium gap-1">
+            <XCircle size={12} /> Solicitud rechazada
           </div>
         )}
         {isCancelado && (
-          <div className="flex-1 text-xs text-red-400 flex items-center justify-center font-medium">
-            🚫 Solicitud cancelada
+          <div className="flex-1 text-xs text-red-400 flex items-center justify-center font-medium gap-1">
+            <Ban size={12} /> Solicitud cancelada
           </div>
         )}
         {isLast && (
-          <div className="flex-1 text-xs text-green-400 flex items-center justify-center font-medium">
-            ✅ Proceso completado
+          <div className="flex-1 text-xs text-green-400 flex items-center justify-center font-medium gap-1">
+            <CheckCircle2 size={12} /> Proceso completado
           </div>
         )}
       </div>

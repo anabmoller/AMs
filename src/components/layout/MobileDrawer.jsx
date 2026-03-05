@@ -1,8 +1,17 @@
 /**
  * MobileDrawer — slide-out from left with all nav items (role-gated)
+ * Icons: lucide-react + CornIcon + BullIcon (custom SVGs)
  */
 import { useNotifications } from "../../context/NotificationContext";
 import { useAuth } from "../../context/AuthContext";
+import {
+  LayoutDashboard, Bell, ShoppingCart, Fuel, Package,
+  BarChart3, Shield, Users, Wallet, SlidersHorizontal, RotateCcw,
+  Settings, Plus, X, KeyRound,
+} from "lucide-react";
+import { BullIcon, CornIcon } from "../icons";
+
+const ICON_SIZE = 18;
 
 export default function MobileDrawer({ open, onClose, screen, onNavigate, onNewRequest, currentUser, canViewAnalytics, canManageUsers, canViewGanado }) {
   const { getVisibleNotifications } = useNotifications();
@@ -10,21 +19,23 @@ export default function MobileDrawer({ open, onClose, screen, onNavigate, onNewR
   const unreadCount = getVisibleNotifications(auth.currentUser?.name, auth.currentUser?.role).filter(n => !n.read).length;
 
   const mainItems = [
-    { key: 'panel', icon: '🏠', label: 'Panel General' },
-    { key: 'notifications', icon: '🔔', label: 'Notificaciones', badge: unreadCount || null },
-    { key: 'inventory', icon: '📦', label: 'Catálogo' },
-    ...(canViewGanado ? [{ key: 'ganado', icon: '🐄', label: 'Ganado' }] : []),
-    { key: 'materia_prima', icon: '🧪', label: 'Materia Prima' },
-    { key: 'combustible', icon: '⛽', label: 'Combustible' },
-    ...(canViewAnalytics ? [{ key: 'analytics', icon: '📊', label: 'Análisis' }] : []),
-    ...(canManageUsers ? [{ key: 'security', icon: '🛡️', label: 'Seguridad' }] : []),
+    { key: 'panel', icon: <LayoutDashboard size={ICON_SIZE} />, label: 'Panel General' },
+    { key: 'notifications', icon: <Bell size={ICON_SIZE} />, label: 'Notificaciones', badge: unreadCount || null },
+    { key: 'dashboard', icon: <ShoppingCart size={ICON_SIZE} />, label: 'Compras' },
+    ...(canViewGanado ? [{ key: 'ganado', icon: <BullIcon size={ICON_SIZE} />, label: 'Hacienda' }] : []),
+    { key: 'materia_prima', icon: <CornIcon size={ICON_SIZE} />, label: 'Materia Prima' },
+    { key: 'combustible', icon: <Fuel size={ICON_SIZE} />, label: 'Combustible' },
+    { key: 'inventory', icon: <Package size={ICON_SIZE} />, label: 'Inventario' },
+    ...(canViewAnalytics ? [{ key: 'analytics', icon: <BarChart3 size={ICON_SIZE} />, label: 'Análisis' }] : []),
+    ...(canManageUsers ? [{ key: 'security', icon: <Shield size={ICON_SIZE} />, label: 'Seguridad' }] : []),
   ];
 
   const adminItems = [
-    ...(canManageUsers ? [{ key: 'users', icon: '👥', label: 'Usuarios' }] : []),
-    ...(canViewAnalytics ? [{ key: 'budgets', icon: '💰', label: 'Presupuestos' }] : []),
-    ...(canManageUsers ? [{ key: 'parameters', icon: '⚙️', label: 'Parámetros' }] : []),
-    ...(canManageUsers ? [{ key: 'approvalConfig', icon: '🔄', label: 'Aprobaciones' }] : []),
+    ...(canManageUsers ? [{ key: 'users', icon: <Users size={ICON_SIZE} />, label: 'Usuarios' }] : []),
+    ...(canManageUsers ? [{ key: 'permissions', icon: <KeyRound size={ICON_SIZE} />, label: 'Permisos' }] : []),
+    ...(canViewAnalytics ? [{ key: 'budgets', icon: <Wallet size={ICON_SIZE} />, label: 'Presupuestos' }] : []),
+    ...(canManageUsers ? [{ key: 'parameters', icon: <SlidersHorizontal size={ICON_SIZE} />, label: 'Parámetros' }] : []),
+    ...(canManageUsers ? [{ key: 'approvalConfig', icon: <RotateCcw size={ICON_SIZE} />, label: 'Aprobaciones' }] : []),
   ];
 
   const handleNav = (key) => {
@@ -63,9 +74,7 @@ export default function MobileDrawer({ open, onClose, screen, onNavigate, onNewR
             className="w-8 h-8 rounded-lg bg-transparent border-none cursor-pointer flex items-center justify-center text-slate-400 hover:bg-[#F8F9FB]/[0.06] transition-colors"
             aria-label="Cerrar menú"
           >
-            <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"/>
-            </svg>
+            <X size={18} />
           </button>
         </div>
 
@@ -95,7 +104,7 @@ export default function MobileDrawer({ open, onClose, screen, onNavigate, onNewR
                   : 'bg-transparent text-slate-400 font-normal hover:bg-[rgba(255,255,255,0.06)]'
               }`}
             >
-              <span className="text-[15px] w-5 text-center">{item.icon}</span>
+              <span className="w-5 flex items-center justify-center flex-shrink-0">{item.icon}</span>
               <span className="flex-1 text-left">{item.label}</span>
               {item.badge > 0 && (
                 <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-px rounded-full min-w-[18px] text-center">
@@ -118,7 +127,7 @@ export default function MobileDrawer({ open, onClose, screen, onNavigate, onNewR
                       : 'bg-transparent text-slate-400 font-normal hover:bg-[rgba(255,255,255,0.06)]'
                   }`}
                 >
-                  <span className="text-[15px] w-5 text-center">{item.icon}</span>
+                  <span className="w-5 flex items-center justify-center flex-shrink-0">{item.icon}</span>
                   <span className="flex-1 text-left">{item.label}</span>
                 </button>
               ))}
@@ -134,7 +143,7 @@ export default function MobileDrawer({ open, onClose, screen, onNavigate, onNewR
                 : 'bg-transparent text-slate-400 font-normal hover:bg-[rgba(255,255,255,0.06)]'
             }`}
           >
-            <span className="text-[15px] w-5 text-center">🔧</span>
+            <span className="w-5 flex items-center justify-center flex-shrink-0"><Settings size={ICON_SIZE} /></span>
             <span className="flex-1 text-left">Configuración</span>
           </button>
         </nav>
@@ -145,7 +154,8 @@ export default function MobileDrawer({ open, onClose, screen, onNavigate, onNewR
             onClick={() => { onNewRequest(); onClose(); }}
             className="w-full py-2.5 rounded-lg bg-[#1F2A44] hover:bg-[#1F2A44] text-white text-sm font-semibold flex items-center justify-center gap-1.5 transition-colors border-none cursor-pointer"
           >
-            + Nueva Solicitud
+            <Plus size={14} />
+            Nueva Solicitud
           </button>
         </div>
       </div>

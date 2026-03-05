@@ -4,21 +4,26 @@
  * seeds sample notifications for demo.
  */
 import { createContext, useContext, useState, useCallback } from "react";
+import {
+  Bell, CheckCircle, XCircle, Truck, ClipboardList, RotateCcw, Info,
+} from "lucide-react";
 import { MANAGER_MAP, COMPANY_MAP, THRESHOLDS } from "../constants/approvalConfig";
 import { formatGuaranies } from "../constants/budgets";
 
 const NotificationContext = createContext(null);
 
+const ICON_SIZE = 16;
+
 // Notification type → icon mapping
 const TYPE_ICONS = {
-  new_request: "🔔",
-  authorized: "✅",
-  approved: "✅",
-  rejected: "❌",
-  received: "🚚",
-  order: "📋",
-  revision: "↩️",
-  info: "ℹ️",
+  new_request: <Bell size={ICON_SIZE} />,
+  authorized: <CheckCircle size={ICON_SIZE} />,
+  approved: <CheckCircle size={ICON_SIZE} />,
+  rejected: <XCircle size={ICON_SIZE} />,
+  received: <Truck size={ICON_SIZE} />,
+  order: <ClipboardList size={ICON_SIZE} />,
+  revision: <RotateCcw size={ICON_SIZE} />,
+  info: <Info size={ICON_SIZE} />,
 };
 
 const TYPE_COLORS = {

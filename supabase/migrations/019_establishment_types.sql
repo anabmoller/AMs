@@ -20,15 +20,15 @@ UPDATE establishments SET tipo = 'propio' WHERE tipo IS NULL;
 
 -- 4. Upsert the 9 group establishments (tipo = propio, active = true)
 INSERT INTO establishments (name, active, tipo) VALUES
-  ('Cerro Moimbí',           true, 'propio'),
-  ('Ypotí',                  true, 'propio'),
-  ('Estancia Santa Clara',   true, 'propio'),
-  ('Ouro Verde',             true, 'propio'),
-  ('Santa Maria das Neves',  true, 'propio'),
-  ('Vila Azul',              true, 'propio'),
-  ('Ibirorã',                true, 'propio'),
-  ('Ibirapitã',              true, 'propio'),
-  ('Serrumbi',               true, 'propio')
+  ('Cerro Memby',            true, 'propio'),
+  ('Ypoti',                  true, 'propio'),
+  ('Santa Clara',            true, 'propio'),
+  ('Oro Verde',              true, 'propio'),
+  ('Santa Maria da Serra',   true, 'propio'),
+  ('Cielo Azul',             true, 'propio'),
+  ('Yby Porã',               true, 'propio'),
+  ('Yby Pytã',               true, 'propio'),
+  ('Lusipar',                true, 'propio')
 ON CONFLICT (name) DO UPDATE SET
   active = true,
   tipo = 'propio';

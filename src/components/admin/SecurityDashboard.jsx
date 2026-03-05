@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { BarChart3, Search, Star, ClipboardList } from 'lucide-react';
 import Card from '../shared/Card';
 import Badge from '../shared/Badge';
 
@@ -8,10 +9,10 @@ import Badge from '../shared/Badge';
 // ============================================================
 
 const TABS = [
-  { key: 'resumen', label: 'Resumen', icon: '📊' },
-  { key: 'auditoria', label: 'Auditoría', icon: '🔍' },
-  { key: 'evaluacion', label: 'Evaluación Proveedores', icon: '⭐' },
-  { key: 'documentacion', label: 'Documentación', icon: '📋' },
+  { key: 'resumen', label: 'Resumen', icon: <BarChart3 size={16} /> },
+  { key: 'auditoria', label: 'Auditoría', icon: <Search size={16} /> },
+  { key: 'evaluacion', label: 'Evaluación Proveedores', icon: <Star size={16} /> },
+  { key: 'documentacion', label: 'Documentación', icon: <ClipboardList size={16} /> },
 ];
 
 const SECURITY_POLICIES = [

@@ -36,7 +36,7 @@ function getApprovalPreview(amount, establishment) {
   return steps;
 }
 
-export default function NewRequestForm({ onSubmit, onCancel, usdRate = 7800, usdLive = false }) {
+export default function NewRequestForm({ onSubmit, onCancel, usdRate = 7800, usdLive = false, requestType = null }) {
   const { currentUser } = useAuth();
   const { showNotif, effectiveUser } = useApp();
   const activeUser = effectiveUser || currentUser;
@@ -184,6 +184,14 @@ export default function NewRequestForm({ onSubmit, onCancel, usdRate = 7800, usd
       </div>
 
       <div className="px-5">
+        {requestType && (
+          <div className="flex items-center gap-1.5 mb-2 text-slate-400">
+            {requestType.icon && typeof requestType.icon === "function"
+              ? <requestType.icon size={14} />
+              : <span className="text-sm">{requestType.icon}</span>}
+            <span className="text-[11px] font-semibold uppercase tracking-wide">{requestType.label}</span>
+          </div>
+        )}
         <h2 className="text-[22px] font-semibold text-white mb-1 mt-0">{stepTitles[step - 1].title}</h2>
         <div className="text-[13px] text-slate-400 mb-5">{stepTitles[step - 1].sub}</div>
 

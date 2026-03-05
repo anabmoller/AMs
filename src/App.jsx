@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
 import { normalizeStatus } from "./utils/statusHelpers";
 import { hasPermission } from "./constants/users";
+import { isSuperAdmin, canAccessModule, buildRecordsFilter } from "./lib/permissions";
 
 import ErrorBoundary from "./components/common/ErrorBoundary";
 import { AuthProvider, useAuth } from "./context/AuthContext";
@@ -18,6 +19,8 @@ import Notification from "./components/common/Notification";
 import Dashboard from "./components/requests/Dashboard";
 import RequestDetail from "./components/requests/RequestDetail";
 import NewRequestForm from "./components/requests/NewRequestForm";
+import RequestTypeSelector from "./components/requests/RequestTypeSelector";
+import { getAvailableRequestTypes } from "./constants/requestTypes";
 import SettingsScreen from "./components/settings/SettingsScreen";
 import ApprovalConfigScreen from "./components/admin/ApprovalConfigScreen";
 import GlobalSearch from "./components/shared/GlobalSearch";
@@ -52,6 +55,7 @@ const MovimientoDetail = lazyRetry(() => import("./components/ganado/MovimientoD
 const PanelGeneral = lazyRetry(() => import("./components/dashboard/PanelGeneral"));
 const MateriaPrimaDashboard = lazyRetry(() => import("./components/dashboard/MateriaPrimaDashboard"));
 const CombustibleDashboard = lazyRetry(() => import("./components/dashboard/CombustibleDashboard"));
+const PermissionsScreen = lazyRetry(() => import("./components/admin/PermissionsScreen"));
 
 function LazyFallback() {
   return (
@@ -73,12 +77,15 @@ function AppContent() {
     requests, notification, statusCounts, pendingApprovals, showNotif,
     addRequest, confirmRequest, approveStep, rejectRequest, sendForRevision,
     advanceStatus, cancelRequest, updateRequest, dataLoading, setDevOverride,
+    allowedModules, isAdmin,
   } = useApp();
 
   const [screen, setScreen] = useState("panel");
   const [selectedRequestId, setSelectedRequestId] = useState(null);
   const selectedRequest = selectedRequestId ? requests.find(r => r.id === selectedRequestId) : null;
   const [showNewForm, setShowNewForm] = useState(false);
+  const [showTypeSelector, setShowTypeSelector] = useState(false);
+  const [selectedRequestType, setSelectedRequestType] = useState(null);
   const [selectedMovimientoId, setSelectedMovimientoId] = useState(null);
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterEstablishment, setFilterEstablishment] = useState("all");
@@ -188,10 +195,15 @@ function AppContent() {
     );
   }
 
-  // Filter requests based on role (use effective user for impersonation)
-  const visibleRequests = effectiveCan("view_all_requests")
-    ? requests
-    : requests.filter(r => r.requester === effectiveUser.name || r.assignee === effectiveUser.name);
+  // Filter requests based on permissions (super_admin sees all, others see own only)
+  const visibleRequests = useMemo(() => {
+    if (isSuperAdmin(effectiveUser)) return requests;
+    return requests.filter(r =>
+      r.createdById === effectiveUser.id ||
+      r.requester === effectiveUser.name ||
+      r.assignee === effectiveUser.name
+    );
+  }, [requests, effectiveUser]);
 
   const filtered = visibleRequests.filter(r => {
     if (filterStatus !== "all" && normalizeStatus(r.status) !== filterStatus) return false;
@@ -221,17 +233,26 @@ function AppContent() {
       setSelectedRequestId(null);
       setSelectedMovimientoId(null);
       setShowNewForm(false);
+      setShowTypeSelector(false);
+      setSelectedRequestType(null);
     }
   };
 
   const handleNewRequest = () => {
+    setShowTypeSelector(true);
+  };
+
+  const handleSelectRequestType = (type) => {
+    setSelectedRequestType(type);
+    setShowTypeSelector(false);
     setScreen("panel");
     setShowNewForm(true);
   };
 
   const handleAddRequest = (form) => {
-    addRequest(form);
+    addRequest({ ...form, requestType: selectedRequestType?.key || "general" });
     setShowNewForm(false);
+    setSelectedRequestType(null);
   };
 
   const renderContent = () => {
@@ -239,9 +260,10 @@ function AppContent() {
       return (
         <NewRequestForm
           onSubmit={handleAddRequest}
-          onCancel={() => setShowNewForm(false)}
+          onCancel={() => { setShowNewForm(false); setSelectedRequestType(null); }}
           usdRate={usdRate}
           usdLive={usdLive}
+          requestType={selectedRequestType}
         />
       );
     }
@@ -271,7 +293,7 @@ function AppContent() {
       );
     }
 
-    if (screen === "ganado" && effectiveCan("view_ganado")) {
+    if (screen === "ganado" && canAccessModule(effectiveUser, 'ganado')) {
       return (
         <Suspense fallback={<LazyFallback />}>
           <MovimientosScreen
@@ -284,7 +306,7 @@ function AppContent() {
       );
     }
 
-    if (screen === "ganado-new" && effectiveCan("create_movimiento_ganado")) {
+    if (screen === "ganado-new" && canAccessModule(effectiveUser, 'ganado') && effectiveCan("create_movimiento_ganado")) {
       return (
         <Suspense fallback={<LazyFallback />}>
           <NuevoMovimientoForm
@@ -295,7 +317,7 @@ function AppContent() {
       );
     }
 
-    if (screen === "ganado-detail" && effectiveCan("view_ganado") && selectedMovimientoId) {
+    if (screen === "ganado-detail" && canAccessModule(effectiveUser, 'ganado') && selectedMovimientoId) {
       return (
         <Suspense fallback={<LazyFallback />}>
           <MovimientoDetail
@@ -331,24 +353,28 @@ function AppContent() {
       );
     }
 
-    if (screen === "security" && effectiveCan("manage_users")) {
+    if (screen === "security" && isAdmin) {
       return <Suspense fallback={<LazyFallback />}><SecurityDashboard onBack={() => setScreen("panel")} /></Suspense>;
     }
 
-    if (screen === "users" && effectiveCan("manage_users")) {
+    if (screen === "users" && isAdmin) {
       return <Suspense fallback={<LazyFallback />}><UserManagementScreen onBack={() => setScreen("settings")} /></Suspense>;
     }
 
-    if (screen === "budgets" && effectiveCan("view_analytics")) {
+    if (screen === "budgets" && (isAdmin || effectiveCan("view_analytics"))) {
       return <Suspense fallback={<LazyFallback />}><BudgetManagementScreen onBack={() => setScreen("settings")} /></Suspense>;
     }
 
-    if (screen === "parameters" && effectiveCan("manage_settings")) {
+    if (screen === "parameters" && isAdmin) {
       return <Suspense fallback={<LazyFallback />}><ParametersScreen onBack={() => setScreen("settings")} /></Suspense>;
     }
 
-    if (screen === "approvalConfig" && effectiveCan("manage_settings")) {
+    if (screen === "approvalConfig" && isAdmin) {
       return <ApprovalConfigScreen onBack={() => setScreen("settings")} />;
+    }
+
+    if (screen === "permissions" && isAdmin) {
+      return <Suspense fallback={<LazyFallback />}><PermissionsScreen onBack={() => setScreen("settings")} /></Suspense>;
     }
 
     if (screen === "notifications") {
@@ -431,9 +457,11 @@ function AppContent() {
         onNavigate={handleNavigate}
         onNewRequest={newRequestHandler}
         currentUser={effectiveUser.name}
-        canViewAnalytics={effectiveCan("view_analytics")}
-        canManageUsers={effectiveCan("manage_users")}
-        canViewGanado={effectiveCan("view_ganado")}
+        canViewAnalytics={isAdmin || effectiveCan("view_analytics")}
+        canManageUsers={isAdmin}
+        canViewGanado={canAccessModule(effectiveUser, 'ganado')}
+        allowedModules={allowedModules}
+        isAdmin={isAdmin}
         usdRate={usdRate}
         usdLive={usdLive}
         onRefreshRate={fetchUsdRate}
@@ -457,9 +485,11 @@ function AppContent() {
           onNavigate={handleNavigate}
           onNewRequest={newRequestHandler}
           currentUser={effectiveUser.name}
-          canViewAnalytics={effectiveCan("view_analytics")}
-          canManageUsers={effectiveCan("manage_users")}
-          canViewGanado={effectiveCan("view_ganado")}
+          canViewAnalytics={isAdmin || effectiveCan("view_analytics")}
+          canManageUsers={isAdmin}
+          canViewGanado={canAccessModule(effectiveUser, 'ganado')}
+          allowedModules={allowedModules}
+          isAdmin={isAdmin}
         />
 
         {renderContent()}
@@ -483,6 +513,15 @@ function AppContent() {
           onNavigate={handleNavigate}
           requests={visibleRequests}
           onClose={() => setShowSearch(false)}
+        />
+      )}
+
+      {/* Request type selector modal */}
+      {showTypeSelector && (
+        <RequestTypeSelector
+          types={getAvailableRequestTypes(effectiveUser)}
+          onSelect={handleSelectRequestType}
+          onClose={() => setShowTypeSelector(false)}
         />
       )}
     </div>

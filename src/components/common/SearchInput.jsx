@@ -2,6 +2,8 @@
  * Shared search input with magnifying glass icon and optional clear button.
  * Replaces duplicate search inputs in Dashboard, InventoryScreen, InventoryModal.
  */
+import { Search } from "lucide-react";
+
 export default function SearchInput({
   value,
   onChange,
@@ -15,7 +17,7 @@ export default function SearchInput({
         wrapClassName || ""
       }`}
     >
-      <span className="text-base opacity-40">🔍</span>
+      <Search size={16} className="text-slate-400 opacity-60 shrink-0" />
       <input
         placeholder={placeholder}
         value={value}

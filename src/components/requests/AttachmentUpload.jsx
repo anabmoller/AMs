@@ -4,6 +4,7 @@
 // Uses Supabase Storage bucket "attachments"
 // ============================================================
 import { useState, useRef } from "react";
+import { FileText, Camera, Paperclip } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
@@ -125,8 +126,8 @@ export default function AttachmentUpload({ requestUuid, attachments = [], onAtta
                   className="w-11 h-11 rounded object-cover flex-shrink-0 border border-white/[0.06]"
                 />
               ) : (
-                <div className="w-11 h-11 rounded bg-[#1F2A44]/[0.06] flex items-center justify-center text-lg flex-shrink-0">
-                  📄
+                <div className="w-11 h-11 rounded bg-[#1F2A44]/[0.06] flex items-center justify-center flex-shrink-0">
+                  <FileText size={20} className="text-slate-400" />
                 </div>
               )}
 
@@ -178,7 +179,7 @@ export default function AttachmentUpload({ requestUuid, attachments = [], onAtta
               onClick={() => cameraInputRef.current?.click()}
               className="flex-1 py-3 px-2.5 rounded-lg border border-[#C8A03A]/[0.19] bg-[#1F2A44]/[0.04] cursor-pointer text-center"
             >
-              <div className="text-xl mb-1">📸</div>
+              <div className="mb-1"><Camera size={20} className="text-[#C8A03A]" /></div>
               <div className="text-[11px] font-semibold text-[#C8A03A]">
                 Tomar Foto
               </div>
@@ -189,7 +190,7 @@ export default function AttachmentUpload({ requestUuid, attachments = [], onAtta
               onClick={() => fileInputRef.current?.click()}
               className="flex-1 py-3 px-2.5 rounded-lg border border-blue-400/[0.19] bg-blue-400/[0.04] cursor-pointer text-center"
             >
-              <div className="text-xl mb-1">📎</div>
+              <div className="mb-1"><Paperclip size={20} className="text-blue-400" /></div>
               <div className="text-[11px] font-semibold text-blue-400">
                 Subir Archivo
               </div>

@@ -1,4 +1,5 @@
-import { Component } from "react";
+import { Component, createElement } from "react";
+import { Wrench, AlertTriangle } from "lucide-react";
 import { supabaseConfigured } from "../../lib/supabase";
 
 export default class ErrorBoundary extends Component {
@@ -30,8 +31,10 @@ export default class ErrorBoundary extends Component {
 
       return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] p-8 text-center">
-          <div className="text-5xl mb-4">
-            {isEnvMissing ? "🔧" : "⚠️"}
+          <div className="mb-4 text-slate-400">
+            {isEnvMissing
+              ? createElement(Wrench, { size: 48 })
+              : createElement(AlertTriangle, { size: 48 })}
           </div>
           <h2 className="text-xl font-bold text-white m-0 mb-2">
             {isEnvMissing

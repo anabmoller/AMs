@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { FileText, Camera } from "lucide-react";
 import { PRIORITY_LEVELS } from "../../constants";
 
 const MAX_FILES = 5;
@@ -106,7 +107,7 @@ export default function RequestStepDetails({ form, errors, onUpdateForm, FieldEr
                   />
                 ) : (
                   <div className="w-full h-full bg-[#F8F9FB]/[0.05] flex flex-col items-center justify-center">
-                    <span className="text-lg">📄</span>
+                    <FileText size={20} className="text-slate-400" />
                     <span className="text-[8px] text-slate-400">PDF</span>
                   </div>
                 )}
@@ -129,7 +130,7 @@ export default function RequestStepDetails({ form, errors, onUpdateForm, FieldEr
             onClick={() => fileRef.current?.click()}
             className="w-full py-2.5 rounded-lg border border-dashed border-white/[0.12] bg-[#F8F9FB]/[0.02] text-xs text-slate-400 cursor-pointer"
           >
-            📷 {photos.length === 0 ? "Agregar fotos o documentos" : `Agregar más (${photos.length}/${MAX_FILES})`}
+            <Camera size={14} className="inline mr-1" />{photos.length === 0 ? "Agregar fotos o documentos" : `Agregar más (${photos.length}/${MAX_FILES})`}
           </button>
         )}
         <div className="text-[10px] text-slate-500 mt-1">

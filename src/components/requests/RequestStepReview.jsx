@@ -1,3 +1,4 @@
+import { RefreshCw, AlertTriangle } from "lucide-react";
 import SummaryRow from "../common/SummaryRow";
 
 function fmtGs(n) {
@@ -49,7 +50,7 @@ export default function RequestStepReview({
 
       {/* Approval flow visual (C8 / Task 7) */}
       <div className="bg-[#1F2A44]/[0.04] rounded-xl px-3.5 py-3 border border-[#C8A03A]/[0.08]">
-        <div className="text-xs font-semibold text-[#C8A03A] mb-2.5">{"🔄"} Flujo de Aprobaci{"ó"}n</div>
+        <div className="text-xs font-semibold text-[#C8A03A] mb-2.5 flex items-center gap-1"><RefreshCw size={12} /> Flujo de Aprobaci{"ó"}n</div>
         <div className="flex items-center gap-0">
           {approvalSteps.map((s, i) => (
             <div key={i} className="flex items-center">
@@ -69,7 +70,7 @@ export default function RequestStepReview({
       {/* Budget warning */}
       {budgetInfo?.exceeds && (
         <div className="bg-amber-500/[0.06] rounded-lg px-3 py-2.5 border border-amber-500/[0.19]">
-          <div className="text-[11px] font-semibold text-amber-400">{"⚠"} Esta solicitud excede el presupuesto asignado</div>
+          <div className="text-[11px] font-semibold text-amber-400 flex items-center gap-1"><AlertTriangle size={12} /> Esta solicitud excede el presupuesto asignado</div>
           <div className="text-[10px] text-slate-400 mt-0.5">Se requerirá aprobación adicional del Director</div>
         </div>
       )}

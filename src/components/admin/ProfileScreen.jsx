@@ -1,5 +1,6 @@
 import { useAuth } from "../../context/AuthContext";
 import { useApp } from "../../context/AppContext";
+import { Lock } from "lucide-react";
 
 export default function ProfileScreen({ onBack, currentUser }) {
   const { logout } = useAuth();
@@ -46,7 +47,7 @@ export default function ProfileScreen({ onBack, currentUser }) {
           onClick={() => showNotif("Redirigiendo a cambio de contraseña...", "info")}
           className="w-full py-3 rounded-xl border border-white/[0.06] bg-[#F8F9FB]/[0.03] text-white text-sm font-semibold cursor-pointer hover:bg-[#F8F9FB]/[0.06] transition-colors"
         >
-          🔒 Cambiar contraseña
+          <Lock size={14} className="inline mr-1" /> Cambiar contraseña
         </button>
         <button
           onClick={() => {

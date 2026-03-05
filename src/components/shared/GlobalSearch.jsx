@@ -1,4 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import {
+  ShoppingCart, Package, BarChart3, Shield, Settings, FileText,
+} from "lucide-react";
 
 /**
  * Global search modal (Cmd+K / Ctrl+K)
@@ -24,11 +27,11 @@ export default function GlobalSearch({ onNavigate, requests = [], onClose }) {
     {
       title: 'Navegación',
       items: [
-        { icon: '📋', label: 'Solicitudes', action: () => { onNavigate('dashboard'); onClose(); } },
-        { icon: '📦', label: 'Inventario', action: () => { onNavigate('inventory'); onClose(); } },
-        { icon: '📊', label: 'Análisis', action: () => { onNavigate('analytics'); onClose(); } },
-        { icon: '🛡️', label: 'Seguridad', action: () => { onNavigate('security'); onClose(); } },
-        { icon: '⚙️', label: 'Configuración', action: () => { onNavigate('settings'); onClose(); } },
+        { icon: <ShoppingCart size={16} />, label: 'Solicitudes', action: () => { onNavigate('dashboard'); onClose(); } },
+        { icon: <Package size={16} />, label: 'Inventario', action: () => { onNavigate('inventory'); onClose(); } },
+        { icon: <BarChart3 size={16} />, label: 'Análisis', action: () => { onNavigate('analytics'); onClose(); } },
+        { icon: <Shield size={16} />, label: 'Seguridad', action: () => { onNavigate('security'); onClose(); } },
+        { icon: <Settings size={16} />, label: 'Configuración', action: () => { onNavigate('settings'); onClose(); } },
       ],
     },
   ];
@@ -104,7 +107,7 @@ export default function GlobalSearch({ onNavigate, requests = [], onClose }) {
                   onClick={() => { onNavigate('request', r.id); onClose(); }}
                   className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-[#F8F9FB]/[0.06] transition-colors"
                 >
-                  <span className="text-base">📋</span>
+                  <span className="text-base text-slate-400"><FileText size={16} /></span>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm text-slate-300 truncate">{r.name}</div>
                     <div className="text-[10px] text-slate-500">{r.id} · {r.establishment}</div>

@@ -1,6 +1,7 @@
 /**
  * NotificationsScreen — full-page notification list
  */
+import { Bell } from "lucide-react";
 import { useNotifications } from "../../context/NotificationContext";
 import { useAuth } from "../../context/AuthContext";
 import { relativeTime } from "../../utils/dateFormatters";
@@ -75,7 +76,7 @@ export default function NotificationsScreen({ onBack, onNavigate }) {
                 className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 text-base"
                 style={{ background: (TYPE_COLORS[notif.type] || "#64748b") + "15", color: TYPE_COLORS[notif.type] || "#64748b" }}
               >
-                {TYPE_ICONS[notif.type] || "🔔"}
+                {TYPE_ICONS[notif.type] || <Bell size={16} />}
               </div>
 
               {/* Content */}

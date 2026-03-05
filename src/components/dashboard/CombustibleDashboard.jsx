@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { Fuel, DollarSign, Truck, BarChart3, AlertTriangle, FileText } from "lucide-react";
 import Card from "../shared/Card";
 import Badge from "../shared/Badge";
 import PageHeader from "../common/PageHeader";
@@ -8,22 +9,22 @@ import { ESTABLECIMIENTOS_PROPIOS } from "../../constants/establecimientos";
 
 const KPI_DATA = {
   todos: [
-    { key: "consumo_mes", label: "Consumo Mes (L)", value: "12.450", icon: "⛽", color: "#3b82f6" },
-    { key: "gasto_mes", label: "Gasto Mes (Gs)", value: "8.2M", icon: "💰", color: "#C8A03A" },
-    { key: "cargas", label: "Cargas", value: 38, icon: "🚛", color: "#8b5cf6" },
-    { key: "precio_lt", label: "Precio/Lt (Gs)", value: "6.580", icon: "📊", color: "#10b981" },
+    { key: "consumo_mes", label: "Consumo Mes (L)", value: "12.450", icon: <Fuel size={18} />, color: "#3b82f6" },
+    { key: "gasto_mes", label: "Gasto Mes (Gs)", value: "8.2M", icon: <DollarSign size={18} />, color: "#C8A03A" },
+    { key: "cargas", label: "Cargas", value: 38, icon: <Truck size={18} />, color: "#8b5cf6" },
+    { key: "precio_lt", label: "Precio/Lt (Gs)", value: "6.580", icon: <BarChart3 size={18} />, color: "#10b981" },
   ],
   ypoti: [
-    { key: "consumo_mes", label: "Consumo Mes (L)", value: "4.200", icon: "⛽", color: "#3b82f6" },
-    { key: "gasto_mes", label: "Gasto Mes (Gs)", value: "2.8M", icon: "💰", color: "#C8A03A" },
-    { key: "cargas", label: "Cargas", value: 14, icon: "🚛", color: "#8b5cf6" },
-    { key: "precio_lt", label: "Precio/Lt (Gs)", value: "6.580", icon: "📊", color: "#10b981" },
+    { key: "consumo_mes", label: "Consumo Mes (L)", value: "4.200", icon: <Fuel size={18} />, color: "#3b82f6" },
+    { key: "gasto_mes", label: "Gasto Mes (Gs)", value: "2.8M", icon: <DollarSign size={18} />, color: "#C8A03A" },
+    { key: "cargas", label: "Cargas", value: 14, icon: <Truck size={18} />, color: "#8b5cf6" },
+    { key: "precio_lt", label: "Precio/Lt (Gs)", value: "6.580", icon: <BarChart3 size={18} />, color: "#10b981" },
   ],
-  cerro_moimbi: [
-    { key: "consumo_mes", label: "Consumo Mes (L)", value: "3.100", icon: "⛽", color: "#3b82f6" },
-    { key: "gasto_mes", label: "Gasto Mes (Gs)", value: "2.1M", icon: "💰", color: "#C8A03A" },
-    { key: "cargas", label: "Cargas", value: 10, icon: "🚛", color: "#8b5cf6" },
-    { key: "precio_lt", label: "Precio/Lt (Gs)", value: "6.580", icon: "📊", color: "#10b981" },
+  cerro_memby: [
+    { key: "consumo_mes", label: "Consumo Mes (L)", value: "3.100", icon: <Fuel size={18} />, color: "#3b82f6" },
+    { key: "gasto_mes", label: "Gasto Mes (Gs)", value: "2.1M", icon: <DollarSign size={18} />, color: "#C8A03A" },
+    { key: "cargas", label: "Cargas", value: 10, icon: <Truck size={18} />, color: "#8b5cf6" },
+    { key: "precio_lt", label: "Precio/Lt (Gs)", value: "6.580", icon: <BarChart3 size={18} />, color: "#10b981" },
   ],
 };
 
@@ -34,11 +35,11 @@ const PROVIDERS = [
 ];
 
 const RECENT_ACTIVITY = [
-  { id: 1, text: "Carga de 3.200 L diésel — Ypotí", time: "Hace 5 horas", icon: "⛽", estab: "ypoti" },
-  { id: 2, text: "Alerta: consumo elevado en Cerro Moimbí (+18%)", time: "Hace 6 horas", icon: "🚨", estab: "cerro_moimbi" },
-  { id: 3, text: "Carga de 2.500 L diésel — Santa Clara", time: "Hace 1 día", icon: "⛽", estab: "santa_clara" },
-  { id: 4, text: "Factura procesada — Petropar Febrero", time: "Hace 2 días", icon: "📄", estab: null },
-  { id: 5, text: "Carga de 1.800 L gasolina — Ouro Verde", time: "Hace 3 días", icon: "⛽", estab: "ouro_verde" },
+  { id: 1, text: "Carga de 3.200 L diésel — Ypoti", time: "Hace 5 horas", icon: <Fuel size={14} />, estab: "ypoti" },
+  { id: 2, text: "Alerta: consumo elevado en Cerro Memby (+18%)", time: "Hace 6 horas", icon: <AlertTriangle size={14} />, estab: "cerro_memby" },
+  { id: 3, text: "Carga de 2.500 L diésel — Santa Clara", time: "Hace 1 día", icon: <Fuel size={14} />, estab: "santa_clara" },
+  { id: 4, text: "Factura procesada — Petropar Febrero", time: "Hace 2 días", icon: <FileText size={14} />, estab: null },
+  { id: 5, text: "Carga de 1.800 L gasolina — Oro Verde", time: "Hace 3 días", icon: <Fuel size={14} />, estab: "oro_verde" },
 ];
 
 /* ── Sub-components ─────────────────────────────────────────── */
@@ -60,7 +61,7 @@ function KpiCard({ label, value, icon, color }) {
 function ProviderRow({ provider }) {
   return (
     <div className="flex items-center gap-3 px-4 py-3 hover:bg-[#F8F9FB]/[0.04] transition-colors">
-      <span className="text-lg shrink-0">⛽</span>
+      <span className="shrink-0"><Fuel size={18} /></span>
       <div className="flex-1 min-w-0">
         <div className="text-[13px] font-semibold text-white truncate">{provider.name}</div>
         <div className="text-[11px] text-slate-500">{provider.items} · Última entrega: {provider.lastDelivery}</div>

@@ -1,4 +1,9 @@
 import { useState } from "react";
+import {
+  BarChart3, ShoppingCart, Package, Truck, Paperclip,
+  Clock, FileEdit, RefreshCw, ClipboardList,
+} from "lucide-react";
+import { BullIcon } from "../icons";
 import { getEstablishments } from "../../constants/parameters";
 import { formatGuaranies } from "../../utils/statusHelpers";
 import RequestCard from "./RequestCard";
@@ -8,12 +13,12 @@ import EmptyState from "../shared/EmptyState";
 /* ── Filter definitions ───────────────────────────────────── */
 
 const MODULE_FILTERS = [
-  { key: "todas", label: "Todas", icon: "📊" },
-  { key: "compras", label: "Compras", icon: "📋" },
-  { key: "ganado", label: "Ganado", icon: "🐄" },
-  { key: "inventario", label: "Inventario", icon: "📦" },
-  { key: "fretes", label: "Fretes", icon: "🚚" },
-  { key: "otros", label: "Otros", icon: "📎" },
+  { key: "todas", label: "Todas", icon: <BarChart3 size={14} /> },
+  { key: "compras", label: "Compras", icon: <ShoppingCart size={14} /> },
+  { key: "ganado", label: "Ganado", icon: <BullIcon size={14} /> },
+  { key: "inventario", label: "Inventario", icon: <Package size={14} /> },
+  { key: "fretes", label: "Fretes", icon: <Truck size={14} /> },
+  { key: "otros", label: "Otros", icon: <Paperclip size={14} /> },
 ];
 
 const STATUS_FILTERS = [
@@ -89,9 +94,9 @@ export default function Dashboard({
 
       {/* KPI counters */}
       <div className="grid grid-cols-3 gap-2.5 px-5 py-4">
-        <CounterCard label="Por aprobar" value={pendingCount} color="text-amber-400" icon="⏳" />
-        <CounterCard label="Borradores" value={draftCount} color="text-slate-400" icon="📝" />
-        <CounterCard label="En proceso" value={inProcessCount} color="text-blue-400" icon="🔄" />
+        <CounterCard label="Por aprobar" value={pendingCount} color="text-amber-400" icon={<Clock size={16} />} />
+        <CounterCard label="Borradores" value={draftCount} color="text-slate-400" icon={<FileEdit size={16} />} />
+        <CounterCard label="En proceso" value={inProcessCount} color="text-blue-400" icon={<RefreshCw size={16} />} />
       </div>
 
       {/* Module filter */}
@@ -201,7 +206,7 @@ export default function Dashboard({
           <RequestsTable requests={localFiltered} onSelectRequest={onSelectRequest} />
         ) : localFiltered.length === 0 ? (
           <EmptyState
-            icon="📋"
+            icon={<ClipboardList size={40} className="text-slate-500" />}
             title="No se encontraron solicitudes"
             description="Intenta cambiar los filtros o crea una nueva solicitud"
           />

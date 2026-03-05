@@ -1,10 +1,19 @@
 /**
  * Desktop sidebar navigation — dark mode, with theme toggle
+ * Icons: lucide-react + BullIcon + CornIcon (custom SVGs)
  */
 import { useTheme } from "../../context/ThemeContext";
 import { useNotifications } from "../../context/NotificationContext";
 import { useAuth } from "../../context/AuthContext";
 import NotificationBell from "../shared/NotificationBell";
+import {
+  LayoutDashboard, Bell, ShoppingCart, Fuel, Package,
+  BarChart3, Shield, Users, Wallet, SlidersHorizontal, RotateCcw,
+  Settings, MessageCircle, Sun, Moon, Plus, KeyRound,
+} from "lucide-react";
+import { BullIcon, CornIcon } from "../icons";
+
+const ICON_SIZE = 18;
 
 export default function DesktopSidebar({ screen, onNavigate, onNewRequest, currentUser, canViewAnalytics, canManageUsers, canViewGanado, usdRate, usdLive, onRefreshRate }) {
   const { theme, toggleTheme } = useTheme();
@@ -13,24 +22,24 @@ export default function DesktopSidebar({ screen, onNavigate, onNewRequest, curre
   const unreadCount = getVisibleNotifications(auth.currentUser?.name, auth.currentUser?.role).filter(n => !n.read).length;
 
   const mainItems = [
-    { key: 'panel', icon: '🏠', label: 'Panel General' },
-    { key: 'notifications', icon: '🔔', label: 'Notificaciones', badge: unreadCount || null },
-    { key: 'inventory', icon: '📦', label: 'Catálogo' },
-    ...(canViewGanado ? [{ key: 'ganado', icon: '🐄', label: 'Ganado' }] : []),
-    { key: 'materia_prima', icon: '🧪', label: 'Materia Prima' },
-    { key: 'combustible', icon: '⛽', label: 'Combustible' },
-    ...(canViewAnalytics ? [{ key: 'analytics', icon: '📊', label: 'Análisis' }] : []),
-    ...(canManageUsers ? [{ key: 'security', icon: '🛡️', label: 'Seguridad' }] : []),
+    { key: 'panel', icon: <LayoutDashboard size={ICON_SIZE} />, label: 'Panel General' },
+    { key: 'notifications', icon: <Bell size={ICON_SIZE} />, label: 'Notificaciones', badge: unreadCount || null },
+    { key: 'dashboard', icon: <ShoppingCart size={ICON_SIZE} />, label: 'Compras' },
+    ...(canViewGanado ? [{ key: 'ganado', icon: <BullIcon size={ICON_SIZE} />, label: 'Hacienda' }] : []),
+    { key: 'materia_prima', icon: <CornIcon size={ICON_SIZE} />, label: 'Materia Prima' },
+    { key: 'combustible', icon: <Fuel size={ICON_SIZE} />, label: 'Combustible' },
+    { key: 'inventory', icon: <Package size={ICON_SIZE} />, label: 'Inventario' },
+    ...(canViewAnalytics ? [{ key: 'analytics', icon: <BarChart3 size={ICON_SIZE} />, label: 'Análisis' }] : []),
+    ...(canManageUsers ? [{ key: 'security', icon: <Shield size={ICON_SIZE} />, label: 'Seguridad' }] : []),
   ];
 
   const adminItems = [
-    ...(canManageUsers ? [{ key: 'users', icon: '👥', label: 'Usuarios' }] : []),
-    ...(canViewAnalytics ? [{ key: 'budgets', icon: '💰', label: 'Presupuestos' }] : []),
-    ...(canManageUsers ? [{ key: 'parameters', icon: '⚙️', label: 'Parámetros' }] : []),
-    ...(canManageUsers ? [{ key: 'approvalConfig', icon: '🔄', label: 'Aprobaciones' }] : []),
+    ...(canManageUsers ? [{ key: 'users', icon: <Users size={ICON_SIZE} />, label: 'Usuarios' }] : []),
+    ...(canManageUsers ? [{ key: 'permissions', icon: <KeyRound size={ICON_SIZE} />, label: 'Permisos' }] : []),
+    ...(canViewAnalytics ? [{ key: 'budgets', icon: <Wallet size={ICON_SIZE} />, label: 'Presupuestos' }] : []),
+    ...(canManageUsers ? [{ key: 'parameters', icon: <SlidersHorizontal size={ICON_SIZE} />, label: 'Parámetros' }] : []),
+    ...(canManageUsers ? [{ key: 'approvalConfig', icon: <RotateCcw size={ICON_SIZE} />, label: 'Aprobaciones' }] : []),
   ];
-
-  const initial = currentUser?.charAt(0)?.toUpperCase() || 'U';
 
   return (
     <aside className="desktop-sidebar bg-[#0d0e14]">
@@ -66,10 +75,10 @@ export default function DesktopSidebar({ screen, onNavigate, onNewRequest, curre
         {/* Theme toggle */}
         <button
           onClick={(e) => { e.stopPropagation(); toggleTheme(); }}
-          className="w-7 h-7 rounded-md bg-[#F8F9FB]/[0.06] border-none cursor-pointer flex items-center justify-center text-sm hover:bg-[#F8F9FB]/[0.12] transition-colors"
+          className="w-7 h-7 rounded-md bg-[#F8F9FB]/[0.06] border-none cursor-pointer flex items-center justify-center hover:bg-[#F8F9FB]/[0.12] transition-colors text-slate-400"
           title={theme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
         >
-          {theme === 'dark' ? '☀️' : '🌙'}
+          {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
         </button>
       </div>
 
@@ -91,12 +100,12 @@ export default function DesktopSidebar({ screen, onNavigate, onNewRequest, curre
 
         <SectionLabel>Sistema</SectionLabel>
         <NavItem
-          item={{ key: 'settings', icon: '🔧', label: 'Configuración' }}
+          item={{ key: 'settings', icon: <Settings size={ICON_SIZE} />, label: 'Configuración' }}
           active={screen === 'settings'}
           onClick={() => onNavigate('settings')}
         />
         <NavItem
-          item={{ key: 'help', icon: '💬', label: 'Ayuda' }}
+          item={{ key: 'help', icon: <MessageCircle size={ICON_SIZE} />, label: 'Ayuda' }}
           active={false}
           onClick={() => window.open('https://wa.me/595986354781?text=Hola%2C%20necesito%20ayuda%20con%20YPOTI%20Compras', '_blank')}
         />
@@ -109,9 +118,7 @@ export default function DesktopSidebar({ screen, onNavigate, onNewRequest, curre
           className="w-full py-2.5 rounded-lg bg-[#1F2A44] hover:bg-[#1F2A44] text-white text-sm font-semibold flex items-center justify-center gap-1.5 transition-colors border-none cursor-pointer"
           aria-label="Nueva Solicitud"
         >
-          <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd"/>
-          </svg>
+          <Plus size={14} />
           Nueva Solicitud
         </button>
       </div>
@@ -184,7 +191,7 @@ function NavItem({ item, active, onClick }) {
           : 'bg-transparent text-slate-400 font-normal hover:bg-[rgba(255,255,255,0.06)] hover:text-slate-200'
       }`}
     >
-      <span className="text-[15px] w-5 text-center">{item.icon}</span>
+      <span className="w-5 flex items-center justify-center flex-shrink-0">{item.icon}</span>
       <span className="flex-1 text-left">{item.label}</span>
       {item.badge > 0 && (
         <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-px rounded-full min-w-[18px] text-center">

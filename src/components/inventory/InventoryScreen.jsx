@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { Package } from "lucide-react";
 import { GROUP_COLORS, MODULE_CATEGORIES } from "../../constants";
 import { supabase } from "../../lib/supabase";
 import BackButton from "../common/BackButton";
@@ -156,7 +157,7 @@ export default function InventoryScreen({ onBack, accessibleModules }) {
         <BackButton onClick={onBack} />
         <PageHeader title="Catálogo de Productos" subtitle="Cargando..." />
         <div className="text-center py-[60px] text-slate-400">
-          <div className="text-[28px] mb-2">{"📦"}</div>
+          <div className="mb-2"><Package size={28} className="text-slate-400 mx-auto" /></div>
           <div className="text-[13px]">Cargando cat{"á"}logo...</div>
         </div>
       </div>

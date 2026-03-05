@@ -13,6 +13,7 @@ import { initParameters } from "../constants/parameters";
 import { initBudgets } from "../constants/budgets";
 import { initUsers, hasPermission } from "../constants/users";
 import { initGanado } from "../constants/ganado";
+import { initPermissions, isSuperAdmin, getAllowedModules, buildRecordsFilter, canAccessModule } from "../lib/permissions";
 import { sanitizeName, sanitizeMultiline, sanitizeNumber } from "../utils/sanitize";
 import { useNotifications } from "./NotificationContext";
 import {
@@ -69,12 +70,13 @@ export function AppProvider({ children }) {
       }
 
       try {
-        // Init reference data + users in parallel
+        // Init reference data + users + permissions in parallel
         await Promise.all([
           initParameters(),
           initBudgets(),
           initUsers(),
           initGanado(),
+          initPermissions(currentUser?.id),
         ]);
 
         // Load all requests with nested data; fall back to sample data for demo
@@ -451,6 +453,10 @@ export function AppProvider({ children }) {
     });
   }, [requests, effectiveUser]);
 
+  // Permissions-aware allowed modules for the effective user
+  const allowedModules = useMemo(() => getAllowedModules(effectiveUser), [effectiveUser]);
+  const isAdmin = useMemo(() => isSuperAdmin(effectiveUser), [effectiveUser]);
+
   return (
     <AppContext.Provider value={{
       requests,
@@ -469,6 +475,8 @@ export function AppProvider({ children }) {
       updateRequest,
       effectiveUser,
       setDevOverride,
+      allowedModules,
+      isAdmin,
     }}>
       {children}
     </AppContext.Provider>

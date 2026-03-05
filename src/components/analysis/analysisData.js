@@ -41,10 +41,10 @@ export const TICK_DIM = { fill: '#64748b', fontSize: 10 };
 /*  CUSTOM ANALYSIS CONFIG                                             */
 /* ------------------------------------------------------------------ */
 export const CHART_TYPES = [
-  { key: 'bar', label: 'Barras', icon: '📊' },
-  { key: 'line', label: 'Linea', icon: '📈' },
-  { key: 'area', label: 'Area', icon: '📉' },
-  { key: 'pie', label: 'Circular', icon: '🥧' },
+  { key: 'bar', label: 'Barras', icon: '▥' },
+  { key: 'line', label: 'Linea', icon: '⌇' },
+  { key: 'area', label: 'Area', icon: '△' },
+  { key: 'pie', label: 'Circular', icon: '◔' },
 ];
 
 export const DIMENSIONS = [
