@@ -210,7 +210,7 @@ function AppContent() {
   const handleNavigate = (target, requestId) => {
     if (target === 'request' && requestId) {
       setSelectedRequestId(requestId);
-      setScreen('dashboard');
+      setScreen('panel');
     } else if (target === 'ganado-detail' && requestId) {
       setSelectedMovimientoId(requestId);
       setScreen('ganado-detail');
@@ -223,7 +223,7 @@ function AppContent() {
   };
 
   const handleNewRequest = () => {
-    setScreen("dashboard");
+    setScreen("panel");
     setShowNewForm(true);
   };
 
@@ -306,7 +306,7 @@ function AppContent() {
     }
 
     if (screen === "inventory" && effectiveCan("view_inventory")) {
-      return <Suspense fallback={<LazyFallback />}><InventoryScreen onBack={() => setScreen("dashboard")} /></Suspense>;
+      return <Suspense fallback={<LazyFallback />}><InventoryScreen onBack={() => setScreen("panel")} /></Suspense>;
     }
 
     if ((screen === "analytics" || screen === "analysis") && effectiveCan("view_analytics")) {
@@ -315,7 +315,7 @@ function AppContent() {
           <AnalyticsScreen
             requests={visibleRequests}
             statusCounts={statusCounts}
-            onBack={() => setScreen("dashboard")}
+            onBack={() => setScreen("panel")}
             defaultSection={screen === "analysis" ? "strategic" : "operational"}
           />
         </Suspense>
@@ -323,7 +323,7 @@ function AppContent() {
     }
 
     if (screen === "security" && effectiveCan("manage_users")) {
-      return <Suspense fallback={<LazyFallback />}><SecurityDashboard onBack={() => setScreen("dashboard")} /></Suspense>;
+      return <Suspense fallback={<LazyFallback />}><SecurityDashboard onBack={() => setScreen("panel")} /></Suspense>;
     }
 
     if (screen === "users" && effectiveCan("manage_users")) {
@@ -343,17 +343,17 @@ function AppContent() {
     }
 
     if (screen === "notifications") {
-      return <NotificationsScreen onBack={() => setScreen("dashboard")} onNavigate={handleNavigate} />;
+      return <NotificationsScreen onBack={() => setScreen("panel")} onNavigate={handleNavigate} />;
     }
 
     if (screen === "profile") {
-      return <ProfileScreen onBack={() => setScreen("dashboard")} currentUser={effectiveUser} />;
+      return <ProfileScreen onBack={() => setScreen("panel")} currentUser={effectiveUser} />;
     }
 
     if (screen === "settings") {
       return (
         <SettingsScreen
-          onBack={() => setScreen("dashboard")}
+          onBack={() => setScreen("panel")}
           onNavigate={handleNavigate}
           devMode={devMode}
           onSetDevMode={setDevMode}
@@ -361,10 +361,18 @@ function AppContent() {
       );
     }
 
+    if (screen === "materia_prima") {
+      return (
+        <Suspense fallback={<LazyFallback />}>
+          <PanelGeneral key="mp" onNavigate={handleNavigate} initialModule="materia_prima" />
+        </Suspense>
+      );
+    }
+
     if (screen === "panel") {
       return (
         <Suspense fallback={<LazyFallback />}>
-          <PanelGeneral onNavigate={handleNavigate} />
+          <PanelGeneral key="panel" onNavigate={handleNavigate} />
         </Suspense>
       );
     }

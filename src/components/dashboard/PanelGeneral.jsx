@@ -295,8 +295,8 @@ function MateriaPrimaView({ onNavigate }) {
 
 /* ── Main component ────────────────────────────────────────── */
 
-export default function PanelGeneral({ onNavigate }) {
-  const [activeModule, setActiveModule] = useState("todos");
+export default function PanelGeneral({ onNavigate, initialModule }) {
+  const [activeModule, setActiveModule] = useState(initialModule || "todos");
 
   const visibleModules =
     activeModule === "todos"

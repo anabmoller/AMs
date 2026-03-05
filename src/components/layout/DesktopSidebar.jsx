@@ -14,10 +14,10 @@ export default function DesktopSidebar({ screen, onNavigate, onNewRequest, curre
 
   const mainItems = [
     { key: 'panel', icon: '🏠', label: 'Panel General' },
-    { key: 'dashboard', icon: '📋', label: 'Solicitudes' },
     { key: 'notifications', icon: '🔔', label: 'Notificaciones', badge: unreadCount || null },
     { key: 'inventory', icon: '📦', label: 'Inventario' },
     ...(canViewGanado ? [{ key: 'ganado', icon: '🐄', label: 'Ganado' }] : []),
+    { key: 'materia_prima', icon: '🧪', label: 'Materia Prima' },
     ...(canViewAnalytics ? [{ key: 'analytics', icon: '📊', label: 'Análisis' }] : []),
     ...(canManageUsers ? [{ key: 'security', icon: '🛡️', label: 'Seguridad' }] : []),
   ];
@@ -33,7 +33,7 @@ export default function DesktopSidebar({ screen, onNavigate, onNewRequest, curre
 
   return (
     <aside className="desktop-sidebar bg-[#0d0e14]">
-      {/* Brand — clickable to go to Solicitudes */}
+      {/* Brand — clickable to go to Panel General */}
       <div
         onClick={() => onNavigate('panel')}
         className="px-5 pt-5 pb-4 border-b border-white/[0.06] flex items-center gap-2.5 cursor-pointer hover:opacity-80 transition-opacity"
