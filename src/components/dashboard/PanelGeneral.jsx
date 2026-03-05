@@ -11,6 +11,7 @@ const MODULES = [
   { key: "ganado", label: "Ganado", icon: "🐄" },
   { key: "inventario", label: "Inventario", icon: "📦" },
   { key: "materia_prima", label: "Materia Prima", icon: "🏭" },
+  { key: "combustible", label: "Combustible", icon: "⛽" },
 ];
 
 const SUMMARY_CARDS = {
@@ -30,6 +31,10 @@ const SUMMARY_CARDS = {
     { label: "Lotes activos", value: 15, icon: "📦", color: "#3b82f6" },
     { label: "Por vencer", value: 2, icon: "⏰", color: "#ef4444" },
   ],
+  combustible: [
+    { label: "Consumo del mes", value: "12.450 L", icon: "⛽", color: "#f59e0b" },
+    { label: "Gasto del mes", value: "$8.2M", icon: "💰", color: "#3b82f6" },
+  ],
 };
 
 const MODULE_META = {
@@ -37,6 +42,7 @@ const MODULE_META = {
   ganado: { label: "Ganado", variant: "purple", icon: "🐄" },
   inventario: { label: "Inventario", variant: "warning", icon: "📦" },
   materia_prima: { label: "Materia Prima", variant: "success", icon: "🏭" },
+  combustible: { label: "Combustible", variant: "warning", icon: "⛽" },
 };
 
 const ACTIVITY_FEED = [
@@ -46,6 +52,8 @@ const ACTIVITY_FEED = [
   { id: 4, module: "compras", text: "Cotización recibida de Proveedor ABC", time: "Hace 2 horas", icon: "📄" },
   { id: 5, module: "ganado", text: "Alerta sanitaria: Vacunación pendiente Est. Norte", time: "Hace 3 horas", icon: "🚨" },
   { id: 6, module: "inventario", text: "Reposición completada — 50 unidades ingresadas", time: "Hace 4 horas", icon: "📥" },
+  { id: 7, module: "combustible", text: "Carga de 3.200 L diésel — Est. Ypoti", time: "Hace 5 horas", icon: "⛽" },
+  { id: 8, module: "combustible", text: "Alerta: consumo elevado en Est. Lusipar (+18%)", time: "Hace 6 horas", icon: "🚨" },
 ];
 
 /* ── Materia Prima expanded mock data ─────────────────────── */
@@ -293,6 +301,159 @@ function MateriaPrimaView({ onNavigate }) {
   );
 }
 
+/* ── Combustible mock data ─────────────────────────────────── */
+
+const COMB_KPI_CARDS = [
+  { label: "Consumo del mes", value: "12.450 L", icon: "⛽", color: "#f59e0b" },
+  { label: "Gasto del mes", value: "Gs 8.2M", icon: "💰", color: "#3b82f6" },
+  { label: "Costo promedio", value: "Gs 6.580/L", icon: "📈", color: "#22c55e" },
+  { label: "Alertas activas", value: 2, icon: "🚨", color: "#ef4444" },
+];
+
+const COMB_ACTIVITY = [
+  { id: "c1", text: "Carga de 3.200 L diésel — Est. Ypoti", time: "Hace 5 horas", icon: "⛽", tipo: "Diésel" },
+  { id: "c2", text: "Alerta: consumo elevado en Est. Lusipar (+18%)", time: "Hace 6 horas", icon: "🚨", tipo: "Alerta" },
+  { id: "c3", text: "Carga de 1.800 L gasolina — Est. Cielo Azul", time: "Hace 1 día", icon: "⛽", tipo: "Gasolina" },
+  { id: "c4", text: "Mantenimiento tanque completado — Est. Santa Maria", time: "Hace 2 días", icon: "🔧", tipo: "Mantenimiento" },
+  { id: "c5", text: "Factura COMB-2026-045 registrada — Petropar", time: "Hace 3 días", icon: "📄", tipo: "Diésel" },
+];
+
+function CombustibleView({ onNavigate }) {
+  const [periodo, setPeriodo] = useState("mes");
+  const [tipoComb, setTipoComb] = useState("todos");
+  const [centro, setCentro] = useState("todos");
+
+  const filteredActivity = COMB_ACTIVITY.filter((a) => {
+    if (tipoComb === "todos") return true;
+    return a.tipo.toLowerCase() === tipoComb;
+  });
+
+  return (
+    <div className="space-y-5">
+      {/* A) KPI Cards */}
+      <div>
+        <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-1 mb-2.5 flex items-center gap-1.5">
+          ⛽ Combustible — Resumen
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {COMB_KPI_CARDS.map((c) => (
+            <KPICard key={c.label} label={c.label} value={c.value} icon={c.icon} color={c.color} />
+          ))}
+        </div>
+      </div>
+
+      {/* B) Quick filters */}
+      <div>
+        <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-1 mb-2.5 flex items-center gap-1.5">
+          🔍 Filtros
+        </div>
+        <Card hover={false} className="p-3">
+          <div className="flex flex-wrap gap-3">
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Período</label>
+              <select
+                value={periodo}
+                onChange={(e) => setPeriodo(e.target.value)}
+                className="text-[11px] px-2.5 py-1.5 rounded-lg bg-[#F8F9FB]/[0.04] border border-white/[0.06] text-white focus:outline-none cursor-pointer"
+              >
+                <option value="semana">Esta semana</option>
+                <option value="mes">Este mes</option>
+                <option value="trimestre">Trimestre</option>
+                <option value="ano">Este año</option>
+              </select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Tipo</label>
+              <select
+                value={tipoComb}
+                onChange={(e) => setTipoComb(e.target.value)}
+                className="text-[11px] px-2.5 py-1.5 rounded-lg bg-[#F8F9FB]/[0.04] border border-white/[0.06] text-white focus:outline-none cursor-pointer"
+              >
+                <option value="todos">Todos</option>
+                <option value="diésel">Diésel</option>
+                <option value="gasolina">Gasolina</option>
+              </select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Centro</label>
+              <select
+                value={centro}
+                onChange={(e) => setCentro(e.target.value)}
+                className="text-[11px] px-2.5 py-1.5 rounded-lg bg-[#F8F9FB]/[0.04] border border-white/[0.06] text-white focus:outline-none cursor-pointer"
+              >
+                <option value="todos">Todos</option>
+                <option value="ypoti">Ypoti</option>
+                <option value="lusipar">Lusipar</option>
+                <option value="cielo_azul">Cielo Azul</option>
+                <option value="santa_maria">Santa Maria</option>
+              </select>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* C) Activity feed */}
+      <div>
+        <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-1 mb-2.5 flex items-center gap-1.5">
+          🕐 Actividad reciente
+        </div>
+        {filteredActivity.length > 0 ? (
+          filteredActivity.map((entry) => (
+            <Card key={entry.id} hover={false} className="p-3 mb-2">
+              <div className="flex gap-3 items-start">
+                <span className="text-sm mt-0.5">{entry.icon}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Badge variant="warning" size="xs">Combustible</Badge>
+                    <span className="text-[10px] text-slate-500 bg-[#F8F9FB]/[0.04] px-1.5 py-0.5 rounded">{entry.tipo}</span>
+                  </div>
+                  <div className="text-sm text-white">{entry.text}</div>
+                  <div className="text-[10px] text-slate-500 mt-1">{entry.time}</div>
+                </div>
+              </div>
+            </Card>
+          ))
+        ) : (
+          <Card hover={false} className="p-6 text-center">
+            <p className="text-sm text-slate-500">No hay actividad para este filtro</p>
+          </Card>
+        )}
+      </div>
+
+      {/* D) Quick action */}
+      <div>
+        <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider px-1 mb-2.5 flex items-center gap-1.5">
+          ⚡ Acciones rápidas
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <Card hover={false} className="p-4 flex items-start gap-3">
+            <div className="w-9 h-9 rounded-lg bg-[#f59e0b]/10 border border-[#f59e0b]/[0.19] flex items-center justify-center shrink-0">
+              <span className="text-base">⛽</span>
+            </div>
+            <div className="flex-1">
+              <div className="text-[13px] font-semibold text-white mb-1">Registrar carga</div>
+              <div className="text-[11px] text-slate-400 leading-relaxed">
+                Ingresar nueva carga de combustible con volumen, proveedor y centro de costo.
+              </div>
+            </div>
+          </Card>
+          <Card hover={false} className="p-4 flex items-start gap-3">
+            <div className="w-9 h-9 rounded-lg bg-[#3b82f6]/10 border border-[#3b82f6]/[0.19] flex items-center justify-center shrink-0">
+              <span className="text-base">📊</span>
+            </div>
+            <div className="flex-1">
+              <div className="text-[13px] font-semibold text-white mb-1">Ver reportes</div>
+              <div className="text-[11px] text-slate-400 leading-relaxed">
+                Consumo por establecimiento, tendencia mensual y comparativo de costos.
+              </div>
+            </div>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── Main component ────────────────────────────────────────── */
 
 export default function PanelGeneral({ onNavigate, initialModule }) {
@@ -333,9 +494,11 @@ export default function PanelGeneral({ onNavigate, initialModule }) {
         ))}
       </div>
 
-      {/* Materia Prima — expanded custom view */}
+      {/* Module-specific expanded views */}
       {activeModule === "materia_prima" ? (
         <MateriaPrimaView onNavigate={onNavigate} />
+      ) : activeModule === "combustible" ? (
+        <CombustibleView onNavigate={onNavigate} />
       ) : (
         <>
           {/* Summary cards by module */}

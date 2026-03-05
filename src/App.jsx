@@ -369,6 +369,14 @@ function AppContent() {
       );
     }
 
+    if (screen === "combustible") {
+      return (
+        <Suspense fallback={<LazyFallback />}>
+          <PanelGeneral key="comb" onNavigate={handleNavigate} initialModule="combustible" />
+        </Suspense>
+      );
+    }
+
     if (screen === "panel") {
       return (
         <Suspense fallback={<LazyFallback />}>

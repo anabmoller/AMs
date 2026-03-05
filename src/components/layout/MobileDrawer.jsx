@@ -15,6 +15,7 @@ export default function MobileDrawer({ open, onClose, screen, onNavigate, onNewR
     { key: 'inventory', icon: '📦', label: 'Inventario' },
     ...(canViewGanado ? [{ key: 'ganado', icon: '🐄', label: 'Ganado' }] : []),
     { key: 'materia_prima', icon: '🧪', label: 'Materia Prima' },
+    { key: 'combustible', icon: '⛽', label: 'Combustible' },
     ...(canViewAnalytics ? [{ key: 'analytics', icon: '📊', label: 'Análisis' }] : []),
     ...(canManageUsers ? [{ key: 'security', icon: '🛡️', label: 'Seguridad' }] : []),
   ];
