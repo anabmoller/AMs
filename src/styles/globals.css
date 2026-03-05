@@ -110,6 +110,7 @@ body {
 /* --- Surfaces: dark backgrounds → white/light --- */
 :root.light .bg-\[\#0a0b0f\],
 :root.light .bg-\[\#0d0e14\],
+:root.light .bg-\[\#13141a\],
 :root.light .bg-\[\#1a1b22\],
 :root.light .bg-\[\#1a1b23\] {
   background: #ffffff !important;
@@ -141,9 +142,14 @@ body {
 :root.light .bg-\[\#1F2A44\] {
   background: #1e293b !important; /* slate-800: visible on white surfaces */
 }
-/* Preserve white text ON dark navy elements (overrides .text-white → dark rule below) */
+/* Preserve white text ON dark/colored elements (overrides .text-white → dark rule below) */
 :root.light .bg-\[\#1F2A44\] > .text-white,
-:root.light .bg-\[\#1F2A44\].text-white {
+:root.light .bg-\[\#1F2A44\].text-white,
+:root.light .bg-\[\#3b82f6\].text-white,
+:root.light .bg-\[\#C8A03A\].text-white,
+:root.light .bg-green-600.text-white,
+:root.light .bg-red-500.text-white,
+:root.light .bg-red-600.text-white {
   color: #ffffff !important;
 }
 
@@ -185,6 +191,9 @@ body {
 :root.light .text-white\/70 {
   color: rgba(17, 24, 39, 0.7) !important;
 }
+:root.light .text-slate-200 {
+  color: #334155 !important;
+}
 :root.light .text-slate-300 {
   color: #374151 !important;
 }
@@ -210,6 +219,10 @@ body {
 
 /* --- Borders: translucent white → visible gray --- */
 :root.light .border-white\/\[0\.06\] {
+  border-color: #e5e7eb !important;
+}
+:root.light .border-white\/\[0\.03\],
+:root.light .border-white\/\[0\.04\] {
   border-color: #e5e7eb !important;
 }
 :root.light .border-white\/10,
@@ -254,6 +267,18 @@ body {
 }
 :root.light .hover\:bg-\[\#F8F9FB\]\/\[0\.06\]:hover {
   background: #e5e7eb !important;
+}
+:root.light .hover\:bg-\[\#1a1b23\]:hover {
+  background: #f3f4f6 !important;
+}
+
+/* --- Table rows: translucent white bg → light gray --- */
+:root.light .bg-white\/\[0\.02\] {
+  background: #f9fafb !important;
+}
+/* Timeline line in ganado detail */
+:root.light .bg-white\/\[0\.06\] {
+  background: #d1d5db !important;
 }
 :root.light .hover\:bg-\[rgba\(255\,255\,255\,0\.06\)\]:hover,
 :root.light .hover\:bg-\[rgba\(255\,255\,255\,0\.07\)\]:hover {
