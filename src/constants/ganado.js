@@ -462,6 +462,43 @@ export async function fetchTrazabilidad({ limit = 100, offset = 0 } = {}) {
   return data || [];
 }
 
+// ============================================================
+// GANADO METRICS — Server-side KPI aggregation via RPC
+// ============================================================
+let _metricsCache = { data: null, ts: 0, key: "" };
+const METRICS_CACHE_TTL = 30_000; // 30s
+
+export async function fetchGanadoMetrics({ fechaDesde = null, fechaHasta = null, establecimientoId = null } = {}) {
+  const cacheKey = `${fechaDesde}|${fechaHasta}|${establecimientoId}`;
+  const now = Date.now();
+  if (_metricsCache.data && _metricsCache.key === cacheKey && (now - _metricsCache.ts) < METRICS_CACHE_TTL) {
+    return _metricsCache.data;
+  }
+
+  const params = {};
+  if (fechaDesde) params.p_fecha_desde = fechaDesde;
+  if (fechaHasta) params.p_fecha_hasta = fechaHasta;
+  if (establecimientoId) params.p_establecimiento_id = establecimientoId;
+
+  const { data, error } = await supabase.rpc("get_ganado_metrics", params);
+  if (error) {
+    console.error("[Ganado] fetchGanadoMetrics:", error.message);
+    return null;
+  }
+
+  if (import.meta.env.DEV) {
+    console.log("[Ganado] metrics:", data);
+  }
+
+  _metricsCache = { data, ts: now, key: cacheKey };
+  return data;
+}
+
+/** Invalidate metrics cache (call after mutations) */
+export function invalidateGanadoMetrics() {
+  _metricsCache = { data: null, ts: 0, key: "" };
+}
+
 /** Raw ETL fazendas with coordinates (for map) */
 export async function fetchETLFazendas() {
   const { data, error } = await supabase

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { hasPermission } from "../../constants/users";
 import { getEstablishments } from "../../constants/parameters";
@@ -6,6 +6,7 @@ import {
   GANADO_STATUS_FLOW, GANADO_EXTRA_STATUSES,
   TIPO_OPERACION_OPTIONS,
   fetchMovimientos,
+  fetchGanadoMetrics,
 } from "../../constants/ganado";
 import PageHeader from "../common/PageHeader";
 import SearchInput from "../common/SearchInput";
@@ -26,14 +27,18 @@ function FilterPill({ label, active, onClick, color }) {
   );
 }
 
-function KpiCard({ label, value, icon, color }) {
+function KpiCard({ label, value, icon, color, loading }) {
   return (
     <div className="bg-[#13141a] border border-white/[0.06] rounded-xl p-4 flex-1 min-w-[140px]">
       <div className="flex items-center gap-2 mb-1">
         <span className="text-lg">{icon}</span>
         <span className="text-[10px] text-slate-500 uppercase tracking-wider font-medium">{label}</span>
       </div>
-      <div className="text-2xl font-bold" style={{ color: color || "#fff" }}>{value}</div>
+      <div className="text-2xl font-bold" style={{ color: color || "#fff" }}>
+        {loading ? (
+          <span className="inline-block w-12 h-6 bg-white/[0.04] rounded animate-pulse" />
+        ) : value}
+      </div>
     </div>
   );
 }
@@ -46,18 +51,55 @@ export default function MovimientosScreen({ onBack, onNavigate }) {
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterEstablishment, setFilterEstablishment] = useState("all");
 
+  // Server-side metrics
+  const [metrics, setMetrics] = useState(null);
+  const [metricsLoading, setMetricsLoading] = useState(true);
+
+  // Load movimientos + metrics in parallel
   useEffect(() => {
     async function load() {
       setLoading(true);
-      const data = await fetchMovimientos();
+      setMetricsLoading(true);
+
+      const [data, metricsData] = await Promise.all([
+        fetchMovimientos(),
+        fetchGanadoMetrics(),
+      ]);
+
       setMovimientos(data);
+      setMetrics(metricsData);
       setLoading(false);
+      setMetricsLoading(false);
     }
     load();
   }, []);
 
-  // KPI calculations
+  // Re-fetch metrics when establishment filter changes (server-side filtering)
+  const refreshMetrics = useCallback(async (estId) => {
+    setMetricsLoading(true);
+    const m = await fetchGanadoMetrics({
+      establecimientoId: estId === "all" ? null : estId,
+    });
+    setMetrics(m);
+    setMetricsLoading(false);
+  }, []);
+
+  const handleEstablishmentChange = useCallback((val) => {
+    setFilterEstablishment(val);
+    refreshMetrics(val);
+  }, [refreshMetrics]);
+
+  // KPI values from server metrics (fallback to client-side if RPC unavailable)
   const kpis = useMemo(() => {
+    if (metrics) {
+      return {
+        porValidar: Number(metrics.por_validar) || 0,
+        enTransito: Number(metrics.en_transito) || 0,
+        totalCabezas: Number(metrics.total_cabezas) || 0,
+        totalGs: Number(metrics.total_gs) || 0,
+      };
+    }
+    // Client-side fallback
     const porValidar = movimientos.filter(m => m.estado === "borrador" || m.estado === "pendiente_validacion").length;
     const enTransito = movimientos.filter(m => m.estado === "en_transito").length;
     const totalCabezas = movimientos.reduce((sum, m) => sum + (m.cantidadTotal || 0), 0);
@@ -65,18 +107,26 @@ export default function MovimientosScreen({ onBack, onNavigate }) {
       .filter(m => m.moneda === "PYG" && m.estado !== "anulado")
       .reduce((sum, m) => sum + (m.precioTotal || 0), 0);
     return { porValidar, enTransito, totalCabezas, totalGs };
-  }, [movimientos]);
+  }, [metrics, movimientos]);
 
-  // Status counts for pills
+  // Status counts from server metrics (fallback to client-side)
   const statusCounts = useMemo(() => {
     const all = [...GANADO_STATUS_FLOW, ...GANADO_EXTRA_STATUSES];
+    if (metrics?.by_status) {
+      return all.map(s => ({
+        ...s,
+        count: Number(metrics.by_status[s.key]) || 0,
+      }));
+    }
     return all.map(s => ({
       ...s,
       count: movimientos.filter(m => m.estado === s.key).length,
     }));
-  }, [movimientos]);
+  }, [metrics, movimientos]);
 
-  // Filtered
+  const totalMovimientos = metrics ? Number(metrics.total_movimientos) || movimientos.length : movimientos.length;
+
+  // Filtered (client-side for card list — movimientos are already loaded)
   const filtered = useMemo(() => {
     return movimientos.filter(m => {
       if (filterStatus !== "all" && m.estado !== filterStatus) return false;
@@ -101,20 +151,21 @@ export default function MovimientosScreen({ onBack, onNavigate }) {
     <div className="max-w-6xl mx-auto px-4 py-6">
       <PageHeader
         title="Movimientos de Ganado"
-        subtitle={`${movimientos.length} movimientos registrados`}
+        subtitle={`${totalMovimientos} movimientos registrados`}
         onBack={onBack}
       />
 
       {/* KPI cards */}
       <div className="flex gap-3 overflow-x-auto pb-2 mb-6 scrollbar-hide">
-        <KpiCard label="Por Validar" value={kpis.porValidar} icon="⏳" color="#f59e0b" />
-        <KpiCard label="En Tránsito" value={kpis.enTransito} icon="🚚" color="#8b5cf6" />
-        <KpiCard label="Total Cabezas" value={kpis.totalCabezas.toLocaleString("es-PY")} icon="🐄" color="#3b82f6" />
+        <KpiCard label="Por Validar" value={kpis.porValidar} icon="⏳" color="#f59e0b" loading={metricsLoading} />
+        <KpiCard label="En Tránsito" value={kpis.enTransito} icon="🚚" color="#8b5cf6" loading={metricsLoading} />
+        <KpiCard label="Total Cabezas" value={kpis.totalCabezas.toLocaleString("es-PY")} icon="🐄" color="#3b82f6" loading={metricsLoading} />
         <KpiCard
           label="Total Gs."
           value={`Gs. ${kpis.totalGs.toLocaleString("es-PY")}`}
           icon="💰"
           color="#C8A03A"
+          loading={metricsLoading}
         />
       </div>
 
@@ -127,7 +178,7 @@ export default function MovimientosScreen({ onBack, onNavigate }) {
         />
         <select
           value={filterEstablishment}
-          onChange={(e) => setFilterEstablishment(e.target.value)}
+          onChange={(e) => handleEstablishmentChange(e.target.value)}
           className="bg-[#13141a] border border-white/[0.06] text-slate-300 text-xs rounded-lg px-3 py-2 min-w-[160px]"
         >
           <option value="all">Todos los establecimientos</option>
@@ -139,7 +190,7 @@ export default function MovimientosScreen({ onBack, onNavigate }) {
 
       {/* Status filter pills */}
       <div className="flex gap-2 overflow-x-auto pb-3 mb-4 scrollbar-hide">
-        <FilterPill label={`Todos (${movimientos.length})`} active={filterStatus === "all"} onClick={() => setFilterStatus("all")} />
+        <FilterPill label={`Todos (${totalMovimientos})`} active={filterStatus === "all"} onClick={() => setFilterStatus("all")} />
         {statusCounts.filter(s => s.count > 0).map(s => (
           <FilterPill
             key={s.key}
