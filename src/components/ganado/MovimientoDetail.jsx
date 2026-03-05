@@ -8,7 +8,7 @@ import {
   getCategorias, getFrigorificos,
   fetchSingleMovimiento, validateMovimiento, advanceGanadoStatus,
   addDivergencia, resolveDivergencia, anularMovimiento, updateMovimiento,
-  addPesaje, deletePesaje,
+  addPesaje, deletePesaje, invalidateGanadoMetrics,
 } from "../../constants/ganado";
 
 function getStatusInfo(estado) {
@@ -106,6 +106,7 @@ export default function MovimientoDetail({ movimientoUuid, onBack, onNavigate })
     setActionLoading(true);
     try {
       await validateMovimiento(movimientoUuid);
+      invalidateGanadoMetrics();
       await load();
     } catch (err) {
       console.error("[Detail] Validate failed:", err);
@@ -118,6 +119,7 @@ export default function MovimientoDetail({ movimientoUuid, onBack, onNavigate })
     setActionLoading(true);
     try {
       await advanceGanadoStatus(movimientoUuid, nextStatus.key, advanceComment || undefined);
+      invalidateGanadoMetrics();
       setShowAdvanceDialog(false);
       setAdvanceComment("");
       await load();
@@ -163,6 +165,7 @@ export default function MovimientoDetail({ movimientoUuid, onBack, onNavigate })
     setActionLoading(true);
     try {
       await anularMovimiento(movimientoUuid, anularReason);
+      invalidateGanadoMetrics();
       setShowAnularDialog(false);
       await load();
     } catch (err) {

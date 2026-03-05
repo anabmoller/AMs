@@ -4,7 +4,7 @@ import { getEstablishments } from "../../constants/parameters";
 import {
   FINALIDAD_OPTIONS, TIPO_OPERACION_OPTIONS,
   getCategorias, getFrigorificos,
-  insertMovimiento,
+  insertMovimiento, invalidateGanadoMetrics,
 } from "../../constants/ganado";
 
 const STEPS = [
@@ -188,6 +188,7 @@ export default function NuevoMovimientoForm({ onCancel, onCreated }) {
         observaciones: form.observaciones,
       };
       await insertMovimiento(payload);
+      invalidateGanadoMetrics();
       onCreated?.();
     } catch (err) {
       console.error("[NuevoMovimiento] Submit failed:", err);
