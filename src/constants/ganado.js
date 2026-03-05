@@ -381,3 +381,97 @@ export async function fetchPesajesByMovimiento(movimientoUuid) {
   }
   return (data || []).map(transformPesaje);
 }
+
+// ============================================================
+// ETL ANALYTICS — Read from normalized pipeline tables
+// ============================================================
+
+/** Total cattle by establishment (from ETL data) */
+export async function fetchGanadoPorEstablecimiento() {
+  const { data, error } = await supabase
+    .from("vw_ganado_por_establecimiento")
+    .select("*")
+    .order("total_animales_comprados", { ascending: false });
+  if (error) {
+    console.error("[Ganado ETL] fetchGanadoPorEstablecimiento:", error.message);
+    return [];
+  }
+  return data || [];
+}
+
+/** Purchases by provider (from ETL data) */
+export async function fetchComprasPorProveedor() {
+  const { data, error } = await supabase
+    .from("vw_compras_por_proveedor")
+    .select("*")
+    .order("total_animales", { ascending: false });
+  if (error) {
+    console.error("[Ganado ETL] fetchComprasPorProveedor:", error.message);
+    return [];
+  }
+  return data || [];
+}
+
+/** Average weight per category (from ETL data) */
+export async function fetchPesoPorCategoria() {
+  const { data, error } = await supabase
+    .from("vw_peso_por_categoria")
+    .select("*");
+  if (error) {
+    console.error("[Ganado ETL] fetchPesoPorCategoria:", error.message);
+    return [];
+  }
+  return data || [];
+}
+
+/** Movement distribution by destination (from ETL data) */
+export async function fetchMovimientosPorDestino() {
+  const { data, error } = await supabase
+    .from("vw_movimientos_por_destino")
+    .select("*");
+  if (error) {
+    console.error("[Ganado ETL] fetchMovimientosPorDestino:", error.message);
+    return [];
+  }
+  return data || [];
+}
+
+/** Yearly purchase trends (from ETL data) */
+export async function fetchTendenciaAnual() {
+  const { data, error } = await supabase
+    .from("vw_tendencia_compras_anual")
+    .select("*");
+  if (error) {
+    console.error("[Ganado ETL] fetchTendenciaAnual:", error.message);
+    return [];
+  }
+  return data || [];
+}
+
+/** Full traceability view (from ETL data) */
+export async function fetchTrazabilidad({ limit = 100, offset = 0 } = {}) {
+  const { data, error } = await supabase
+    .from("vw_trazabilidad_completa")
+    .select("*")
+    .range(offset, offset + limit - 1)
+    .order("fecha_emision", { ascending: false });
+  if (error) {
+    console.error("[Ganado ETL] fetchTrazabilidad:", error.message);
+    return [];
+  }
+  return data || [];
+}
+
+/** Raw ETL fazendas with coordinates (for map) */
+export async function fetchETLFazendas() {
+  const { data, error } = await supabase
+    .from("etl_fazendas")
+    .select("id, nome, tipo, latitude, longitude, departamento, distrito")
+    .not("latitude", "is", null)
+    .order("nome");
+  if (error) {
+    console.error("[Ganado ETL] fetchETLFazendas:", error.message);
+    return [];
+  }
+  return data || [];
+}
