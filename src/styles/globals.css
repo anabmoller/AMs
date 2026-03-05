@@ -98,59 +98,127 @@ body {
 :root.light ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
 :root.light ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
 
-/* ---- Light mode overrides ---- */
+/* ===========================================================
+   LIGHT MODE OVERRIDES
+   Force white/light surfaces and readable contrast in light mode
+   =========================================================== */
 :root.light body {
   background: #f8f9fa;
   color: #111827;
 }
 
+/* --- Surfaces: dark backgrounds → white/light --- */
 :root.light .bg-\[\#0a0b0f\],
-:root.light .bg-\[\#0d0e14\] {
+:root.light .bg-\[\#0d0e14\],
+:root.light .bg-\[\#1a1b22\],
+:root.light .bg-\[\#1a1b23\] {
   background: #ffffff !important;
 }
-
 :root.light .min-h-screen.bg-\[\#0a0b0f\] {
   background: #f8f9fa !important;
 }
 
-:root.light .text-white {
-  color: #111827 !important;
-}
-
-:root.light .text-slate-400 {
-  color: #6b7280 !important;
-}
-
-:root.light .text-slate-500 {
-  color: #9ca3af !important;
-}
-
-:root.light .text-slate-600 {
-  color: #9ca3af !important;
-}
-
-:root.light .text-slate-300 {
-  color: #374151 !important;
-}
-
-:root.light .border-white\/\[0\.06\] {
-  border-color: #e5e7eb !important;
-}
-
-:root.light .bg-\[\#F8F9FB\]\/\[0\.03\],
+/* --- Card surfaces (semi-transparent fills) --- */
 :root.light .bg-\[\#F8F9FB\]\/\[0\.02\],
+:root.light .bg-\[\#F8F9FB\]\/\[0\.03\],
 :root.light .bg-\[\#F8F9FB\]\/\[0\.04\] {
   background: #ffffff !important;
 }
-
 :root.light .bg-\[\#F8F9FB\]\/\[0\.05\] {
   background: #f9fafb !important;
 }
-
 :root.light .bg-\[\#F8F9FB\]\/\[0\.06\] {
   background: #f3f4f6 !important;
 }
+:root.light .bg-\[\#F8F9FB\]\/20 {
+  background: rgba(0, 0, 0, 0.08) !important;
+}
+:root.light .bg-\[\#F8F9FB\] {
+  background: #111827 !important;
+}
 
+/* --- Navy (#1F2A44) elements: keep dark for buttons/logos, preserve white text --- */
+:root.light .bg-\[\#1F2A44\] {
+  background: #1e293b !important; /* slate-800: visible on white surfaces */
+}
+/* Preserve white text ON dark navy elements (overrides .text-white → dark rule below) */
+:root.light .bg-\[\#1F2A44\] > .text-white,
+:root.light .bg-\[\#1F2A44\].text-white {
+  color: #ffffff !important;
+}
+
+/* --- Navy semi-transparent fills → light tints --- */
+:root.light .bg-\[\#1F2A44\]\/10,
+:root.light .bg-\[\#1F2A44\]\/15 {
+  background: rgba(30, 41, 59, 0.08) !important;
+}
+:root.light .bg-\[\#1F2A44\]\/\[0\.04\],
+:root.light .bg-\[\#1F2A44\]\/\[0\.05\],
+:root.light .bg-\[\#1F2A44\]\/\[0\.06\],
+:root.light .bg-\[\#1F2A44\]\/\[0\.07\],
+:root.light .bg-\[\#1F2A44\]\/\[0\.08\] {
+  background: rgba(30, 41, 59, 0.06) !important;
+}
+:root.light .bg-\[\#1F2A44\]\/\[0\.1\],
+:root.light .bg-\[\#1F2A44\]\/\[0\.12\],
+:root.light .bg-\[\#1F2A44\]\/\[0\.15\] {
+  background: rgba(30, 41, 59, 0.10) !important;
+}
+
+/* --- Gradient cards (navy/gold) → light surfaces in light mode --- */
+:root.light .bg-gradient-to-br.from-\[\#1F2A44\].to-\[\#1F2A44\] {
+  background: linear-gradient(to bottom right, #e2e8f0, #e2e8f0) !important;
+}
+:root.light .bg-gradient-to-br.from-\[\#1F2A44\].to-\[\#C8A03A\] {
+  background: linear-gradient(to bottom right, #1e293b, #92710A) !important;
+}
+/* Preserve white text on gradient cards */
+:root.light .bg-gradient-to-br.from-\[\#1F2A44\].to-\[\#C8A03A\] .text-white,
+:root.light .bg-gradient-to-br.from-\[\#1F2A44\].to-\[\#C8A03A\].text-white {
+  color: #ffffff !important;
+}
+
+/* --- Text: ensure readable contrast on light surfaces --- */
+:root.light .text-white {
+  color: #111827 !important;
+}
+:root.light .text-white\/70 {
+  color: rgba(17, 24, 39, 0.7) !important;
+}
+:root.light .text-slate-300 {
+  color: #374151 !important;
+}
+:root.light .text-slate-400 {
+  color: #6b7280 !important;
+}
+:root.light .text-slate-500 {
+  color: #6b7280 !important;
+}
+:root.light .text-slate-600 {
+  color: #4b5563 !important;
+}
+
+/* Monto/gradient cards: opacity text → proper light-mode text */
+:root.light .bg-gradient-to-br.from-\[\#1F2A44\].to-\[\#1F2A44\] .text-white {
+  color: #1e293b !important;
+}
+:root.light .bg-gradient-to-br.from-\[\#1F2A44\].to-\[\#1F2A44\] [class*="opacity-70"],
+:root.light .bg-gradient-to-br.from-\[\#1F2A44\].to-\[\#1F2A44\] [class*="opacity-80"] {
+  opacity: 1 !important;
+  color: #64748b !important;
+}
+
+/* --- Borders: translucent white → visible gray --- */
+:root.light .border-white\/\[0\.06\] {
+  border-color: #e5e7eb !important;
+}
+:root.light .border-white\/10,
+:root.light .border-white\/\[0\.10\],
+:root.light .border-white\/\[0\.12\] {
+  border-color: #d1d5db !important;
+}
+
+/* --- Form controls --- */
 :root.light select,
 :root.light input,
 :root.light textarea {
@@ -159,20 +227,45 @@ body {
   border-color: #d1d5db !important;
   color-scheme: light !important;
 }
-
 :root.light select option {
   background: #ffffff;
   color: #111827;
 }
 
+/* --- Layout: sidebar, desktop --- */
 :root.light .desktop-sidebar {
   background: #ffffff !important;
   border-right-color: #e5e7eb !important;
 }
 
-:root.light .bg-\[\#1a1b22\],
-:root.light .bg-\[\#1a1b23\] {
-  background: #ffffff !important;
+/* --- Bottom nav / action bars: dark rgba → white --- */
+:root.light .bg-\[rgba\(10\,11\,15\,0\.97\)\],
+:root.light .bg-\[rgba\(10\,11\,15\,0\.95\)\] {
+  background: rgba(255, 255, 255, 0.97) !important;
+}
+/* Translucent white fills in sidebar/drawer → light gray fills */
+:root.light .bg-\[rgba\(255\,255\,255\,0\.04\)\] {
+  background: rgba(0, 0, 0, 0.03) !important;
+}
+
+/* --- Hover states for navy elements --- */
+:root.light .hover\:bg-\[\#1F2A44\]:hover {
+  background: #334155 !important;
+}
+:root.light .hover\:bg-\[\#F8F9FB\]\/\[0\.06\]:hover {
+  background: #e5e7eb !important;
+}
+:root.light .hover\:bg-\[rgba\(255\,255\,255\,0\.06\)\]:hover,
+:root.light .hover\:bg-\[rgba\(255\,255\,255\,0\.07\)\]:hover {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+/* --- Shadows: reduce heavy dark shadows --- */
+:root.light .shadow-lg.shadow-black\/20 {
+  --tw-shadow-color: rgba(0, 0, 0, 0.08) !important;
+}
+:root.light .shadow-md.shadow-black\/20 {
+  --tw-shadow-color: rgba(0, 0, 0, 0.06) !important;
 }
 
 /* Custom focus */
@@ -252,15 +345,34 @@ input, select, textarea, button { font-family: inherit; }
 :root.light .text-\[\#C8A03A\] {
   color: #92710A !important;
 }
-:root.light .bg-\[\#1F2A44\] {
-  background: #1F2A44 !important;
-}
 :root.light .border-\[\#C8A03A\] {
   border-color: #92710A !important;
 }
-:root.light .bg-\[\#1F2A44\]\/\[0\.07\] {
-  background: rgba(31,42,68,0.06) !important;
+:root.light .border-\[\#C8A03A\]\/30,
+:root.light .border-\[\#C8A03A\]\/25,
+:root.light .border-\[\#C8A03A\]\/\[0\.19\],
+:root.light .border-\[\#C8A03A\]\/\[0\.12\] {
+  border-color: rgba(146, 113, 10, 0.25) !important;
 }
 :root.light .text-\[\#1F2A44\] {
-  color: #1F2A44 !important;
+  color: #1e293b !important;
+}
+
+/* Progress bar backgrounds in gradient cards */
+:root.light .bg-gradient-to-br.from-\[\#1F2A44\].to-\[\#1F2A44\] .bg-\[\#F8F9FB\]\/20 {
+  background: rgba(0, 0, 0, 0.12) !important;
+}
+:root.light .bg-gradient-to-br.from-\[\#1F2A44\].to-\[\#1F2A44\] .bg-\[\#F8F9FB\] {
+  background: #1e293b !important;
+}
+
+/* Inline style gradients (approval, buttons) — force via filter */
+:root.light .bg-black\/50 {
+  background: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Recharts — light mode grid */
+:root.light .recharts-cartesian-grid-horizontal line,
+:root.light .recharts-cartesian-grid-vertical line {
+  stroke: rgba(0, 0, 0, 0.08) !important;
 }
