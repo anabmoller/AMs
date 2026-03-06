@@ -188,8 +188,8 @@ body {
 :root.light .text-white {
   color: #111827 !important;
 }
-/* Force white text on dark/colored CTA backgrounds in light mode */
-.text-on-dark {
+/* Force white text on dark/colored CTA backgrounds — @utility ensures Tailwind v4 preserves it */
+@utility text-on-dark {
   color: #ffffff !important;
 }
 :root.light .text-white\/70 {
