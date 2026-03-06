@@ -15,7 +15,34 @@ import PageHeader from "../common/PageHeader";
 import SearchInput from "../common/SearchInput";
 import MovimientoCard from "./MovimientoCard";
 import RebanhoAtivo from "./RebanhoAtivo";
+import HaciendaKpiCard from "./HaciendaKpiCard";
 
+/* ────────────────────────────────────────────────────────────────
+   Tab button — matches AnalysisScreen pill pattern exactly
+   ──────────────────────────────────────────────────────────────── */
+const TABS = [
+  { key: "movimientos", label: "Movimientos" },
+  { key: "hato",        label: "Hato" },
+];
+
+function TabButton({ label, active, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-3.5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+        active
+          ? "bg-[#1F2A44]/10 text-[#C8A03A] border border-[#C8A03A]/30"
+          : "bg-[#F8F9FB]/[0.03] text-slate-500 border border-white/[0.06] hover:bg-[#F8F9FB]/[0.06]"
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────
+   Filter pill — status pills for Movimientos tab
+   ──────────────────────────────────────────────────────────────── */
 function FilterPill({ label, active, onClick, color }) {
   return (
     <button
@@ -31,24 +58,13 @@ function FilterPill({ label, active, onClick, color }) {
   );
 }
 
-function KpiCard({ label, value, icon, color, loading }) {
-  return (
-    <div className="bg-[#13141a] border border-white/[0.06] rounded-xl p-4 flex-1 min-w-[140px]">
-      <div className="flex items-center gap-2 mb-1">
-        <span className="text-lg">{icon}</span>
-        <span className="text-[10px] text-slate-500 uppercase tracking-wider font-medium">{label}</span>
-      </div>
-      <div className="text-2xl font-bold" style={{ color: color || "#fff" }}>
-        {loading ? (
-          <span className="inline-block w-12 h-6 bg-white/[0.04] rounded animate-pulse" />
-        ) : value}
-      </div>
-    </div>
-  );
-}
 
+/* ────────────────────────────────────────────────────────────────
+   MovimientosScreen — Hacienda shell
+   ──────────────────────────────────────────────────────────────── */
 export default function MovimientosScreen({ onBack, onNavigate }) {
   const { currentUser } = useAuth();
+  const [activeTab, setActiveTab] = useState("movimientos");
   const [movimientos, setMovimientos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -159,21 +175,44 @@ export default function MovimientosScreen({ onBack, onNavigate }) {
   const establishments = getEstablishments();
   const canCreate = hasPermission(currentUser, "create_movimiento_ganado");
 
+  const subtitles = {
+    movimientos: `${totalMovimientos} movimientos — Compras, ventas y traslados operativos`,
+    hato: "Inventario animal activo por establecimiento",
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">
+      {/* ── Shell header ── */}
       <PageHeader
-        title="Movimientos de Ganado"
-        subtitle={`${totalMovimientos} movimientos — Compras, ventas y traslados operativos`}
+        title="Hacienda"
+        subtitle={subtitles[activeTab]}
         onBack={onBack}
       />
 
+      {/* ── Tab switcher — matches production AnalysisScreen pill row ── */}
+      <div className="flex gap-1.5 mb-6">
+        {TABS.map(t => (
+          <TabButton
+            key={t.key}
+            label={t.label}
+            active={activeTab === t.key}
+            onClick={() => setActiveTab(t.key)}
+          />
+        ))}
+      </div>
+
+      {/* ── Hato tab ── */}
+      {activeTab === "hato" && <RebanhoAtivo />}
+
+      {/* ── Movimientos tab ── */}
+      {activeTab === "movimientos" && (<>
       {/* KPI cards — purchase-centric */}
       <div className="flex gap-3 overflow-x-auto pb-2 mb-6 scrollbar-hide">
-        <KpiCard label="Compras del Mes" value={hKpis?.monthlyPurchases ?? "—"} icon={<ShoppingCart size={18} />} color="#22c55e" loading={hKpisLoading} />
-        <KpiCard label="Entradas Mes" value={hKpis?.monthlyEntries ?? "—"} icon={<ArrowDownCircle size={18} />} color="#3b82f6" loading={hKpisLoading} />
-        <KpiCard label="Total Cabezas" value={(hKpis?.totalAnimals ?? kpis.totalCabezas).toLocaleString("es-PY")} icon={<BullIcon size={18} />} color="#8b5cf6" loading={hKpisLoading} />
-        <KpiCard label="Ventas Mes" value={hKpis?.monthlySales ?? "—"} icon={<ArrowUpCircle size={18} />} color="#C8A03A" loading={hKpisLoading} />
-        <KpiCard label="Mortalidades" value={hKpis?.totalMortalities ?? "—"} icon={<Skull size={18} />} color="#ef4444" loading={hKpisLoading} />
+        <HaciendaKpiCard label="Compras del Mes" value={hKpis?.monthlyPurchases ?? "—"} icon={<ShoppingCart size={18} />} color="#22c55e" loading={hKpisLoading} />
+        <HaciendaKpiCard label="Entradas Mes" value={hKpis?.monthlyEntries ?? "—"} icon={<ArrowDownCircle size={18} />} color="#3b82f6" loading={hKpisLoading} />
+        <HaciendaKpiCard label="Total Cabezas" value={(hKpis?.totalAnimals ?? kpis.totalCabezas).toLocaleString("es-PY")} icon={<BullIcon size={18} />} color="#8b5cf6" loading={hKpisLoading} />
+        <HaciendaKpiCard label="Ventas Mes" value={hKpis?.monthlySales ?? "—"} icon={<ArrowUpCircle size={18} />} color="#C8A03A" loading={hKpisLoading} />
+        <HaciendaKpiCard label="Mortalidades" value={hKpis?.totalMortalities ?? "—"} icon={<Skull size={18} />} color="#ef4444" loading={hKpisLoading} />
       </div>
 
       {/* Filters */}
@@ -186,7 +225,7 @@ export default function MovimientosScreen({ onBack, onNavigate }) {
         <select
           value={filterEstablishment}
           onChange={(e) => handleEstablishmentChange(e.target.value)}
-          className="bg-[#13141a] border border-white/[0.06] text-slate-300 text-xs rounded-lg px-3 py-2 min-w-[160px]"
+          className="bg-[#F8F9FB]/[0.05] border border-white/[0.1] text-slate-300 text-xs rounded-lg px-3 py-2 min-w-[160px] outline-none focus:border-[#C8A03A]/50"
         >
           <option value="all">Todos los establecimientos</option>
           {establishments.map(e => (
@@ -207,11 +246,6 @@ export default function MovimientosScreen({ onBack, onNavigate }) {
             color={s.color}
           />
         ))}
-      </div>
-
-      {/* ── Rebanho Ativo section ── */}
-      <div className="mb-8 -mx-4 rounded-xl overflow-hidden">
-        <RebanhoAtivo />
       </div>
 
       {/* Loading */}
@@ -247,9 +281,10 @@ export default function MovimientosScreen({ onBack, onNavigate }) {
           ))}
         </div>
       )}
+      </>)}
 
       {/* FAB for new movimiento */}
-      {canCreate && (
+      {canCreate && activeTab === "movimientos" && (
         <button
           onClick={() => onNavigate("ganado-new")}
           className="fixed bottom-20 right-5 sm:bottom-8 sm:right-8 w-14 h-14 rounded-full bg-[#C8A03A] text-white text-2xl font-bold shadow-lg shadow-[#C8A03A]/20 hover:bg-[#b8922f] transition-colors flex items-center justify-center z-40"
