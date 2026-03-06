@@ -1,5 +1,5 @@
 // ============================================================
-// YPOTI — Edge Function: request-mutations
+// SIGAM — Edge Function: request-mutations
 // Actions: create, update, add-comment, add-quotation
 // ============================================================
 
@@ -171,6 +171,19 @@ Deno.serve(async (req) => {
         const { requestUuid: commentReqId, texto } = payload;
         if (!commentReqId || !texto) {
           throw new Error("requestUuid and texto are required");
+        }
+
+        // PR-3: Verify caller can see the request before allowing comment
+        if (!hasPermission(caller, "view_all_requests")) {
+          const { data: commentReq, error: commentReqErr } = await supabaseAdmin
+            .from("requests")
+            .select("created_by")
+            .eq("id", commentReqId)
+            .single();
+          if (commentReqErr) throw commentReqErr;
+          if (commentReq.created_by !== caller.id) {
+            throw new Error("Not authorized to comment on this request");
+          }
         }
 
         const { error } = await supabaseAdmin.from("comments").insert({

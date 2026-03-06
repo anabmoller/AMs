@@ -1,5 +1,5 @@
 // ============================================================
-// YPOTI — Edge Function: ganado-mutations
+// SIGAM — Edge Function: ganado-mutations
 // Actions: create, update, validate, advance-status,
 //          add-categories, update-category, remove-category,
 //          add-divergence, resolve-divergence,
@@ -350,6 +350,10 @@ Deno.serve(async (req) => {
       // ADD DIVERGENCE
       // ─────────────────────────────────────────────────
       case "add-divergence": {
+        // PR-3: require ganado permission to report divergences
+        if (!hasPermission(caller, "view_ganado")) {
+          throw new Error("No permission to report divergences");
+        }
         const { movimientoUuid: divUuid, divergencia } = payload;
         if (!divUuid || !divergencia) throw new Error("movimientoUuid and divergencia are required");
 
@@ -373,6 +377,10 @@ Deno.serve(async (req) => {
       // RESOLVE DIVERGENCE
       // ─────────────────────────────────────────────────
       case "resolve-divergence": {
+        // PR-3: only users who can validate movements can resolve divergences
+        if (!hasPermission(caller, "validate_movimiento_ganado")) {
+          throw new Error("No permission to resolve divergences");
+        }
         const { divergenciaId, resolucion } = payload;
         if (!divergenciaId) throw new Error("divergenciaId is required");
 
@@ -394,6 +402,10 @@ Deno.serve(async (req) => {
       // ADD ATTACHMENT
       // ─────────────────────────────────────────────────
       case "add-attachment": {
+        // PR-3: require ganado create permission to attach files
+        if (!hasPermission(caller, "create_movimiento_ganado")) {
+          throw new Error("No permission to add attachments");
+        }
         const { movimientoUuid: attUuid, archivo } = payload;
         if (!attUuid || !archivo) throw new Error("movimientoUuid and archivo are required");
 
