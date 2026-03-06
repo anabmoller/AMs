@@ -39,7 +39,7 @@ export default function RequestTypeSelector({ types = [], onSelect, onClose }) {
                   hover:border-[#C8A03A]/40 transition-all text-left group"
               >
                 <span className="flex items-center justify-center w-10 h-10 rounded-lg bg-white/10 text-[#C8A03A] group-hover:bg-[#C8A03A]/20 transition-colors">
-                  {Icon && typeof Icon === "function" ? (
+                  {Icon && (typeof Icon === "function" || (typeof Icon === "object" && Icon.$$typeof)) ? (
                     <Icon size={20} />
                   ) : (
                     <span className="text-lg">{Icon}</span>

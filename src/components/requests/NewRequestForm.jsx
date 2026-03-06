@@ -186,7 +186,7 @@ export default function NewRequestForm({ onSubmit, onCancel, usdRate = 7800, usd
       <div className="px-5">
         {requestType && (
           <div className="flex items-center gap-1.5 mb-2 text-slate-400">
-            {requestType.icon && typeof requestType.icon === "function"
+            {requestType.icon && (typeof requestType.icon === "function" || (typeof requestType.icon === "object" && requestType.icon.$$typeof))
               ? <requestType.icon size={14} />
               : <span className="text-sm">{requestType.icon}</span>}
             <span className="text-[11px] font-semibold uppercase tracking-wide">{requestType.label}</span>
