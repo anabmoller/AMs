@@ -4,12 +4,11 @@ import { hasPermission } from "../../constants/users";
 import { getEstablishments } from "../../constants/parameters";
 import {
   GANADO_STATUS_FLOW, GANADO_EXTRA_STATUSES,
-  TIPO_OPERACION_OPTIONS,
   fetchMovimientos,
   fetchGanadoMetrics,
 } from "../../constants/ganado";
 import { getHaciendaKPIs } from "../../lib/hacendaService";
-import { ShoppingCart, ArrowDownCircle, ArrowUpCircle, Skull, DollarSign } from "lucide-react";
+import { ShoppingCart, ArrowDownCircle, ArrowUpCircle, Skull } from "lucide-react";
 import { BullIcon } from "../icons";
 import PageHeader from "../common/PageHeader";
 import SearchInput from "../common/SearchInput";
