@@ -1,5 +1,5 @@
 // ============================================================
-// YPOTI — Edge Function: request-workflow
+// SIGAM — Edge Function: request-workflow
 // Actions: confirm, approve, reject, revision, advance
 // The most security-critical function: handles approval flow,
 // budget consumption, and status transitions SERVER-SIDE.
@@ -16,7 +16,9 @@ import {
   calculateApprovalSteps,
   isFullyApproved,
   canUserApproveStep,
+  parseApprovalConfigRows,
   STEP_STATUS,
+  type DynamicParams,
 } from "../_shared/approvalEngine.ts";
 import { sanitizeText, sanitizeMultiline } from "../_shared/sanitize.ts";
 
@@ -66,12 +68,19 @@ Deno.serve(async (req) => {
           name: u.name,
         }));
 
-        // Load dynamic params for approval engine
-        const [estabRes, compRes] = await Promise.all([
+        // Load dynamic params for approval engine (DB-driven config)
+        const [estabRes, compRes, configRes] = await Promise.all([
           supabaseAdmin.from("establishments").select("name, company:companies(name), manager").eq("active", true),
-          supabaseAdmin.from("companies").select("name, director"),
+          supabaseAdmin.from("companies").select("name, director, president"),
+          supabaseAdmin.from("approval_config").select("category, key, value"),
         ]);
-        const dynamicParams = {
+
+        // Parse approval_config rows into typed config (falls back to hardcoded defaults)
+        const config = configRes.data
+          ? parseApprovalConfigRows(configRes.data as Array<{ category: string; key: string; value: string }>)
+          : undefined;
+
+        const dynamicParams: DynamicParams = {
           establishments: (estabRes.data || []).map((e: Record<string, unknown>) => ({
             name: e.name as string,
             company: (e.company as Record<string, string>)?.name || "",
@@ -80,7 +89,9 @@ Deno.serve(async (req) => {
           companies: (compRes.data || []).map((c: Record<string, unknown>) => ({
             name: c.name as string,
             director: c.director as string || "",
+            president: (c as Record<string, unknown>).president as string || "",
           })),
+          config,
         };
 
         // Find matching budget
@@ -181,20 +192,22 @@ Deno.serve(async (req) => {
         const { requestUuid, comment } = payload;
         if (!requestUuid) throw new Error("requestUuid is required");
 
-        // Load request + steps
-        const { data: request, error: reqErr } = await supabaseAdmin
-          .from("requests")
-          .select("*")
-          .eq("id", requestUuid)
-          .single();
+        // Load request + steps + config in parallel
+        const [reqResult, stepsResult, approveConfigRes] = await Promise.all([
+          supabaseAdmin.from("requests").select("*").eq("id", requestUuid).single(),
+          supabaseAdmin.from("approval_steps").select("*").eq("request_id", requestUuid).order("step_order", { ascending: true }),
+          supabaseAdmin.from("approval_config").select("category, key, value").eq("category", "super_approver"),
+        ]);
+        const { data: request, error: reqErr } = reqResult;
         if (reqErr) throw reqErr;
-
-        const { data: steps, error: stepsErr } = await supabaseAdmin
-          .from("approval_steps")
-          .select("*")
-          .eq("request_id", requestUuid)
-          .order("step_order", { ascending: true });
+        const { data: steps, error: stepsErr } = stepsResult;
         if (stepsErr) throw stepsErr;
+
+        // Parse super-approvers from DB
+        const superApprovers: Record<string, number> = {};
+        for (const row of (approveConfigRes.data || []) as Array<{ key: string; value: string }>) {
+          superApprovers[row.key] = row.value === "Infinity" ? Infinity : (Number(row.value) || 0);
+        }
 
         // Find current pending step
         const currentStep = (steps || []).find(
@@ -204,7 +217,7 @@ Deno.serve(async (req) => {
 
         // Authorization: caller must be the designated approver or a super-approver
         const totalAmount = Number(request.total_amount) || 0;
-        if (!canUserApproveStep(caller.username, { approverUsername: currentStep.approver_username }, totalAmount)) {
+        if (!canUserApproveStep(caller.username, { approverUsername: currentStep.approver_username }, totalAmount, Object.keys(superApprovers).length > 0 ? superApprovers : undefined)) {
           throw new Error(
             `Not authorized: expected ${currentStep.approver_username}, got ${caller.username}`,
           );
@@ -308,23 +321,28 @@ Deno.serve(async (req) => {
         const { requestUuid, reason } = payload;
         if (!requestUuid) throw new Error("requestUuid is required");
 
-        // Load steps
-        const { data: steps } = await supabaseAdmin
-          .from("approval_steps")
-          .select("*")
-          .eq("request_id", requestUuid)
-          .order("step_order", { ascending: true });
+        // Load steps + request + super-approvers in parallel
+        const [rejectStepsRes, rejectReqRes, rejectConfigRes] = await Promise.all([
+          supabaseAdmin.from("approval_steps").select("*").eq("request_id", requestUuid).order("step_order", { ascending: true }),
+          supabaseAdmin.from("requests").select("total_amount").eq("id", requestUuid).single(),
+          supabaseAdmin.from("approval_config").select("category, key, value").eq("category", "super_approver"),
+        ]);
+        const { data: steps } = rejectStepsRes;
 
         const currentStep = (steps || []).find(
           (s: Record<string, unknown>) => s.status === "pending",
         );
         if (!currentStep) throw new Error("No pending step found");
 
+        // Parse super-approvers from DB
+        const rejectSuperApprovers: Record<string, number> = {};
+        for (const row of (rejectConfigRes.data || []) as Array<{ key: string; value: string }>) {
+          rejectSuperApprovers[row.key] = row.value === "Infinity" ? Infinity : (Number(row.value) || 0);
+        }
+
         // Authorization (includes super-approvers)
-        const { data: reqForReject } = await supabaseAdmin
-          .from("requests").select("total_amount").eq("id", requestUuid).single();
-        const rejectAmount = Number(reqForReject?.total_amount) || 0;
-        if (!canUserApproveStep(caller.username, { approverUsername: currentStep.approver_username }, rejectAmount)) {
+        const rejectAmount = Number(rejectReqRes.data?.total_amount) || 0;
+        if (!canUserApproveStep(caller.username, { approverUsername: currentStep.approver_username }, rejectAmount, Object.keys(rejectSuperApprovers).length > 0 ? rejectSuperApprovers : undefined)) {
           throw new Error("Not authorized to reject this step");
         }
 
@@ -370,23 +388,28 @@ Deno.serve(async (req) => {
         const { requestUuid, reason } = payload;
         if (!requestUuid) throw new Error("requestUuid is required");
 
-        // Load steps
-        const { data: steps } = await supabaseAdmin
-          .from("approval_steps")
-          .select("*")
-          .eq("request_id", requestUuid)
-          .order("step_order", { ascending: true });
+        // Load steps + request + super-approvers in parallel
+        const [revStepsRes, revReqRes, revConfigRes] = await Promise.all([
+          supabaseAdmin.from("approval_steps").select("*").eq("request_id", requestUuid).order("step_order", { ascending: true }),
+          supabaseAdmin.from("requests").select("total_amount").eq("id", requestUuid).single(),
+          supabaseAdmin.from("approval_config").select("category, key, value").eq("category", "super_approver"),
+        ]);
+        const { data: steps } = revStepsRes;
 
         const currentStep = (steps || []).find(
           (s: Record<string, unknown>) => s.status === "pending",
         );
         if (!currentStep) throw new Error("No pending step found");
 
+        // Parse super-approvers from DB
+        const revSuperApprovers: Record<string, number> = {};
+        for (const row of (revConfigRes.data || []) as Array<{ key: string; value: string }>) {
+          revSuperApprovers[row.key] = row.value === "Infinity" ? Infinity : (Number(row.value) || 0);
+        }
+
         // Authorization: caller must be the designated approver (same as approve/reject)
-        const { data: reqForRevision } = await supabaseAdmin
-          .from("requests").select("total_amount").eq("id", requestUuid).single();
-        const revisionAmount = Number(reqForRevision?.total_amount) || 0;
-        if (!canUserApproveStep(caller.username, { approverUsername: currentStep.approver_username }, revisionAmount)) {
+        const revisionAmount = Number(revReqRes.data?.total_amount) || 0;
+        if (!canUserApproveStep(caller.username, { approverUsername: currentStep.approver_username }, revisionAmount, Object.keys(revSuperApprovers).length > 0 ? revSuperApprovers : undefined)) {
           throw new Error("Not authorized to send this step for revision");
         }
 
