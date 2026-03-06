@@ -209,6 +209,11 @@ export default function MovimientosScreen({ onBack, onNavigate }) {
         ))}
       </div>
 
+      {/* ── Rebanho Ativo section ── */}
+      <div className="mb-8 -mx-4 rounded-xl overflow-hidden">
+        <RebanhoAtivo />
+      </div>
+
       {/* Loading */}
       {loading && (
         <div className="text-center py-12">
@@ -242,11 +247,6 @@ export default function MovimientosScreen({ onBack, onNavigate }) {
           ))}
         </div>
       )}
-
-      {/* ── Rebanho Ativo section ── */}
-      <div className="mt-10 -mx-4 rounded-xl overflow-hidden">
-        <RebanhoAtivo />
-      </div>
 
       {/* FAB for new movimiento */}
       {canCreate && (
