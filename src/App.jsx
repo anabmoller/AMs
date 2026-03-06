@@ -163,6 +163,17 @@ function AppContent() {
     return () => document.removeEventListener('keydown', handler);
   }, []);
 
+  // Filter requests based on permissions (super_admin sees all, others see own only)
+  const visibleRequests = useMemo(() => {
+    if (!effectiveUser) return [];
+    if (isSuperAdmin(effectiveUser)) return requests;
+    return requests.filter(r =>
+      r.createdById === effectiveUser.id ||
+      r.requester === effectiveUser.name ||
+      r.assignee === effectiveUser.name
+    );
+  }, [requests, effectiveUser]);
+
   // Loading spinner
   if (loading) {
     return (
@@ -194,16 +205,6 @@ function AppContent() {
       </div>
     );
   }
-
-  // Filter requests based on permissions (super_admin sees all, others see own only)
-  const visibleRequests = useMemo(() => {
-    if (isSuperAdmin(effectiveUser)) return requests;
-    return requests.filter(r =>
-      r.createdById === effectiveUser.id ||
-      r.requester === effectiveUser.name ||
-      r.assignee === effectiveUser.name
-    );
-  }, [requests, effectiveUser]);
 
   const filtered = visibleRequests.filter(r => {
     if (filterStatus !== "all" && normalizeStatus(r.status) !== filterStatus) return false;
