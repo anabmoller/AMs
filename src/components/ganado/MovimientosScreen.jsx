@@ -14,6 +14,7 @@ import { BullIcon } from "../icons";
 import PageHeader from "../common/PageHeader";
 import SearchInput from "../common/SearchInput";
 import MovimientoCard from "./MovimientoCard";
+import RebanhoAtivo from "./RebanhoAtivo";
 
 function FilterPill({ label, active, onClick, color }) {
   return (
@@ -241,6 +242,11 @@ export default function MovimientosScreen({ onBack, onNavigate }) {
           ))}
         </div>
       )}
+
+      {/* ── Rebanho Ativo section ── */}
+      <div className="mt-10 -mx-4 rounded-xl overflow-hidden">
+        <RebanhoAtivo />
+      </div>
 
       {/* FAB for new movimiento */}
       {canCreate && (
