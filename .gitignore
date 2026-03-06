@@ -41,6 +41,12 @@ _catalog.json
 _suppliers.json
 run_mega_correction.sh
 
+# Large data / legacy directories (not part of the app)
+PDR/
+Tudo boi/
+ganado_pipeline/
+*.xlsx
+
 # Claude Code config
 .claude/
 PLAN.md
