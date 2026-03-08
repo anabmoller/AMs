@@ -25,7 +25,7 @@ const ALL_MODULES = [
 /**
  * Roles that count as "super admin" — full unrestricted access.
  */
-const SUPER_ADMIN_ROLES = ["admin", "presidente"];
+const SUPER_ADMIN_ROLES = ["admin", "presidente", "superadmin"];
 
 /* ------------------------------------------------------------------ */
 /*  Initialisation (called once on app boot)                           */

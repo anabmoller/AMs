@@ -173,6 +173,62 @@ export const ROLES = {
       "view_ganado",
     ],
   },
+  // ── Roles canónicos P0 ─────────────────────────────────
+  superadmin: {
+    key: "superadmin",
+    label: "Super Administrador",
+    description: "Acceso completo al sistema — rol canónico P0",
+    color: "#8b2131",
+    permissions: [
+      "create_request", "view_all_requests", "approve_manager",
+      "approve_purchase", "manage_quotations", "advance_status",
+      "view_analytics", "view_inventory", "manage_settings", "manage_users",
+      "view_ganado", "create_movimiento_ganado", "validate_movimiento_ganado",
+    ],
+  },
+  aprobador: {
+    key: "aprobador",
+    label: "Aprobador",
+    description: "Aprobación de solicitudes — rol canónico P0",
+    color: "#dc2626",
+    permissions: [
+      "create_request", "view_all_requests", "approve_manager",
+      "approve_purchase", "view_analytics", "view_inventory", "advance_status",
+      "view_ganado", "create_movimiento_ganado", "validate_movimiento_ganado",
+    ],
+  },
+  autorizador: {
+    key: "autorizador",
+    label: "Autorizador",
+    description: "Autorización de solicitudes — rol canónico P0",
+    color: "#2d5a27",
+    permissions: [
+      "create_request", "view_all_requests", "approve_manager",
+      "approve_purchase", "view_analytics", "view_inventory", "advance_status",
+      "view_ganado", "create_movimiento_ganado", "validate_movimiento_ganado",
+    ],
+  },
+  parametrizador: {
+    key: "parametrizador",
+    label: "Parametrizador",
+    description: "Gestión de parámetros del sistema — rol canónico P0",
+    color: "#64748b",
+    permissions: [
+      "create_request", "view_all_requests", "view_analytics",
+      "view_inventory", "manage_settings",
+      "view_ganado",
+    ],
+  },
+  soporte_tecnico: {
+    key: "soporte_tecnico",
+    label: "Soporte Técnico",
+    description: "Soporte técnico con acceso de lectura — rol canónico P0",
+    color: "#78716c",
+    permissions: [
+      "view_all_requests", "view_inventory", "view_analytics",
+      "view_ganado",
+    ],
+  },
 };
 
 // ---- Module-level cache ----

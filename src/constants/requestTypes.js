@@ -79,7 +79,7 @@ export function getAvailableRequestTypes(user) {
   const role = user.role || "solicitante";
 
   // Super admins see all types
-  if (["admin", "presidente"].includes(role)) {
+  if (["admin", "presidente", "superadmin"].includes(role)) {
     return REQUEST_TYPES;
   }
 

@@ -13,7 +13,7 @@ const DEV_USERS = [
 
 export default function SettingsScreen({ onBack, onNavigate, devMode, onSetDevMode }) {
   const { currentUser, logout, can } = useAuth();
-  const role = ROLES[currentUser.role];
+  const role = ROLES[currentUser.role] || { label: currentUser.role, permissions: [] };
 
   return (
     <div className="animate-fadeIn">
