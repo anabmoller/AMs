@@ -128,7 +128,9 @@ export async function initParameters() {
 // ============================================================
 
 export function getParameters() { return _params; }
-export function getEstablishments() { return _params.establishments.filter(e => e.active); }
+export function getEstablishments() {
+  return _params.establishments.filter(e => e.active && e.tipo_entidad === "establecimiento");
+}
 export function getSectors() { return _params.sectors.filter(s => s.active); }
 export function getProductTypes() { return _params.productTypes.filter(p => p.active); }
 export function getSuppliers() { return _params.suppliers.filter(s => s.active); }
